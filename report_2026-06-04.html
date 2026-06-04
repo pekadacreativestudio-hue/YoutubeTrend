@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>YouTube Trend Analysis — Hardcord Targeting Report</title>
+  <style>
+    /* ------------------------------------------------------------------ */
+    /* Reset & base                                                         */
+    /* ------------------------------------------------------------------ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: #0f0f13;
+      color: #e0e0e8;
+      min-height: 100vh;
+      padding: 0 0 60px;
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Header                                                               */
+    /* ------------------------------------------------------------------ */
+    header {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      padding: 40px 32px 32px;
+      border-bottom: 3px solid #e94560;
+      position: relative;
+      overflow: hidden;
+    }
+
+    header::before {
+      content: '';
+      position: absolute;
+      top: -60px; right: -60px;
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(233,69,96,0.15) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .brand-tag {
+      display: inline-block;
+      background: #e94560;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 3px;
+      margin-bottom: 14px;
+    }
+
+    h1 {
+      font-size: clamp(20px, 4vw, 32px);
+      font-weight: 800;
+      color: #ffffff;
+      line-height: 1.2;
+      margin-bottom: 8px;
+    }
+
+    h1 span { color: #e94560; }
+
+    .subtitle {
+      font-size: 15px;
+      color: #a0aec0;
+      font-weight: 400;
+      margin-bottom: 20px;
+    }
+
+    .meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+      margin-top: 8px;
+    }
+
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 13px;
+      color: #718096;
+    }
+
+    .meta-item strong {
+      color: #cbd5e0;
+      font-weight: 600;
+    }
+
+    .meta-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #e94560;
+      display: inline-block;
+      flex-shrink: 0;
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Main content                                                         */
+    /* ------------------------------------------------------------------ */
+    .content {
+      max-width: 1200px;
+      margin: 36px auto 0;
+      padding: 0 24px;
+    }
+
+    .section-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #718096;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #2d3748;
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Table wrapper                                                         */
+    /* ------------------------------------------------------------------ */
+    .table-wrapper {
+      overflow-x: auto;
+      border-radius: 12px;
+      border: 1px solid #2d3748;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    thead tr {
+      background: #1a202c;
+    }
+
+    thead th {
+      padding: 14px 16px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #718096;
+      border-bottom: 2px solid #2d3748;
+      white-space: nowrap;
+    }
+
+    thead th.numeric { text-align: right; }
+
+    tbody tr {
+      background: #171923;
+      transition: background 0.15s;
+    }
+
+    tbody tr:nth-child(even) {
+      background: #1a202c;
+    }
+
+    tbody tr:hover {
+      background: #2d3748;
+    }
+
+    tbody tr:last-child td { border-bottom: none; }
+
+    td {
+      padding: 13px 16px;
+      border-bottom: 1px solid #2d3748;
+      vertical-align: middle;
+    }
+
+    td.numeric { text-align: right; font-variant-numeric: tabular-nums; }
+
+    /* Rank column */
+    .rank-cell {
+      font-size: 18px;
+      font-weight: 800;
+      color: #4a5568;
+      text-align: center;
+      width: 52px;
+    }
+
+    .rank-cell.top3 { color: #e94560; }
+
+    /* Channel name */
+    .channel-name {
+      font-weight: 600;
+      color: #e2e8f0;
+      max-width: 220px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* Category badge */
+    .category-badge {
+      display: inline-block;
+      padding: 3px 9px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      background: #2d3748;
+      color: #90cdf4;
+      white-space: nowrap;
+    }
+
+    /* Numbers */
+    .number {
+      color: #a0aec0;
+      font-size: 13px;
+    }
+
+    /* Engagement rate */
+    .engagement {
+      color: #68d391;
+      font-weight: 600;
+    }
+
+    /* Score badge — color-coded */
+    .score-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 13px;
+      min-width: 80px;
+      white-space: nowrap;
+    }
+
+    .score-high {
+      background: rgba(72, 187, 120, 0.15);
+      color: #68d391;
+      border: 1px solid rgba(72, 187, 120, 0.3);
+    }
+
+    .score-mid {
+      background: rgba(236, 201, 75, 0.15);
+      color: #f6e05e;
+      border: 1px solid rgba(236, 201, 75, 0.3);
+    }
+
+    .score-low {
+      background: rgba(245, 101, 101, 0.12);
+      color: #fc8181;
+      border: 1px solid rgba(245, 101, 101, 0.25);
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Legend                                                               */
+    /* ------------------------------------------------------------------ */
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-top: 20px;
+      padding: 16px 20px;
+      background: #1a202c;
+      border-radius: 8px;
+      border: 1px solid #2d3748;
+    }
+
+    .legend-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #718096;
+      width: 100%;
+      margin-bottom: 4px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: #a0aec0;
+    }
+
+    .legend-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+    }
+
+    .dot-high  { background: #68d391; }
+    .dot-mid   { background: #f6e05e; }
+    .dot-low   { background: #fc8181; }
+
+    /* ------------------------------------------------------------------ */
+    /* Score formula box                                                    */
+    /* ------------------------------------------------------------------ */
+    .formula-box {
+      margin-top: 28px;
+      padding: 18px 22px;
+      background: #1a202c;
+      border: 1px solid #2d3748;
+      border-left: 4px solid #e94560;
+      border-radius: 8px;
+      font-size: 13px;
+      color: #a0aec0;
+      line-height: 1.8;
+    }
+
+    .formula-box strong { color: #e2e8f0; }
+
+    code {
+      background: #2d3748;
+      color: #90cdf4;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-family: 'Cascadia Code', 'Fira Code', monospace;
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Footer                                                               */
+    /* ------------------------------------------------------------------ */
+    footer {
+      max-width: 1200px;
+      margin: 48px auto 0;
+      padding: 20px 24px;
+      border-top: 1px solid #2d3748;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      font-size: 12px;
+      color: #4a5568;
+    }
+
+    footer span { color: #718096; }
+    footer strong { color: #a0aec0; }
+
+    /* ------------------------------------------------------------------ */
+    /* Responsive                                                           */
+    /* ------------------------------------------------------------------ */
+    @media (max-width: 640px) {
+      header { padding: 28px 16px 24px; }
+      .content { padding: 0 12px; }
+      td, th { padding: 10px 10px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ================================================================== -->
+  <!-- Header                                                               -->
+  <!-- ================================================================== -->
+  <header>
+    <div class="header-inner">
+      <div class="brand-tag">Hardcord Targeting</div>
+      <h1>YouTube Trend Analysis — <span>Hardcord</span> Targeting Report</h1>
+      <p class="subtitle">Top Channels for 6-Second Ad Placement</p>
+      <div class="meta-row">
+        <div class="meta-item">
+          <span class="meta-dot"></span>
+          <span>Generated: <strong>2026-06-04 12:13:27</strong></span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-dot"></span>
+          <span>Region: <strong>LK</strong></span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-dot"></span>
+          <span>Channels analysed: <strong>50</strong></span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================================================================== -->
+  <!-- Content                                                              -->
+  <!-- ================================================================== -->
+  <div class="content">
+
+    <p class="section-title">Top 20 Trending Channels — Ranked by Hardcord Score</p>
+
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th style="text-align:center;">#</th>
+            <th>Channel Name</th>
+            <th>Category</th>
+            <th class="numeric">Subscribers</th>
+            <th class="numeric">Total Views</th>
+            <th class="numeric">Avg Likes</th>
+            <th class="numeric">Engagement %</th>
+            <th class="numeric">Hardcord Score</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+          <tr>
+            <td class="rank-cell top3">
+              1
+            </td>
+            <td>
+              <div class="channel-name" title="shakiraVEVO">shakiraVEVO</div>
+            </td>
+            <td>
+              <span class="category-badge">Music</span>
+            </td>
+            <td class="numeric number">18,200,000</td>
+            <td class="numeric number">73,861,336</td>
+            <td class="numeric number">2,281,326</td>
+            <td class="numeric engagement">3.09%</td>
+            <td class="numeric">
+              
+                <span class="score-badge score-high">1656.2590</span>
+              
+            </td>
+          </tr>
+          
+          <tr>
+            <td class="rank-cell top3">
+              2
+            </td>
+            <td>
+              <div class="channel-name" title="Sun TV">Sun TV</div>
+            </td>
+            <td>
+              <span class="category-badge">Entertainment</span>
+            </td>
+            <td class="numeric number">32,400,000</td>
+            <td class="numeric number">14,318,720</td>
+            <td class="numeric number">391,936</td>
+            <td class="numeric engagement">2.74%</td>
+            <td class="numeric">
+              
+                <span class="score-badge score-low">294.3653</span>
+              
+            </td>
+          </tr>
+          
+          <tr>
+            <td class="rank-cell top3">
+              3
+            </td>
+            <td>
+              <div class="channel-name" title="PlayStation">PlayStation</div>
+            </td>
+            <td>
+              <span class="category-badge">Gaming</span>
+            </td>
+            <td class="numeric number">17,100,000</td>
+            <td class="numeric number">4,615,995</td>
+            <td class="numeric number">310,319</td>
+            <td class="numeric engagement">6.72%</td>
+            <td class="numeric">
+              
+                <span class="score-badge score-low">224.4536</span>
+              
+            </td>
+          </tr>
+          
+          <tr>
+            <td class="rank-cell ">
+              4
+            </td>
+            <td>
+              <div class="channel-name" title="Anirudh Ravichander - Topic">Anirudh Ravichander - Topic</div>
+            </td>
+            <td>
+              <span class="category-badge">Music</span>
+            </td>
+            <td class="numeric number">27,200</td>
+            <td class="numeric number">22,928,543</td>
+            <td class="numeric number">497,350</td>
+            <td class="numeric engagement">2.17%</td>
+            <td class="numeric">
+              
+                <span class="score-badge score-low">220.5533</span>
+              
+            </td>
+          </tr>
+          
+          <tr>
+            <td class="rank-cell ">
+              5
+            </td>
+            <td>
+              <div class="channel-name" title="Call of Duty">Call of Duty</div>
+            </td>
+            <td>
+              <span class="category-badge">Gaming</span>
+            </td>
+            <td class="numeric number">8,150,000</td>
+            <td class="numeric number">30,961,191</td>
+            <td class="numeric number">213,522</td>
+            <td class="numeric engagement">0.69%</td>
+            <td class="numeric">
+              
+                <span class="score-badge score-low">147.5684</span>
+              
+            </td>
+          </tr>
+          
+          <tr>
+            <td class="rank-cell ">
+              6
+            </td>
+            <td>
+              <div class="channel-name" title="Maddock Films">Maddock Films</div>
+            </td>
+            <td>
+              <span class="category-badge">Entertainment</span>
+            </td>
+            <td class="numeric number">1,900,000</td>
+            <td class="numeric number">22,713,223</td>
+            <td class="numeric number">142,110</td>
+            <td class="numeric engagement">0.63%</td>
+            <td class="numeric">
+              
+                <span class="score-badge score-low">89.2274</span>
+              
+            </td>
+          </tr>
+          
+          <tr>
+            <td class="rank-cell ">
+              7
+            </td>
+            <td>
+              <div class="channel-name" title="Sony Music South">Sony Music South</div>
+            </td>
+            <td>
+              <span class="category-badge">Music</span>
+            </td>
+            <td class="numeric number">21,400,000</td>
+            <td class="numeric number">3,538,604</td>
+            <td class="numeric number">91,348</td>
+            <td class="numeric engagement">2.58%</td>
+            <td class="numeric">
+              
+                <span class="score-badge score-low">66.9619</span>
+              
+            </td>
+          </tr>
+          
+          <tr>
+            <td class="rank-cell ">
+              8
+            </td>
+            <td>
+              <div class="channel-name" title="BANGTANTV">BANGTANTV</div>
+            </td>
+            <td>
+              <span class="category-badge">Music</span>
+            </td>
+            <td class="numeric number">84,600,000</td>
+            <td class="numeric number">526,202</td>
+            <td class="numeric number">83,804</td>
+            <td class="numeric engagement">15.93%</td>
+            <td class="numeric">
+              
+                <span class="score-badge score-low">66.4345</span>
+              
+            </td>
+          </tr>
+          
+          <tr>
+            <td class="rank-cell ">
+              9
+            </td>
+            <td>
+              <div class="channel-name" title="Smokio">Smokio</div>
+            </td>
+            <td>
+              <span class="category-badge">Entertainment</span>
+            </td>
+            <td class="numeric number">579,000</td>
+            <td class="numeric number">2,793,190</td>
+            <td class="numeric number">107,292</td>
+            <td class="numeric engagement">3.84%</td>
+            <td class="numeric">
+              
+                <span class="score-badge score-low">61.8289</span>
+              
+            </td>
+          </tr>
+          
+          <tr>
+            <td class="rank-cell ">
+              10
+            </td>
+            <td>
+              <div class="channel-name" title="Netflix">Netflix</div>
+            </td>
+            <td>
+              <span class="category-badge">Entertainment</span>
+            </td>
+            <td class="numeric number">33,300,000</td>
+            <td class="numeric number">2,808,559</td>
+            <td class="numeric number">78,634</td>
+            <td class="numeric engagement">2.80%</td>
+            <td class="numeric">
+              
+                <span class="score-badge score-low">59.1520</span>
+              
+            </td>
+          </tr>
+          
+          <tr>
+            <td class="rank-cell ">
+              11
+            </td>
+            <td>
+              <div class="channel-name" title="HBO Max">HBO Max</div>
+            </td>
+            <td>
+              <span class="category-badge">Entertainment</span>
+            </td>
+            <td class="numeric number">3,060,000</td>
+            <td class="numeric number">17,899,105</td>
+            <td class="numeric number">85,282</td>
+            <td class="numeric engagement">0.48%</td>
+            <td class="numeric">
+              
+                <span class="score-badge score-low">55.3115</span>
+              
+            </td>
+          </tr>
+          
+          <tr>
+            <td class="rank-cell ">
+              12
+            </td>
+            <td>
+              <div class="channel-name" title="Warner Bros.">Warner Bros.</div>
+            </td>
+            <td>
+              <span class="category-badge">Film & Animation</span>
+            </td>
+            <td class="numeric number">12,800,000</td>
+            <td class="numeric number">12,327,450</td>
+            <td class="numeric number">75,091</td>
+            <td class="numeric engagement">0.61%</td>
+            <td class="numeric">
+              
+                <span class="score-badge score-low">53.3688</span>
+              
+            </td>
+          </tr>
+          
+          <tr>
+            <td class="rank-cell ">
+              13
+            </td>
+            <td>
+              <div class="channel-name" title="Saregama Tamil">Saregama Tamil</div>
+            </td>
+            <td>
+              <span class="category-badge">Music</span>
+            </td>
+            <td class="numeric number">10,900,000</td>
+            <td class="numeric number">7,188,324</td>
+            <td class="numeric number">59,472</td>
+            <td class="numeric engagement">0.83%</td>
+            <td class="numeric">
+              
+                <span class="score-badge score-low">41.8530</span>
+              
+            </td>
+          </tr>
+          
+          <tr>
+            <td class="rank-cell ">
+              14
+            </td>
+            <td>
+              <div class="channel-name" title="Mythri Movie Makers">Mythri Movie Makers</div>
+            </td>
+            <td>
+              <span class="category-badge">Entertainment</span>
+            </td>
+            <td class="numeric number">5,340,000</td>
+            <td class="numeric number">4,969,038</td>
+            <td class="numeric number">61,732</td>
+            <td class="numeric engagement">1.24%</td>
+            <td class="numeric">
+              
+                <span class="score-badge score-low">41.5305</span>
+              
+            </td>
+          </tr>
+          
+          <tr>
+            <td class="rank-cell ">
+              15
+            </td>
+            <td>
+              <div class="channel-name" title="Think Music India">Think Music India</div>
+            </td>
+            <td>
+              <span class="category-badge">Music</span>
+            </td>
+            <td class="numeric number">22,500,000</td>
+            <td class="numeric number">2,803,745</td>
+            <td class="numeric number">52,724</td>
+            <td class="numeric engagement">1.88%</td>
+            <td class="numeric">
+              
+                <span class="score-badge score-low">38.7636</span>
+              
+            </td>
+          </tr>
+          
+          <tr>
+            <td class="rank-cell ">
+              16
+            </td>
+            <td>
+              <div class="channel-name" title="Apple TV">Apple TV</div>
+            </td>
+            <td>
+              <span class="category-badge">Entertainment</span>
+            </td>
+            <td class="numeric number">2,380,000</td>
+            <td class="numeric number">2,526,272</td>
+            <td class="numeric number">23,205</td>
+            <td class="numeric engagement">0.92%</td>
+            <td class="numeric">
+              
+                <span class="score-badge score-low">14.7968</span>
+              
+            </td>
+          </tr>
+          
+          <tr>
+            <td class="rank-cell ">
+              17
+            </td>
+            <td>
+              <div class="channel-name" title="Dinuli Damsandi">Dinuli Damsandi</div>
+            </td>
+            <td>
+              <span class="category-badge">Music</span>
+            </td>
+            <td class="numeric number">419,000</td>
+            <td class="numeric number">555,210</td>
+            <td class="numeric number">25,470</td>
+            <td class="numeric engagement">4.59%</td>
+            <td class="numeric">
+              
+                <span class="score-badge score-low">14.3198</span>
+              
+            </td>
+          </tr>
+          
+          <tr>
+            <td class="rank-cell ">
+              18
+            </td>
+            <td>
+              <div class="channel-name" title="Mihiran">Mihiran</div>
+            </td>
+            <td>
+              <span class="category-badge">Music</span>
+            </td>
+            <td class="numeric number">331,000</td>
+            <td class="numeric number">275,161</td>
+            <td class="numeric number">21,403</td>
+            <td class="numeric engagement">7.78%</td>
+            <td class="numeric">
+              
+                <span class="score-badge score-low">11.8141</span>
+              
+            </td>
+          </tr>
+          
+          <tr>
+            <td class="rank-cell ">
+              19
+            </td>
+            <td>
+              <div class="channel-name" title="DilShan L Silva">DilShan L Silva</div>
+            </td>
+            <td>
+              <span class="category-badge">Entertainment</span>
+            </td>
+            <td class="numeric number">162,000</td>
+            <td class="numeric number">545,460</td>
+            <td class="numeric number">11,225</td>
+            <td class="numeric engagement">2.06%</td>
+            <td class="numeric">
+              
+                <span class="score-badge score-low">5.8477</span>
+              
+            </td>
+          </tr>
+          
+          <tr>
+            <td class="rank-cell ">
+              20
+            </td>
+            <td>
+              <div class="channel-name" title="Master Brothers FF">Master Brothers FF</div>
+            </td>
+            <td>
+              <span class="category-badge">Gaming</span>
+            </td>
+            <td class="numeric number">152,000</td>
+            <td class="numeric number">55,731</td>
+            <td class="numeric number">8,994</td>
+            <td class="numeric engagement">16.14%</td>
+            <td class="numeric">
+              
+                <span class="score-badge score-low">4.6606</span>
+              
+            </td>
+          </tr>
+          
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Legend -->
+    <div class="legend">
+      <div class="legend-title">Score Colour Legend</div>
+      <div class="legend-item">
+        <span class="legend-dot dot-high"></span>
+        High priority — strongest ad-placement candidates
+      </div>
+      <div class="legend-item">
+        <span class="legend-dot dot-mid"></span>
+        Medium priority — good reach with moderate engagement
+      </div>
+      <div class="legend-item">
+        <span class="legend-dot dot-low"></span>
+        Lower priority — smaller audience or lower engagement
+      </div>
+    </div>
+
+    <!-- Formula box -->
+    <div class="formula-box">
+      <strong>Hardcord Score Formula:</strong><br/>
+      <code>score = (views / 1,000,000) &times; (likes / max(views, 1) &times; 100) &times; log10(max(subscribers, 1))</code><br/><br/>
+      This blends <strong>reach</strong> (total trending views), <strong>engagement rate</strong> (likes-to-views ratio),
+      and <strong>audience size</strong> (log-scaled subscribers) into a single targeting priority score.
+      Channels with high scores deliver broad, engaged audiences — ideal for 6-second hardcord placements.
+    </div>
+
+  </div>
+
+  <!-- ================================================================== -->
+  <!-- Footer                                                               -->
+  <!-- ================================================================== -->
+  <footer>
+    <span>Generated by <strong>YoutubeTrend Analyzer</strong></span>
+    <span>Data sourced from YouTube Data API v3 &mdash; 2026-06-04 12:13:27</span>
+  </footer>
+
+</body>
+</html>
