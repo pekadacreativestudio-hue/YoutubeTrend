@@ -234,6 +234,39 @@ def extract_program_name(title):
     return t.strip()
 
 
+# Keyword sets for program classification
+_NEWS_KW = ["news", "paththare", "wartha", "prime time", "lunch time",
+            "වාර්ත", "ප්‍රවෘත්ති", "පුවත්", "satana", "balaya", "aluth parlimentuwa"]
+_REALITY_KW = ["star", "talent", "idol", "voice", "dancing", "dream", "champion",
+               "got ", "reality", "super", "unlimited", "junior", "battle",
+               "lakshapathi", "kotipathi", "derana 60", "hadawatha", "calendar"]
+_MUSIC_KW = ["song", "sindu", "සිංදු", "ගීත", " music", "cover song", "acoustic",
+             "music video", "musical"]
+_TALK_KW = ["talk", "interview", "chat", "salakuna", "tharu walalla",
+            "the hot seat", "live at", "diyatha"]
+
+
+def classify_program(name, episodes):
+    """Classify a program as Teledrama / News / Reality / Music / Talk / Other."""
+    n = name.lower()
+    cats = [e.get("category_id", "") for e in episodes]
+    dom = max(set(cats), key=cats.count) if cats else ""
+
+    if dom == "25" or any(k in n for k in _NEWS_KW):
+        return "📰 News"
+    if any(k in n for k in _REALITY_KW):
+        return "🎤 Reality/Show"
+    if any(k in n for k in _TALK_KW):
+        return "🗣️ Talk Show"
+    if dom == "10" or any(k in n for k in _MUSIC_KW):
+        return "🎵 Music"
+    if dom in ("24", "1") and len(episodes) >= 4:
+        return "🎭 Teledrama"
+    if len(episodes) >= 4:
+        return "🎭 Teledrama"
+    return "📺 Other"
+
+
 @st.cache_data(show_spinner=False, ttl=3600)
 def get_curated_channel_stats():
     """Fetch stats for all curated Sri Lankan channels."""
@@ -320,6 +353,7 @@ def get_channel_programs(channel_id, date_from_str, date_to_str, max_scan):
             "likes": likes,
             "comments": comments,
             "engagement": round((likes / max(views, 1)) * 100, 2),
+            "category_id": snippet.get("categoryId", ""),
             "url": f"https://youtube.com/watch?v={vid}",
         })
 
@@ -332,6 +366,7 @@ def get_channel_programs(channel_id, date_from_str, date_to_str, max_scan):
             "episode_count": len(eps),
             "total_views": total_views,
             "avg_views": total_views // max(len(eps), 1),
+            "category": classify_program(name, eps),
         }
     return programs
 
@@ -368,6 +403,7 @@ def analyze_program(name, prog):
         "avg_views": avg_views, "highest": highest, "lowest": lowest,
         "avg_engagement": avg_eng, "trend": trend, "trend_icon": trend_icon,
         "trend_change": round(change, 1), "hardcord": hardcord, "episodes": eps,
+        "category": prog.get("category", "📺 Other"),
     }
 
 
@@ -480,20 +516,26 @@ with tab1:
                     st.rerun()
         st.markdown("")
 
-    # Program list with Add buttons (top 25)
-    for idx, (pname, pdata) in enumerate(ranked_programs[:25]):
-        c1, c2, c3, c4 = st.columns([5, 1.3, 1.3, 1.4])
+    # Optional category filter
+    all_types = sorted({p["category"] for _, p in ranked_programs})
+    type_filter = st.multiselect("Filter by type", all_types, default=all_types)
+
+    # Program list with Add buttons (top 25 after filter)
+    filtered = [(n, p) for n, p in ranked_programs if p["category"] in type_filter]
+    for idx, (pname, pdata) in enumerate(filtered[:25]):
+        c1, c2, c3, c4, c5 = st.columns([3.4, 1.5, 1.3, 1.1, 1.3])
         c1.markdown(f"**{pname}**")
-        c2.markdown(f"👁 {format_number(pdata['total_views'])}")
-        c3.markdown(f"🎞 {pdata['episode_count']} eps")
+        c2.markdown(pdata["category"])
+        c3.markdown(f"👁 {format_number(pdata['total_views'])}")
+        c4.markdown(f"🎞 {pdata['episode_count']}")
         already = pname in st.session_state.compare
         full = len(st.session_state.compare) >= 4
         if already:
-            c4.markdown("✅ Added")
+            c5.markdown("✅ Added")
         elif full:
-            c4.markdown("—")
+            c5.markdown("—")
         else:
-            if c4.button("➕ Add", key=f"add_{idx}"):
+            if c5.button("➕ Add", key=f"add_{idx}"):
                 st.session_state.compare.append(pname)
                 st.rerun()
 
@@ -515,6 +557,7 @@ with tab1:
     rank_df = pd.DataFrame([{
         "Priority": f"#{i+1}",
         "Program": a["name"],
+        "Type": a["category"],
         "Avg Views/Ep": format_number(a["avg_views"]),
         "Total Views": format_number(a["total_views"]),
         "Episodes": a["episode_count"],
@@ -557,7 +600,7 @@ with tab1:
     # Per-program detail
     st.markdown("##### 🔍 Per-Program Detail & Ad-Placement Guide")
     for a in ranked_analyses:
-        with st.expander(f"{a['trend_icon']} {a['name']} — {format_number(a['avg_views'])} avg views/ep · {a['trend']}", expanded=True):
+        with st.expander(f"{a['trend_icon']} {a['name']} · {a['category']} — {format_number(a['avg_views'])} avg views/ep · {a['trend']}", expanded=True):
             m1, m2, m3, m4, m5 = st.columns(5)
             m1.markdown(f'<div class="metric-card"><h2>{a["episode_count"]}</h2><p>Episodes</p></div>', unsafe_allow_html=True)
             m2.markdown(f'<div class="metric-card"><h2>{format_number(a["total_views"])}</h2><p>Total Views</p></div>', unsafe_allow_html=True)
