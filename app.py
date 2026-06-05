@@ -49,18 +49,51 @@ REGIONS = {
     "Bangladesh 🇧🇩": "BD",
 }
 
-# Curated list of major Sri Lankan TV / teledrama channels (verified channel IDs)
+# ---------------------------------------------------------------------------
+# Curated Sri Lankan channels — verified IDs, grouped by type
+# ---------------------------------------------------------------------------
+
+# Used for the channel comparison table in Tab 1 / Program Comparison Step 1
 SRI_LANKA_LOCAL_CHANNELS = {
-    "TV Derana":            "UCRDDfbYPHX_GUJ4lcQYTc8A",
-    "Hiru TV":              "UCOtYyt7W5PmPnwQjWWF_Z-Q",
-    "Sirasa TV":            "UCn0XmAUFv6d2tofMFEesSNw",
-    "Swarnavahini TV":      "UCaIc6SgS90ud_RgMSC6hW_w",
-    "ITN Network":          "UCAGQUfHzdsgxJ1pq2XDS2TQ",
-    "Sri Lanka Rupavahini": "UCT83ymyAGm7Gnk_4ifxjxIA",
-    "TV 1 Sri Lanka":       "UCoQXpCWew0Q3qz6buZYOAFg",
-    "Shakthi TV":           "UCjm7vbOwssao7Bhm9wX3-bw",
-    "TNL Tv":               "UCgFK94EtfymL9AvhxQucaTw",
-    "Ada Derana (News)":    "UCCK3OZi788Ok44K97WAhLKQ",
+    # ── TV / Broadcast Channels ──────────────────────────────────────────
+    "TV Derana":              ("UCRDDfbYPHX_GUJ4lcQYTc8A", "📺 TV Channel"),
+    "Hiru TV":                ("UCOtYyt7W5PmPnwQjWWF_Z-Q", "📺 TV Channel"),
+    "Sirasa TV":              ("UCn0XmAUFv6d2tofMFEesSNw", "📺 TV Channel"),
+    "Swarnavahini TV":        ("UCaIc6SgS90ud_RgMSC6hW_w", "📺 TV Channel"),
+    "Swarnavahini Digital":   ("UCAH7R88V7gz7RqJv78nNOzg", "📺 TV Channel"),
+    "ITN Network":            ("UCAGQUfHzdsgxJ1pq2XDS2TQ", "📺 TV Channel"),
+    "Sri Lanka Rupavahini":   ("UCT83ymyAGm7Gnk_4ifxjxIA", "📺 TV Channel"),
+    "TV 1 Sri Lanka":         ("UCoQXpCWew0Q3qz6buZYOAFg", "📺 TV Channel"),
+    "Shakthi TV":             ("UCjm7vbOwssao7Bhm9wX3-bw", "📺 TV Channel"),
+    "TNL Tv":                 ("UCgFK94EtfymL9AvhxQucaTw", "📺 TV Channel"),
+    "Siyatha TV":             ("UCc30sTBdN9LRSxEuHaXV_bQ", "📺 TV Channel"),
+    "Ada Derana (News)":      ("UCCK3OZi788Ok44K97WAhLKQ", "📺 TV Channel"),
+    # ── Content Creators ─────────────────────────────────────────────────
+    "Chanux Bro":             ("UCETxOvOv9_44-CUzsPlzyxQ", "🎥 Creator"),
+    "Lochi":                  ("UCYFn7BOOlmL21iNJ6q5IDfg", "🎥 Creator"),
+    "Janai Priyai":           ("UCfYQW_0xEVwKfePgWRxTYhg", "🎥 Creator"),
+    "Ratta":                  ("UCJbxRq_IlWyzvB9KK0Mrs8A", "🎥 Creator"),
+    "Wasthi Productions":     ("UCMQYRNX1Fg-HJ8Ey7Z3WPrA", "🎥 Creator"),
+    "Mokka Commentry":        ("UC3Y7OyuS9jNdZy3ZadrAbWQ", "🎥 Creator"),
+    "Sarith and Surith":      ("UCLEa0khmFIbpyjFqb90RBOA", "🎥 Creator"),
+    "Roshan Fernando":        ("UCNbhBaSxzjD4Yr7bRVKiWaw", "🎥 Creator"),
+    "Dhanith Sri":            ("UCyCNFZZpmyZQEgtar98I8tA", "🎥 Creator"),
+    "DilShan L Silva":        ("UC5A7foGvdlddb0b6iHaqUBg", "🎥 Creator"),
+    "Thiwanka Dilshan":       ("UCmr1WFY6P4PCmPlbic02iRA", "🎥 Creator"),
+    # ── Music Artists ────────────────────────────────────────────────────
+    "IRAJ":                   ("UCNO4dUilYfOikKlcbk5uBTg", "🎵 Music"),
+    "Bathiya N Santhush":     ("UCvivK4AwTrkPBnmrObTFxaQ", "🎵 Music"),
+    "WAYO":                   ("UCO_gVqYTbIRbBV6enNVov3Q", "🎵 Music"),
+    "UMARIA":                 ("UCWYXLMuL0m10w53wnMaUf3g", "🎵 Music"),
+    "Ridma Weerawardena":     ("UC1mrGdQz5KP3fnm4J9gRx7A", "🎵 Music"),
+    "Dinuli Damsandi":        ("UCU9IoKqQvxERkoxwB-L9VwQ", "🎵 Music"),
+    "Mihiran":                ("UC6wvfVVgmnsMUlhfYCv64Gw", "🎵 Music"),
+    "Senanga Dissanayake":    ("UCQwGtvsdORhNh5l0F5fZf0Q", "🎵 Music"),
+    "Sirasa Lakshapathi":     ("UCfnZtEDnl84njUQgtF186cA", "🎵 Music"),
+    # ── Gaming Channels ──────────────────────────────────────────────────
+    "Master Brothers FF":     ("UCnLDg6H44ShnTB3TWLw_R0A", "🎮 Gaming"),
+    "Gaming With Kaniya":     ("UCAYGhFThlHe-3ugwJaUE0sA", "🎮 Gaming"),
+    "DLP Gaming":             ("UC0-UFP1d6OeVtl2VXYSquIA", "🎮 Gaming"),
 }
 
 # ---------------------------------------------------------------------------
@@ -173,7 +206,7 @@ def compute_hardcord_score(views, likes, subscribers):
 
 
 def aggregate_channel_data(videos, channel_details, local_only=False):
-    local_ids = set(SRI_LANKA_LOCAL_CHANNELS.values())
+    local_ids = {cid for cid, _ in SRI_LANKA_LOCAL_CHANNELS.values()}
     channels = {}
     for video in videos:
         snippet = video.get("snippet", {})
@@ -270,15 +303,16 @@ def classify_program(name, episodes):
 @st.cache_data(show_spinner=False, ttl=3600)
 def get_curated_channel_stats():
     """Fetch stats for all curated Sri Lankan channels."""
-    ids = list(SRI_LANKA_LOCAL_CHANNELS.values())
+    ids = [cid for cid, _ in SRI_LANKA_LOCAL_CHANNELS.values()]
     details = fetch_channel_details(ids)
     rows = []
-    for name, cid in SRI_LANKA_LOCAL_CHANNELS.items():
+    for name, (cid, ch_type) in SRI_LANKA_LOCAL_CHANNELS.items():
         d = details.get(cid, {})
         stats = d.get("statistics", {})
         rows.append({
             "channel_id": cid,
             "Channel": name,
+            "Type": ch_type,
             "Subscribers": safe_int(stats.get("subscriberCount")),
             "Total Views": safe_int(stats.get("viewCount")),
             "Total Videos": safe_int(stats.get("videoCount")),
@@ -459,13 +493,19 @@ with tab1:
     with st.spinner("Loading channels..."):
         chan_stats = get_curated_channel_stats()
 
+    # Type filter for channel table
+    all_ch_types = sorted({c["Type"] for c in chan_stats})
+    sel_types = st.multiselect("Filter channel type", all_ch_types, default=all_ch_types, key="ch_type_filter")
+    filtered_chans = [c for c in chan_stats if c["Type"] in sel_types]
+
     chan_df = pd.DataFrame([{
         "Rank": f"#{c['Rank']}",
+        "Type": c["Type"],
         "Channel": c["Channel"],
         "Subscribers": format_number(c["Subscribers"]),
         "Total Views": format_number(c["Total Views"]),
         "Total Videos": f"{c['Total Videos']:,}",
-    } for c in chan_stats])
+    } for c in filtered_chans])
 
     event = st.dataframe(
         chan_df, use_container_width=True, hide_index=True,
@@ -474,7 +514,7 @@ with tab1:
 
     sel_rows = event.selection.rows if hasattr(event, "selection") else []
     if sel_rows:
-        chosen = chan_stats[sel_rows[0]]
+        chosen = filtered_chans[sel_rows[0]]
         if chosen["channel_id"] != st.session_state.selected_channel_id:
             st.session_state.selected_channel_id = chosen["channel_id"]
             st.session_state.selected_channel_name = chosen["Channel"]
