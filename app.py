@@ -90,10 +90,29 @@ SRI_LANKA_LOCAL_CHANNELS = {
     "Mihiran":                ("UC6wvfVVgmnsMUlhfYCv64Gw", "🎵 Music"),
     "Senanga Dissanayake":    ("UCQwGtvsdORhNh5l0F5fZf0Q", "🎵 Music"),
     "Sirasa Lakshapathi":     ("UCfnZtEDnl84njUQgtF186cA", "🎵 Music"),
+    "SANUKA":                 ("UCdvasaXV8gpoJOe-5BDI2gA", "🎵 Music"),
+    "Kanchana Anuradhi":      ("UCNdPhHla8uFW4Ah6jhGy6bg", "🎵 Music"),
+    "Yohani":                 ("UCh9qXeL8eP3Txra2908xksg", "🎵 Music"),
+    "Raini Charuka":          ("UCdpzqsUZde5hl1jyFKhBJkw", "🎵 Music"),
+    "Kaizer Kaiz":            ("UCGq0n1SMca7vFN7FRvtlApw", "🎵 Music"),
+    # ── News Channels ────────────────────────────────────────────────────
+    "Newsfirst Sri Lanka":    ("UCgnFSj7jQffD5V5m05j4dPw", "📰 News"),
+    "Hiru News":              ("UCckltLEhFLv8Xz_lQhYfwmg", "📰 News"),
+    "Ada Derana News":        ("UCW_rA_jb-_vbZtU4cTpnT5Q", "📰 News"),
+    # ── Reality / Talent Shows ───────────────────────────────────────────
+    "Hiru Star":              ("UCcbOsE5_4LEjtQi8X2PFxDw", "🎤 Reality"),
+    "The Voice Sri Lanka":    ("UCmqflTSJ6911aCrnaWIXxsA", "🎤 Reality"),
+    # ── Radio Channels ───────────────────────────────────────────────────
+    "Hiru FM":                ("UC8AMm5NxsMra2cjlewCb8QA", "📻 Radio"),
+    "Y FM":                   ("UCsExZudI-3Bfi2ubAdwcgHw", "📻 Radio"),
     # ── Gaming Channels ──────────────────────────────────────────────────
     "Master Brothers FF":     ("UCnLDg6H44ShnTB3TWLw_R0A", "🎮 Gaming"),
     "Gaming With Kaniya":     ("UCAYGhFThlHe-3ugwJaUE0sA", "🎮 Gaming"),
     "DLP Gaming":             ("UC0-UFP1d6OeVtl2VXYSquIA", "🎮 Gaming"),
+    "ManiYa Streams":         ("UCo0bp6-iNDJmExq6kp6PYcg", "🎮 Gaming"),
+    "Allen K S L":            ("UCWrJW5qgCKGpYAxyMCp5Hxg", "🎮 Gaming"),
+    # ── Vlog / Travel ────────────────────────────────────────────────────
+    "Travel With Chatura":    ("UCwXfRdTtVeVnXXF4poaYw0Q", "🎥 Creator"),
 }
 
 # ---------------------------------------------------------------------------
