@@ -649,7 +649,7 @@ tab1, tab2 = st.tabs(["🎭 Program Comparison", "📊 Trending Channels"])
 # TAB 1 — Program Comparison
 # ===========================================================================
 
-with tab1:
+def render_program_comparison():
     # ── Date Range ──────────────────────────────────────────────────────────
     st.markdown("""
     <div class="section-header">
@@ -672,7 +672,7 @@ with tab1:
 
     if date_from > date_to:
         st.error("'From' date must be before 'To' date.")
-        st.stop()
+        return
 
     st.markdown("---")
 
@@ -716,7 +716,7 @@ with tab1:
 
     if not st.session_state.selected_channel_id:
         st.info("👆 Click a channel above to load its programs.")
-        st.stop()
+        return
 
     st.success(f"Selected channel: **{st.session_state.selected_channel_name}**")
     st.markdown("---")
@@ -739,7 +739,7 @@ with tab1:
 
     if not programs:
         st.warning("No uploads found in this date range. Try widening the range or increasing scan depth.")
-        st.stop()
+        return
 
     ranked_programs = sorted(programs.items(), key=lambda x: x[1]["total_views"], reverse=True)
 
@@ -777,7 +777,7 @@ with tab1:
 
     if not st.session_state.compare:
         st.info("➕ Add at least one program above to see the comparison.")
-        st.stop()
+        return
 
     st.markdown("---")
 
@@ -887,7 +887,7 @@ with tab1:
 # (All settings are INLINE here — no sidebar — to avoid bleed into Tab 1)
 # ===========================================================================
 
-with tab2:
+def render_trending_channels():
     st.markdown("""
     <div class="section-header">
         <span class="step-badge">⚙️</span>
@@ -952,7 +952,7 @@ trending chart. Use **Local SL Channels Only** toggle to see a curated Sri Lanka
                 ranked = get_local_channel_trending_stats(days_back)
             if not ranked:
                 st.warning("No data found for local channels in this period.")
-                st.stop()
+                return
 
             st.subheader(f"🏆 Local SL Channels — {period_label}")
             st.caption(f"Ranked by Hardcord Score based on recent video performance ({period_label})")
@@ -978,14 +978,14 @@ trending chart. Use **Local SL Channels Only** toggle to see a curated Sri Lanka
                 videos = fetch_trending_videos(region_code, max_results, category_id or None)
             if not videos:
                 st.warning("No trending videos found.")
-                st.stop()
+                return
             with st.spinner("Fetching channel details..."):
                 cids = list({v["snippet"]["channelId"] for v in videos if v.get("snippet", {}).get("channelId")})
                 cdetails = fetch_channel_details(cids)
             ranked = aggregate_channel_data(videos, cdetails, local_only=False)
             if not ranked:
                 st.warning("No channels found.")
-                st.stop()
+                return
 
             st.subheader(f"🏆 Trending Channels — {region_label} | {category_label}")
             max_score = ranked[0]["Hardcord Score"] if ranked else 1
@@ -1010,3 +1010,14 @@ trending chart. Use **Local SL Channels Only** toggle to see a curated Sri Lanka
         )
     else:
         st.info("👆 Configure settings above and click **Run Trending Analysis**.")
+
+
+# ===========================================================================
+# Render tabs
+# ===========================================================================
+
+with tab1:
+    render_program_comparison()
+
+with tab2:
+    render_trending_channels()
