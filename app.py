@@ -586,35 +586,70 @@ def get_local_channel_trending_stats(days_back):
     """
     For 'Local Channels Only' mode: fetch recent video stats for all curated channels
     within the last `days_back` days and compute Hardcord Score from actual recent views.
-    This is more accurate than filtering the global mostPopular list (which rarely
-    includes local SL channels).
+
+    Uses the cheap uploads-playlist approach (playlistItems = 1 quota unit each)
+    instead of search.list (100 units each), so the whole scan costs ~100 units
+    rather than 10,000. Per-channel errors are skipped gracefully.
     """
-    published_after = (date.today() - timedelta(days=days_back)).strftime("%Y-%m-%dT00:00:00Z")
+    cutoff = (date.today() - timedelta(days=days_back))
     ids = [cid for cid, _ in SRI_LANKA_LOCAL_CHANNELS.values()]
-    details = fetch_channel_details(ids)
+
+    # One batched call set: snippet (sub count) + contentDetails (uploads playlist)
+    details = {}
+    for i in range(0, len(ids), 50):
+        batch = ids[i:i+50]
+        try:
+            data = api_get("channels",
+                           {"part": "statistics,contentDetails", "id": ",".join(batch)})
+        except requests.exceptions.HTTPError:
+            continue
+        for item in data.get("items", []):
+            details[item["id"]] = item
 
     rows = []
     for ch_name, (cid, ch_type) in SRI_LANKA_LOCAL_CHANNELS.items():
         d = details.get(cid, {})
         ch_stats = d.get("statistics", {})
         subscribers = safe_int(ch_stats.get("subscriberCount"))
+        uploads = (d.get("contentDetails", {})
+                    .get("relatedPlaylists", {})
+                    .get("uploads"))
+        if not uploads:
+            continue
 
-        # Search recent videos for this channel
-        search_data = api_get("search", {
-            "part": "id", "channelId": cid, "type": "video",
-            "order": "date", "publishedAfter": published_after, "maxResults": 10,
-        })
-        video_ids = [item["id"]["videoId"] for item in search_data.get("items", []) if item.get("id", {}).get("videoId")]
+        # Recent uploads (1 page = 50 newest videos), filter to date window
+        try:
+            pl = api_get("playlistItems",
+                         {"part": "contentDetails", "playlistId": uploads, "maxResults": 50})
+        except requests.exceptions.HTTPError:
+            continue
+
+        video_ids = []
+        for x in pl.get("items", []):
+            vp = x["contentDetails"].get("videoPublishedAt", "")[:10]
+            if not vp:
+                continue
+            try:
+                vd = datetime.strptime(vp, "%Y-%m-%d").date()
+            except ValueError:
+                continue
+            if vd >= cutoff:
+                video_ids.append(x["contentDetails"]["videoId"])
         if not video_ids:
             continue
 
-        vid_data = api_get("videos", {"part": "statistics", "id": ",".join(video_ids)})
         total_views, total_likes, count = 0, 0, 0
-        for v in vid_data.get("items", []):
-            s = v.get("statistics", {})
-            total_views += safe_int(s.get("viewCount"))
-            total_likes += safe_int(s.get("likeCount"))
-            count += 1
+        for j in range(0, len(video_ids), 50):
+            try:
+                vid_data = api_get("videos",
+                                   {"part": "statistics", "id": ",".join(video_ids[j:j+50])})
+            except requests.exceptions.HTTPError:
+                continue
+            for v in vid_data.get("items", []):
+                s = v.get("statistics", {})
+                total_views += safe_int(s.get("viewCount"))
+                total_likes += safe_int(s.get("likeCount"))
+                count += 1
 
         if count == 0:
             continue
