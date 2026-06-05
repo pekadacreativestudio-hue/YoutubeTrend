@@ -187,81 +187,280 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-    /* ── Base ── */
-    [data-testid="stAppViewContainer"] { background: #0d0d0d; }
-    [data-testid="stSidebar"] { background: #111111; border-right: 1px solid #1a1a1a; }
-    [data-testid="block-container"] { padding-top: 1rem; }
+    /* ═══════════════════════════════════════════════
+       GLOBAL BASE — near-black background everywhere
+    ═══════════════════════════════════════════════ */
+    html, body, [data-testid="stAppViewContainer"],
+    [data-testid="stApp"], .main, .block-container {
+        background-color: #0d0d0d !important;
+        color: #e0e0e0 !important;
+    }
+    [data-testid="block-container"] {
+        padding-top: 1.2rem !important;
+        max-width: 1200px;
+    }
 
-    /* ── Header banner ── */
+    /* Sidebar (kept clean even though unused for settings) */
+    [data-testid="stSidebar"],
+    [data-testid="stSidebarContent"] {
+        background-color: #0d0d0d !important;
+        border-right: 1px solid #1a2e2a !important;
+    }
+
+    /* ═══════════════════════════════════════════════
+       TYPOGRAPHY — all headings teal
+    ═══════════════════════════════════════════════ */
+    h1, h2, h3, h4, h5, h6 { color: #e0e0e0 !important; }
+    p, li, span, label { color: #c0ccc8 !important; }
+    a { color: #00d4aa !important; }
+    a:hover { color: #00ffcc !important; }
+
+    /* ═══════════════════════════════════════════════
+       HEADER BANNER
+    ═══════════════════════════════════════════════ */
     .main-header {
-        background: linear-gradient(135deg, #111111 0%, #0d1f1a 60%, #0d2218 100%);
-        border: 1px solid #00d4aa33;
-        padding: 1.6rem 2rem; border-radius: 14px; margin-bottom: 1.4rem;
+        background: linear-gradient(135deg, #0d1a17 0%, #0a2018 60%, #071a13 100%);
+        border: 1px solid #00d4aa40;
+        padding: 1.8rem 2rem; border-radius: 16px; margin-bottom: 1.6rem;
         text-align: center;
     }
-    .main-header h1 { color: #00d4aa; margin: 0; font-size: 2rem; letter-spacing: -0.5px; }
-    .main-header p  { color: #7a9e96; margin: 0.35rem 0 0; font-size: 0.92rem; }
-
-    /* ── Metric cards ── */
-    .metric-card {
-        background: #111111; border: 1px solid #1e3530;
-        border-radius: 12px; padding: 1rem; text-align: center;
-        transition: border-color 0.2s;
+    .main-header h1 {
+        color: #00d4aa !important; margin: 0; font-size: 2.1rem;
+        letter-spacing: -0.5px; font-weight: 800;
     }
-    .metric-card:hover { border-color: #00d4aa55; }
-    .metric-card h2 { color: #00d4aa; margin: 0; font-size: 1.65rem; font-weight: 700; }
-    .metric-card p  { color: #7a9e96; margin: 0.2rem 0 0; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.5px; }
+    .main-header p { color: #6a9e96 !important; margin: 0.4rem 0 0; font-size: 0.93rem; }
 
-    /* ── Program cards ── */
-    .prog-card {
-        background: #111111; border: 1px solid #1e3530;
-        border-left: 3px solid #00d4aa;
-        border-radius: 8px; padding: 0.6rem 1rem; margin-bottom: 0.4rem;
-        color: #e0e0e0; font-size: 0.9rem;
-    }
-
-    /* ── Section header ── */
+    /* ═══════════════════════════════════════════════
+       SECTION HEADERS
+    ═══════════════════════════════════════════════ */
     .section-header {
-        display: flex; align-items: center; gap: 10px; margin: 1.2rem 0 0.5rem;
+        display: flex; align-items: center; gap: 10px;
+        margin: 1.4rem 0 0.6rem; padding: 0;
     }
     .step-badge {
-        background: #00d4aa; color: #0d0d0d; border-radius: 50%;
-        width: 28px; height: 28px; display: inline-flex; align-items: center;
-        justify-content: center; font-weight: 800; font-size: 0.85rem; flex-shrink: 0;
+        background: #00d4aa; color: #0a0a0a; border-radius: 50%;
+        width: 30px; height: 30px; display: inline-flex; align-items: center;
+        justify-content: center; font-weight: 900; font-size: 0.82rem; flex-shrink: 0;
     }
-    .section-title { color: #e0e0e0; font-size: 1.1rem; font-weight: 600; margin: 0; }
-
-    /* ── Settings panel ── */
-    .settings-panel {
-        background: #111111; border: 1px solid #1e3530;
-        border-radius: 12px; padding: 1rem 1.4rem; margin-bottom: 1rem;
+    .section-title {
+        color: #e0e0e0 !important; font-size: 1.15rem;
+        font-weight: 700; margin: 0;
     }
 
-    /* ── Buttons ── */
+    /* ═══════════════════════════════════════════════
+       METRIC CARDS
+    ═══════════════════════════════════════════════ */
+    .metric-card {
+        background: #101a18; border: 1px solid #1a3530;
+        border-radius: 12px; padding: 1.1rem 0.8rem; text-align: center;
+        transition: border-color 0.25s, box-shadow 0.25s;
+    }
+    .metric-card:hover {
+        border-color: #00d4aa60;
+        box-shadow: 0 0 14px #00d4aa15;
+    }
+    .metric-card h2 {
+        color: #00d4aa !important; margin: 0;
+        font-size: 1.7rem; font-weight: 800;
+    }
+    .metric-card p {
+        color: #6a9e96 !important; margin: 0.25rem 0 0;
+        font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.8px;
+    }
+
+    /* ═══════════════════════════════════════════════
+       PROGRAM QUEUE CARDS
+    ═══════════════════════════════════════════════ */
+    .prog-card {
+        background: #101a18; border: 1px solid #1a3530;
+        border-left: 3px solid #00d4aa;
+        border-radius: 8px; padding: 0.65rem 1rem; margin-bottom: 0.4rem;
+        color: #d0e0dc !important; font-size: 0.88rem;
+    }
+
+    /* ═══════════════════════════════════════════════
+       BUTTONS
+    ═══════════════════════════════════════════════ */
     .stButton > button {
-        background: #00d4aa !important; color: #0d0d0d !important;
+        background: #00d4aa !important; color: #0a0a0a !important;
         border: none !important; border-radius: 8px !important;
-        padding: 0.5rem 1.2rem !important; font-weight: 700 !important;
-        letter-spacing: 0.3px;
+        padding: 0.5rem 1.3rem !important; font-weight: 700 !important;
+        font-size: 0.9rem !important; letter-spacing: 0.3px;
+        transition: background 0.2s, box-shadow 0.2s !important;
     }
-    .stButton > button:hover { background: #00efc0 !important; }
+    .stButton > button:hover {
+        background: #00f0c0 !important;
+        box-shadow: 0 0 12px #00d4aa55 !important;
+    }
 
-    /* ── Tabs ── */
-    [data-testid="stTabs"] button[data-baseweb="tab"] {
-        color: #7a9e96 !important; font-weight: 600;
+    /* ═══════════════════════════════════════════════
+       TABS
+    ═══════════════════════════════════════════════ */
+    [data-testid="stTabs"] {
+        background: transparent !important;
+    }
+    [data-testid="stTabs"] [role="tablist"] {
+        background: #0d0d0d !important;
+        border-bottom: 1px solid #1a3530 !important;
+        gap: 4px;
+    }
+    [data-testid="stTabs"] button[role="tab"] {
+        color: #7a9e96 !important; font-weight: 600 !important;
+        font-size: 0.95rem !important; padding: 0.6rem 1.4rem !important;
+        border-radius: 6px 6px 0 0 !important; background: transparent !important;
+        border: none !important; border-bottom: 2px solid transparent !important;
+        transition: color 0.2s, border-color 0.2s !important;
+    }
+    [data-testid="stTabs"] button[role="tab"]:hover {
+        color: #00d4aa !important; background: #101a18 !important;
     }
     [data-testid="stTabs"] button[aria-selected="true"] {
-        color: #00d4aa !important; border-bottom: 2px solid #00d4aa !important;
+        color: #00d4aa !important;
+        border-bottom: 2px solid #00d4aa !important;
+        background: #101a18 !important;
     }
 
-    /* ── Divider ── */
-    hr { border-color: #1e3530 !important; }
+    /* ═══════════════════════════════════════════════
+       FORM CONTROLS — inputs, selects, sliders, toggles
+    ═══════════════════════════════════════════════ */
+    /* Input backgrounds */
+    [data-testid="stTextInput"] input,
+    [data-testid="stNumberInput"] input,
+    [data-testid="stSelectbox"] > div > div,
+    [data-testid="stMultiSelect"] > div > div,
+    [data-testid="stDateInput"] input {
+        background-color: #101a18 !important;
+        border: 1px solid #1a3530 !important;
+        color: #e0e0e0 !important;
+        border-radius: 8px !important;
+    }
+    [data-testid="stSelectbox"] > div > div:focus-within,
+    [data-testid="stMultiSelect"] > div > div:focus-within {
+        border-color: #00d4aa !important;
+        box-shadow: 0 0 0 2px #00d4aa25 !important;
+    }
 
-    /* ── Dataframe ── */
-    [data-testid="stDataFrame"] { border-radius: 10px; overflow: hidden; }
+    /* Dropdown menu */
+    [data-testid="stSelectbox"] ul,
+    [data-baseweb="popover"] {
+        background: #101a18 !important;
+        border: 1px solid #1a3530 !important;
+    }
+    [data-testid="stSelectbox"] li:hover,
+    [data-baseweb="option"]:hover {
+        background: #1a3530 !important; color: #00d4aa !important;
+    }
 
-    /* ── Info/success/warning boxes ── */
-    [data-testid="stAlert"] { border-radius: 8px; }
+    /* Slider */
+    [data-testid="stSlider"] [data-baseweb="slider"] div[role="slider"] {
+        background: #00d4aa !important;
+        border-color: #00d4aa !important;
+    }
+    [data-testid="stSlider"] [data-baseweb="slider"] [class*="Track"] div:first-child {
+        background: #00d4aa !important;
+    }
+
+    /* Toggle */
+    [data-testid="stToggle"] input:checked + div {
+        background: #00d4aa !important;
+    }
+
+    /* Multiselect tags */
+    [data-baseweb="tag"] {
+        background: #1a3530 !important; border-color: #00d4aa40 !important;
+        color: #00d4aa !important; border-radius: 6px !important;
+    }
+
+    /* Labels */
+    [data-testid="stWidgetLabel"] p,
+    .stSlider label p,
+    .stSelectbox label p,
+    .stMultiSelect label p,
+    .stDateInput label p,
+    .stToggle label p {
+        color: #7a9e96 !important; font-size: 0.82rem !important;
+        font-weight: 600 !important; text-transform: uppercase !important;
+        letter-spacing: 0.5px !important;
+    }
+
+    /* ═══════════════════════════════════════════════
+       DATAFRAME / TABLE
+    ═══════════════════════════════════════════════ */
+    [data-testid="stDataFrame"] {
+        border-radius: 10px !important;
+        border: 1px solid #1a3530 !important;
+        overflow: hidden !important;
+    }
+    [data-testid="stDataFrame"] iframe {
+        border-radius: 10px !important;
+    }
+
+    /* ═══════════════════════════════════════════════
+       EXPANDER
+    ═══════════════════════════════════════════════ */
+    [data-testid="stExpander"] {
+        background: #101a18 !important;
+        border: 1px solid #1a3530 !important;
+        border-radius: 10px !important;
+    }
+    [data-testid="stExpander"] summary {
+        color: #c0d0cc !important; font-weight: 600 !important;
+    }
+    [data-testid="stExpander"] summary:hover { color: #00d4aa !important; }
+    [data-testid="stExpander"] > div { background: #101a18 !important; }
+
+    /* ═══════════════════════════════════════════════
+       ALERTS — info / success / warning / error
+    ═══════════════════════════════════════════════ */
+    [data-testid="stAlert"] {
+        border-radius: 8px !important;
+        background-color: #101a18 !important;
+        border: 1px solid #1a3530 !important;
+    }
+    /* success */
+    [data-testid="stAlert"][kind="success"],
+    div[data-testid="stAlert"] > div[class*="success"] {
+        border-left: 3px solid #00d4aa !important;
+    }
+    /* info */
+    [data-testid="stAlert"][kind="info"],
+    div[data-testid="stAlert"] > div[class*="info"] {
+        border-left: 3px solid #00a8ff !important;
+    }
+    /* warning */
+    [data-testid="stAlert"][kind="warning"],
+    div[data-testid="stAlert"] > div[class*="warning"] {
+        border-left: 3px solid #ffaa00 !important;
+    }
+
+    /* ═══════════════════════════════════════════════
+       SPINNER
+    ═══════════════════════════════════════════════ */
+    [data-testid="stSpinner"] > div { border-top-color: #00d4aa !important; }
+
+    /* ═══════════════════════════════════════════════
+       DOWNLOAD BUTTON
+    ═══════════════════════════════════════════════ */
+    [data-testid="stDownloadButton"] button {
+        background: transparent !important;
+        border: 1px solid #00d4aa !important;
+        color: #00d4aa !important; border-radius: 8px !important;
+        font-weight: 600 !important;
+    }
+    [data-testid="stDownloadButton"] button:hover {
+        background: #00d4aa15 !important;
+    }
+
+    /* ═══════════════════════════════════════════════
+       DIVIDERS & CAPTIONS
+    ═══════════════════════════════════════════════ */
+    hr { border: none !important; border-top: 1px solid #1a3530 !important; margin: 1rem 0 !important; }
+    [data-testid="stCaption"] p { color: #5a8a82 !important; font-size: 0.8rem !important; }
+
+    /* ═══════════════════════════════════════════════
+       SPINNER / PROGRESS BAR INSIDE DATAFRAME
+    ═══════════════════════════════════════════════ */
+    progress { accent-color: #00d4aa !important; }
 </style>
 """, unsafe_allow_html=True)
 
