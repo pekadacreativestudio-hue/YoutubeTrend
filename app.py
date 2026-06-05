@@ -2,8 +2,8 @@
 YouTube Top Program Analysis — Web Interface
 Hardcord Ad Targeting Tool for 6-Second Commercial Placements
 
-Tab 1: Trending Channels (region-wide rankings)
-Tab 2: Program Comparison (channel -> programs -> compare -> ad placement)
+Tab 1: Program Comparison (channel -> programs -> compare -> ad placement)
+Tab 2: Trending Channels (region-wide rankings)
 """
 
 import os
@@ -22,7 +22,6 @@ import pandas as pd
 # ---------------------------------------------------------------------------
 
 def _load_api_keys():
-    """Collect all configured API keys (supports YOUTUBE_API_KEY, YOUTUBE_API_KEY2, ...)."""
     keys = []
     for name in ("YOUTUBE_API_KEY", "YOUTUBE_API_KEY2", "YOUTUBE_API_KEY3"):
         val = st.secrets.get(name, os.getenv(name, "")) if hasattr(st, "secrets") else os.getenv(name, "")
@@ -63,7 +62,6 @@ REGIONS = {
 # Curated Sri Lankan channels — verified IDs, grouped by type
 # ---------------------------------------------------------------------------
 
-# Used for the channel comparison table in Tab 1 / Program Comparison Step 1
 SRI_LANKA_LOCAL_CHANNELS = {
     # ── TV / Broadcast Channels ──────────────────────────────────────────
     "TV Derana":              ("UCRDDfbYPHX_GUJ4lcQYTc8A", "📺 TV Channel"),
@@ -178,7 +176,7 @@ SRI_LANKA_LOCAL_CHANNELS = {
 }
 
 # ---------------------------------------------------------------------------
-# Styling
+# Page config & modern dark/green theme
 # ---------------------------------------------------------------------------
 
 st.set_page_config(
@@ -189,31 +187,81 @@ st.set_page_config(
 
 st.markdown("""
 <style>
+    /* ── Base ── */
+    [data-testid="stAppViewContainer"] { background: #0d0d0d; }
+    [data-testid="stSidebar"] { background: #111111; border-right: 1px solid #1a1a1a; }
+    [data-testid="block-container"] { padding-top: 1rem; }
+
+    /* ── Header banner ── */
     .main-header {
-        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-        padding: 1.8rem; border-radius: 12px; margin-bottom: 1.2rem; text-align: center;
+        background: linear-gradient(135deg, #111111 0%, #0d1f1a 60%, #0d2218 100%);
+        border: 1px solid #00d4aa33;
+        padding: 1.6rem 2rem; border-radius: 14px; margin-bottom: 1.4rem;
+        text-align: center;
     }
-    .main-header h1 { color: #e94560; margin: 0; font-size: 1.9rem; }
-    .main-header p  { color: #a8b2d8; margin: 0.4rem 0 0; font-size: 0.95rem; }
+    .main-header h1 { color: #00d4aa; margin: 0; font-size: 2rem; letter-spacing: -0.5px; }
+    .main-header p  { color: #7a9e96; margin: 0.35rem 0 0; font-size: 0.92rem; }
+
+    /* ── Metric cards ── */
     .metric-card {
-        background: #16213e; border: 1px solid #0f3460;
-        border-radius: 10px; padding: 0.9rem; text-align: center;
+        background: #111111; border: 1px solid #1e3530;
+        border-radius: 12px; padding: 1rem; text-align: center;
+        transition: border-color 0.2s;
     }
-    .metric-card h2 { color: #e94560; margin: 0; font-size: 1.7rem; }
-    .metric-card p  { color: #a8b2d8; margin: 0; font-size: 0.8rem; }
+    .metric-card:hover { border-color: #00d4aa55; }
+    .metric-card h2 { color: #00d4aa; margin: 0; font-size: 1.65rem; font-weight: 700; }
+    .metric-card p  { color: #7a9e96; margin: 0.2rem 0 0; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    /* ── Program cards ── */
     .prog-card {
-        background: #16213e; border-left: 4px solid #e94560;
-        border-radius: 8px; padding: 0.7rem 1rem; margin-bottom: 0.5rem;
+        background: #111111; border: 1px solid #1e3530;
+        border-left: 3px solid #00d4aa;
+        border-radius: 8px; padding: 0.6rem 1rem; margin-bottom: 0.4rem;
+        color: #e0e0e0; font-size: 0.9rem;
     }
-    .stButton > button {
-        background: linear-gradient(135deg, #e94560, #0f3460);
-        color: white; border: none; border-radius: 8px;
-        padding: 0.45rem 1rem; font-weight: bold; width: 100%;
+
+    /* ── Section header ── */
+    .section-header {
+        display: flex; align-items: center; gap: 10px; margin: 1.2rem 0 0.5rem;
     }
     .step-badge {
-        background: #e94560; color: #fff; border-radius: 50%;
-        padding: 2px 10px; font-weight: bold; margin-right: 8px;
+        background: #00d4aa; color: #0d0d0d; border-radius: 50%;
+        width: 28px; height: 28px; display: inline-flex; align-items: center;
+        justify-content: center; font-weight: 800; font-size: 0.85rem; flex-shrink: 0;
     }
+    .section-title { color: #e0e0e0; font-size: 1.1rem; font-weight: 600; margin: 0; }
+
+    /* ── Settings panel ── */
+    .settings-panel {
+        background: #111111; border: 1px solid #1e3530;
+        border-radius: 12px; padding: 1rem 1.4rem; margin-bottom: 1rem;
+    }
+
+    /* ── Buttons ── */
+    .stButton > button {
+        background: #00d4aa !important; color: #0d0d0d !important;
+        border: none !important; border-radius: 8px !important;
+        padding: 0.5rem 1.2rem !important; font-weight: 700 !important;
+        letter-spacing: 0.3px;
+    }
+    .stButton > button:hover { background: #00efc0 !important; }
+
+    /* ── Tabs ── */
+    [data-testid="stTabs"] button[data-baseweb="tab"] {
+        color: #7a9e96 !important; font-weight: 600;
+    }
+    [data-testid="stTabs"] button[aria-selected="true"] {
+        color: #00d4aa !important; border-bottom: 2px solid #00d4aa !important;
+    }
+
+    /* ── Divider ── */
+    hr { border-color: #1e3530 !important; }
+
+    /* ── Dataframe ── */
+    [data-testid="stDataFrame"] { border-radius: 10px; overflow: hidden; }
+
+    /* ── Info/success/warning boxes ── */
+    [data-testid="stAlert"] { border-radius: 8px; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -223,16 +271,13 @@ st.markdown("""
 
 def api_get(endpoint, params):
     """GET with automatic failover across all configured API keys on quota (403)."""
-    last_resp = None
     for key in (API_KEYS or [YOUTUBE_API_KEY]):
         params["key"] = key
         resp = requests.get(f"{YT_API_BASE}/{endpoint}", params=params, timeout=30)
         if resp.status_code == 403:
-            last_resp = resp
-            continue  # try next key
+            continue
         resp.raise_for_status()
         return resp.json()
-    # all keys exhausted
     st.error("⚠️ API quota exceeded on all keys. Try again after midnight US Pacific, "
              "or reduce the date range / scan depth.")
     st.stop()
@@ -254,10 +299,11 @@ def format_number(n):
 
 
 # ---------------------------------------------------------------------------
-# Trending (Tab 1)
+# Trending helpers (Tab 2)
 # ---------------------------------------------------------------------------
 
 def fetch_trending_videos(region_code, max_results, category_id=None):
+    """Fetch YouTube mostPopular chart for a region."""
     videos, next_page_token, remaining = [], None, max_results
     while remaining > 0:
         params = {
@@ -336,12 +382,68 @@ def aggregate_channel_data(videos, channel_details, local_only=False):
     return result
 
 
+@st.cache_data(show_spinner=False, ttl=3600)
+def get_local_channel_trending_stats(days_back):
+    """
+    For 'Local Channels Only' mode: fetch recent video stats for all curated channels
+    within the last `days_back` days and compute Hardcord Score from actual recent views.
+    This is more accurate than filtering the global mostPopular list (which rarely
+    includes local SL channels).
+    """
+    published_after = (date.today() - timedelta(days=days_back)).strftime("%Y-%m-%dT00:00:00Z")
+    ids = [cid for cid, _ in SRI_LANKA_LOCAL_CHANNELS.values()]
+    details = fetch_channel_details(ids)
+
+    rows = []
+    for ch_name, (cid, ch_type) in SRI_LANKA_LOCAL_CHANNELS.items():
+        d = details.get(cid, {})
+        ch_stats = d.get("statistics", {})
+        subscribers = safe_int(ch_stats.get("subscriberCount"))
+
+        # Search recent videos for this channel
+        search_data = api_get("search", {
+            "part": "id", "channelId": cid, "type": "video",
+            "order": "date", "publishedAfter": published_after, "maxResults": 10,
+        })
+        video_ids = [item["id"]["videoId"] for item in search_data.get("items", []) if item.get("id", {}).get("videoId")]
+        if not video_ids:
+            continue
+
+        vid_data = api_get("videos", {"part": "statistics", "id": ",".join(video_ids)})
+        total_views, total_likes, count = 0, 0, 0
+        for v in vid_data.get("items", []):
+            s = v.get("statistics", {})
+            total_views += safe_int(s.get("viewCount"))
+            total_likes += safe_int(s.get("likeCount"))
+            count += 1
+
+        if count == 0:
+            continue
+
+        score = compute_hardcord_score(total_views, total_likes, subscribers)
+        engagement = round((total_likes / max(total_views, 1)) * 100, 2)
+        rows.append({
+            "Rank": 0, "🇱🇰": "✅", "Channel": ch_name,
+            "Type": ch_type,
+            "Category": ch_type,
+            "Subscribers": subscribers,
+            "Total Views": total_views,
+            "Engagement %": engagement,
+            "Hardcord Score": score,
+            "Recent Videos": count,
+        })
+
+    rows.sort(key=lambda x: x["Hardcord Score"], reverse=True)
+    for i, r in enumerate(rows, 1):
+        r["Rank"] = i
+    return rows
+
+
 # ---------------------------------------------------------------------------
-# Program detection (Tab 2)
+# Program detection (Tab 1)
 # ---------------------------------------------------------------------------
 
 def extract_program_name(title):
-    """Extract the series/program name from an episode title."""
     t = title.strip()
     for dl in ["|", "–", "—", ":", "#"]:
         if dl in t:
@@ -349,13 +451,12 @@ def extract_program_name(title):
             break
     t = re.sub(r"(?i)\bepisode\b.*", "", t)
     t = re.sub(r"(?i)\bep\.?\s*\d.*", "", t)
-    t = re.sub(r"\d{2,}.*", "", t)            # trailing episode numbers / dates
-    t = re.sub(r"[\(\[].*?[\)\]]", "", t)     # bracketed extras (keep core name)
+    t = re.sub(r"\d{2,}.*", "", t)
+    t = re.sub(r"[\(\[].*?[\)\]]", "", t)
     t = t.strip(" -–—|.")
     return t.strip()
 
 
-# Keyword sets for program classification
 _NEWS_KW = ["news", "paththare", "wartha", "prime time", "lunch time",
             "වාර්ත", "ප්‍රවෘත්ති", "පුවත්", "satana", "balaya", "aluth parlimentuwa"]
 _REALITY_KW = ["star", "talent", "idol", "voice", "dancing", "dream", "champion",
@@ -368,7 +469,6 @@ _TALK_KW = ["talk", "interview", "chat", "salakuna", "tharu walalla",
 
 
 def classify_program(name, episodes):
-    """Classify a program as Teledrama / News / Reality / Music / Talk / Other."""
     n = name.lower()
     cats = [e.get("category_id", "") for e in episodes]
     dom = max(set(cats), key=cats.count) if cats else ""
@@ -390,7 +490,6 @@ def classify_program(name, episodes):
 
 @st.cache_data(show_spinner=False, ttl=3600)
 def get_curated_channel_stats():
-    """Fetch stats for all curated Sri Lankan channels."""
     ids = [cid for cid, _ in SRI_LANKA_LOCAL_CHANNELS.values()]
     details = fetch_channel_details(ids)
     rows = []
@@ -413,11 +512,6 @@ def get_curated_channel_stats():
 
 @st.cache_data(show_spinner=False, ttl=1800)
 def get_channel_programs(channel_id, date_from_str, date_to_str, max_scan):
-    """
-    Pull a channel's uploads within a date range, group into programs/series.
-    Returns dict: program_name -> {episodes: [...], total_views, avg_views, ...}
-    Each episode: {title, date, views, likes, comments, engagement, url}
-    """
     date_from = datetime.strptime(date_from_str, "%Y-%m-%d").date()
     date_to = datetime.strptime(date_to_str, "%Y-%m-%d").date()
 
@@ -453,7 +547,6 @@ def get_channel_programs(channel_id, date_from_str, date_to_str, max_scan):
         if stop or not page:
             break
 
-    # Fetch full stats
     stats = {}
     for i in range(0, len(video_ids), 50):
         data = api_get("videos", {"part": "snippet,statistics", "id": ",".join(video_ids[i:i+50])})
@@ -494,7 +587,6 @@ def get_channel_programs(channel_id, date_from_str, date_to_str, max_scan):
 
 
 def analyze_program(name, prog):
-    """Compute analysis metrics for a single program."""
     eps = prog["episodes"]
     count = len(eps)
     total_views = prog["total_views"]
@@ -503,7 +595,6 @@ def analyze_program(name, prog):
     lowest = min(eps, key=lambda e: e["views"])
     avg_eng = round(sum(e["engagement"] for e in eps) / max(count, 1), 2)
 
-    # Trend: last 5 vs first 5 by date
     if count >= 4:
         k = min(5, count // 2) or 1
         first = sum(e["views"] for e in eps[:k]) / k
@@ -530,13 +621,13 @@ def analyze_program(name, prog):
 
 
 # ---------------------------------------------------------------------------
-# Header
+# App Header
 # ---------------------------------------------------------------------------
 
 st.markdown("""
 <div class="main-header">
     <h1>📺 YouTube Program Analyzer</h1>
-    <p>Hardcord Ad Targeting — Compare Programs & Find the Best Episodes for 6-Second Ad Placement</p>
+    <p>Hardcord Ad Targeting · Compare Programs · Find the Best Episodes for 6-Second Ad Placement</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -549,39 +640,54 @@ if "selected_channel_id" not in st.session_state:
     st.session_state.selected_channel_id = None
     st.session_state.selected_channel_name = None
 if "compare" not in st.session_state:
-    st.session_state.compare = []   # list of program names (within selected channel)
+    st.session_state.compare = []
 
 tab1, tab2 = st.tabs(["🎭 Program Comparison", "📊 Trending Channels"])
 
+
 # ===========================================================================
-# TAB 1 — Program Comparison (the main reworked tool)
+# TAB 1 — Program Comparison
 # ===========================================================================
 
 with tab1:
-    # ---- Date range (drives all episode data) ----
-    st.markdown("#### 📅 Date Range")
-    dc1, dc2, dc3 = st.columns([1, 1, 1])
-    with dc1:
-        date_from = st.date_input("From", value=date.today() - timedelta(days=30), key="date_from")
-    with dc2:
-        date_to = st.date_input("To", value=date.today(), key="date_to")
-    with dc3:
-        max_scan = st.select_slider("Scan depth (uploads to check)",
-                                    options=[200, 500, 1000, 1500, 2500], value=1000)
+    # ── Date Range ──────────────────────────────────────────────────────────
+    st.markdown("""
+    <div class="section-header">
+        <span class="step-badge">📅</span>
+        <span class="section-title">Date Range & Scan Settings</span>
+    </div>
+    """, unsafe_allow_html=True)
+
+    with st.container():
+        dc1, dc2, dc3 = st.columns([1, 1, 1])
+        with dc1:
+            date_from = st.date_input("From", value=date.today() - timedelta(days=30), key="date_from")
+        with dc2:
+            date_to = st.date_input("To", value=date.today(), key="date_to")
+        with dc3:
+            max_scan = st.select_slider(
+                "Scan depth (uploads to check)",
+                options=[200, 500, 1000, 1500, 2500], value=1000,
+            )
+
     if date_from > date_to:
         st.error("'From' date must be before 'To' date.")
         st.stop()
 
     st.markdown("---")
 
-    # ---- STEP 1: Channel Comparison ----
-    st.markdown('<h4><span class="step-badge">1</span>Channel Comparison</h4>', unsafe_allow_html=True)
+    # ── STEP 1: Channel Comparison ───────────────────────────────────────────
+    st.markdown("""
+    <div class="section-header">
+        <span class="step-badge">1</span>
+        <span class="section-title">Channel Comparison</span>
+    </div>
+    """, unsafe_allow_html=True)
     st.caption("Sri Lankan channels ranked by total views. Click a row to select a channel.")
 
     with st.spinner("Loading channels..."):
         chan_stats = get_curated_channel_stats()
 
-    # Type filter for channel table
     all_ch_types = sorted({c["Type"] for c in chan_stats})
     sel_types = st.multiselect("Filter channel type", all_ch_types, default=all_ch_types, key="ch_type_filter")
     filtered_chans = [c for c in chan_stats if c["Type"] in sel_types]
@@ -606,7 +712,7 @@ with tab1:
         if chosen["channel_id"] != st.session_state.selected_channel_id:
             st.session_state.selected_channel_id = chosen["channel_id"]
             st.session_state.selected_channel_name = chosen["Channel"]
-            st.session_state.compare = []   # reset comparison on channel change
+            st.session_state.compare = []
 
     if not st.session_state.selected_channel_id:
         st.info("👆 Click a channel above to load its programs.")
@@ -615,12 +721,17 @@ with tab1:
     st.success(f"Selected channel: **{st.session_state.selected_channel_name}**")
     st.markdown("---")
 
-    # ---- STEP 2: Program list for selected channel ----
-    st.markdown('<h4><span class="step-badge">2</span>Programs in Date Range</h4>', unsafe_allow_html=True)
+    # ── STEP 2: Program list ─────────────────────────────────────────────────
+    st.markdown("""
+    <div class="section-header">
+        <span class="step-badge">2</span>
+        <span class="section-title">Programs in Date Range</span>
+    </div>
+    """, unsafe_allow_html=True)
     st.caption(f"Top programs on **{st.session_state.selected_channel_name}** "
                f"from {date_from} to {date_to}, ranked by views. Add up to 4 to compare.")
 
-    with st.spinner("Fetching & grouping programs (this can take a moment)..."):
+    with st.spinner("Fetching & grouping programs..."):
         programs = get_channel_programs(
             st.session_state.selected_channel_id,
             date_from.strftime("%Y-%m-%d"), date_to.strftime("%Y-%m-%d"), max_scan,
@@ -632,7 +743,6 @@ with tab1:
 
     ranked_programs = sorted(programs.items(), key=lambda x: x[1]["total_views"], reverse=True)
 
-    # Queued cards
     if st.session_state.compare:
         st.markdown("**🗂️ Queued for comparison:**")
         qcols = st.columns(4)
@@ -644,11 +754,9 @@ with tab1:
                     st.rerun()
         st.markdown("")
 
-    # Optional category filter
     all_types = sorted({p["category"] for _, p in ranked_programs})
     type_filter = st.multiselect("Filter by type", all_types, default=all_types)
 
-    # Program list with Add buttons (top 25 after filter)
     filtered = [(n, p) for n, p in ranked_programs if p["category"] in type_filter]
     for idx, (pname, pdata) in enumerate(filtered[:25]):
         c1, c2, c3, c4, c5 = st.columns([3.4, 1.5, 1.3, 1.1, 1.3])
@@ -673,15 +781,18 @@ with tab1:
 
     st.markdown("---")
 
-    # ---- STEP 3: Comparison Dashboard ----
-    st.markdown('<h4><span class="step-badge">3</span>Comparison Dashboard</h4>', unsafe_allow_html=True)
+    # ── STEP 3: Comparison Dashboard ────────────────────────────────────────
+    st.markdown("""
+    <div class="section-header">
+        <span class="step-badge">3</span>
+        <span class="section-title">Comparison Dashboard</span>
+    </div>
+    """, unsafe_allow_html=True)
 
     analyses = [analyze_program(p, programs[p]) for p in st.session_state.compare if p in programs]
-
-    # Hardcord priority ranking
     ranked_analyses = sorted(analyses, key=lambda a: a["hardcord"], reverse=True)
 
-    st.markdown("##### 🏆 Hardcord Priority Ranking (best → worst for ad placement)")
+    st.markdown("##### 🏆 Hardcord Priority Ranking")
     rank_df = pd.DataFrame([{
         "Priority": f"#{i+1}",
         "Program": a["name"],
@@ -700,11 +811,9 @@ with tab1:
             "Hardcord Score", min_value=0, max_value=max_hc, format="%.0f")},
     )
 
-    # Comparison charts
     cc1, cc2 = st.columns([3, 2])
-
     with cc1:
-        st.markdown("##### 📈 Episode Views Trend (all programs)")
+        st.markdown("##### 📈 Episode Views Trend")
         frames = []
         for a in analyses:
             df = pd.DataFrame(a["episodes"])[["date", "views"]].copy()
@@ -713,7 +822,7 @@ with tab1:
             frames.append(df)
         combined = pd.concat(frames, axis=1).sort_index()
         st.line_chart(combined, use_container_width=True)
-        st.caption("Higher line = more viewers. Peaks = best episodes to embed your 6-sec ad.")
+        st.caption("Peaks = best episodes to embed your 6-sec ad.")
 
     with cc2:
         st.markdown("##### 📊 Avg Views per Episode")
@@ -725,10 +834,13 @@ with tab1:
 
     st.markdown("---")
 
-    # Per-program detail
     st.markdown("##### 🔍 Per-Program Detail & Ad-Placement Guide")
     for a in ranked_analyses:
-        with st.expander(f"{a['trend_icon']} {a['name']} · {a['category']} — {format_number(a['avg_views'])} avg views/ep · {a['trend']}", expanded=True):
+        with st.expander(
+            f"{a['trend_icon']} {a['name']} · {a['category']} — "
+            f"{format_number(a['avg_views'])} avg views/ep · {a['trend']}",
+            expanded=True,
+        ):
             m1, m2, m3, m4, m5 = st.columns(5)
             m1.markdown(f'<div class="metric-card"><h2>{a["episode_count"]}</h2><p>Episodes</p></div>', unsafe_allow_html=True)
             m2.markdown(f'<div class="metric-card"><h2>{format_number(a["total_views"])}</h2><p>Total Views</p></div>', unsafe_allow_html=True)
@@ -737,24 +849,21 @@ with tab1:
             m5.markdown(f'<div class="metric-card"><h2>{a["trend_icon"]}</h2><p>{a["trend"]} ({a["trend_change"]:+.0f}%)</p></div>', unsafe_allow_html=True)
 
             hc1, hc2 = st.columns(2)
-            hc1.markdown(f"🔺 **Highest episode:** {format_number(a['highest']['views'])} views — "
+            hc1.markdown(f"🔺 **Highest:** {format_number(a['highest']['views'])} views — "
                          f"[{a['highest']['title'][:55]}]({a['highest']['url']})")
-            hc2.markdown(f"🔻 **Lowest episode:** {format_number(a['lowest']['views'])} views — "
+            hc2.markdown(f"🔻 **Lowest:** {format_number(a['lowest']['views'])} views — "
                          f"[{a['lowest']['title'][:55]}]({a['lowest']['url']})")
 
-            # Per-program viewership line
             pdf = pd.DataFrame(a["episodes"])[["date", "views"]].copy()
             pdf["date"] = pd.to_datetime(pdf["date"])
             st.line_chart(pdf.set_index("date")["views"], use_container_width=True)
 
-            # Top 3 ad-placement episodes
             top3 = sorted(a["episodes"], key=lambda e: e["views"], reverse=True)[:3]
-            st.markdown("**🎯 Best episodes to place your ad (highest viewership):**")
+            st.markdown("**🎯 Best episodes to place your ad:**")
             for e in top3:
                 st.markdown(f"- **{format_number(e['views'])} views** · {e['date']} · "
                             f"[{e['title'][:60]}]({e['url']})")
 
-            # Episode table + download
             ep_disp = pd.DataFrame([{
                 "Date": e["date"], "Episode": e["title"],
                 "Views": format_number(e["views"]), "Likes": format_number(e["likes"]),
@@ -766,54 +875,138 @@ with tab1:
 
             csv_buf = io.StringIO()
             pd.DataFrame(a["episodes"]).to_csv(csv_buf, index=False)
-            st.download_button(f"⬇️ Download '{a['name'][:20]}' episodes (CSV)", csv_buf.getvalue(),
-                               file_name=f"{re.sub(r'[^A-Za-z0-9]+','_',a['name'])[:30]}_{date_to}.csv",
-                               mime="text/csv", key=f"dl_{a['name']}")
+            st.download_button(
+                f"⬇️ Download '{a['name'][:20]}' episodes (CSV)", csv_buf.getvalue(),
+                file_name=f"{re.sub(r'[^A-Za-z0-9]+','_',a['name'])[:30]}_{date_to}.csv",
+                mime="text/csv", key=f"dl_{a['name']}",
+            )
 
 
 # ===========================================================================
 # TAB 2 — Trending Channels
+# (All settings are INLINE here — no sidebar — to avoid bleed into Tab 1)
 # ===========================================================================
 
 with tab2:
-    st.sidebar.title("⚙️ Trending Settings")
-    region_label = st.sidebar.selectbox("📍 Region", list(REGIONS.keys()), index=0)
-    region_code = REGIONS[region_label]
-    category_label = st.sidebar.selectbox("🎬 Category", list(CATEGORY_NAMES.values()), index=0)
-    category_id = {v: k for k, v in CATEGORY_NAMES.items()}.get(category_label, "")
-    max_results = st.sidebar.slider("📊 Videos to Analyze", 10, 50, 50, 10)
-    top_n = st.sidebar.slider("🏆 Top Channels", 5, 50, 20, 5)
-    local_only = st.sidebar.toggle("🇱🇰 Local Channels Only", value=False)
-    run_btn = st.sidebar.button("🚀 Run Trending Analysis")
+    st.markdown("""
+    <div class="section-header">
+        <span class="step-badge">⚙️</span>
+        <span class="section-title">Trending Settings</span>
+    </div>
+    """, unsafe_allow_html=True)
+
+    with st.container():
+        ts1, ts2, ts3 = st.columns([1, 1, 1])
+        with ts1:
+            region_label = st.selectbox("📍 Region", list(REGIONS.keys()), index=0, key="t_region")
+            region_code = REGIONS[region_label]
+            category_label = st.selectbox("🎬 Category", list(CATEGORY_NAMES.values()), index=0, key="t_cat")
+            category_id = {v: k for k, v in CATEGORY_NAMES.items()}.get(category_label, "")
+        with ts2:
+            period_options = {
+                "Last 7 days": 7,
+                "Last 14 days": 14,
+                "Last 30 days": 30,
+                "Last 90 days": 90,
+            }
+            period_label = st.selectbox("📅 Period", list(period_options.keys()), index=2, key="t_period")
+            days_back = period_options[period_label]
+            max_results = st.slider("📊 Videos to Analyze", 10, 50, 50, 10, key="t_max")
+        with ts3:
+            top_n = st.slider("🏆 Top Channels to Show", 5, 50, 20, 5, key="t_topn")
+            local_only = st.toggle("🇱🇰 Local SL Channels Only", value=False, key="t_local")
+            st.markdown("")
+            run_btn = st.button("🚀 Run Trending Analysis", key="t_run")
+
+    # ── How does this work? ──────────────────────────────────────────────────
+    with st.expander("ℹ️ How is the Trending Channel list obtained?"):
+        if local_only:
+            st.markdown("""
+**Local SL Channels mode** uses our curated list of **100 verified Sri Lankan channels**.
+For each channel, we pull their most recent videos published in the selected period and
+compute a **Hardcord Score** based on actual views, likes, and subscriber count.
+
+This gives a much more accurate picture than YouTube's global trending chart, which
+rarely features local Sri Lankan TV channels or creators.
+""")
+        else:
+            st.markdown(f"""
+**Global Trending mode** calls the **YouTube Data API v3** —
+`videos.list(chart="mostPopular", regionCode="{region_code}")`.
+
+YouTube itself decides which videos appear in this list based on views, shares, comments,
+and watch time in that region over the past ~48 hours. We then group those videos by channel,
+sum the views/likes, and compute a **Hardcord Score**:
+
+> `Score = (total_views / 1M) × engagement_rate% × log10(subscribers)`
+
+A higher score = better ROI for placing your 6-second hardcord ad.
+
+**Note:** Sri Lankan local TV channels and creators rarely appear in YouTube's global
+trending chart. Use **Local SL Channels Only** toggle to see a curated Sri Lankan ranking instead.
+""")
 
     if run_btn:
-        with st.spinner(f"Fetching trending videos for {region_label}..."):
-            videos = fetch_trending_videos(region_code, max_results, category_id or None)
-        if not videos:
-            st.warning("No trending videos found.")
-            st.stop()
-        with st.spinner("Fetching channel details..."):
-            cids = list({v["snippet"]["channelId"] for v in videos if v.get("snippet", {}).get("channelId")})
-            cdetails = fetch_channel_details(cids)
-        ranked = aggregate_channel_data(videos, cdetails, local_only=local_only)
-        if not ranked:
-            st.warning("No local channels in today's trending list. Turn off the local filter.")
-            st.stop()
+        if local_only:
+            with st.spinner(f"Scanning {len(SRI_LANKA_LOCAL_CHANNELS)} local channels for the past {days_back} days..."):
+                ranked = get_local_channel_trending_stats(days_back)
+            if not ranked:
+                st.warning("No data found for local channels in this period.")
+                st.stop()
 
-        max_score = ranked[0]["Hardcord Score"] if ranked else 1
-        disp = pd.DataFrame([{
-            "Rank": f"#{r['Rank']}", "🇱🇰": r["🇱🇰"], "Channel": r["Channel"],
-            "Category": r["Category"], "Subscribers": format_number(r["Subscribers"]),
-            "Total Views": format_number(r["Total Views"]),
-            "Engagement %": f"{r['Engagement %']}%", "Hardcord Score": r["Hardcord Score"],
-        } for r in ranked[:top_n]])
-        st.subheader(f"🏆 Top Channels — {region_label} | {category_label}")
-        st.dataframe(disp, use_container_width=True, hide_index=True,
-                     column_config={"Hardcord Score": st.column_config.ProgressColumn(
-                         "Hardcord Score", min_value=0, max_value=max_score, format="%.4f")})
+            st.subheader(f"🏆 Local SL Channels — {period_label}")
+            st.caption(f"Ranked by Hardcord Score based on recent video performance ({period_label})")
+
+            max_score = ranked[0]["Hardcord Score"] if ranked else 1
+            disp = pd.DataFrame([{
+                "Rank": f"#{r['Rank']}", "🇱🇰": "✅", "Channel": r["Channel"],
+                "Type": r["Type"],
+                "Subscribers": format_number(r["Subscribers"]),
+                "Total Views": format_number(r["Total Views"]),
+                "Engagement %": f"{r['Engagement %']}%",
+                "Hardcord Score": r["Hardcord Score"],
+                "Recent Videos": r["Recent Videos"],
+            } for r in ranked[:top_n]])
+            st.dataframe(
+                disp, use_container_width=True, hide_index=True,
+                column_config={"Hardcord Score": st.column_config.ProgressColumn(
+                    "Hardcord Score", min_value=0, max_value=max_score, format="%.4f")},
+            )
+
+        else:
+            with st.spinner(f"Fetching trending videos for {region_label}..."):
+                videos = fetch_trending_videos(region_code, max_results, category_id or None)
+            if not videos:
+                st.warning("No trending videos found.")
+                st.stop()
+            with st.spinner("Fetching channel details..."):
+                cids = list({v["snippet"]["channelId"] for v in videos if v.get("snippet", {}).get("channelId")})
+                cdetails = fetch_channel_details(cids)
+            ranked = aggregate_channel_data(videos, cdetails, local_only=False)
+            if not ranked:
+                st.warning("No channels found.")
+                st.stop()
+
+            st.subheader(f"🏆 Trending Channels — {region_label} | {category_label}")
+            max_score = ranked[0]["Hardcord Score"] if ranked else 1
+            disp = pd.DataFrame([{
+                "Rank": f"#{r['Rank']}", "🇱🇰": r["🇱🇰"], "Channel": r["Channel"],
+                "Category": r["Category"], "Subscribers": format_number(r["Subscribers"]),
+                "Total Views": format_number(r["Total Views"]),
+                "Engagement %": f"{r['Engagement %']}%", "Hardcord Score": r["Hardcord Score"],
+            } for r in ranked[:top_n]])
+            st.dataframe(
+                disp, use_container_width=True, hide_index=True,
+                column_config={"Hardcord Score": st.column_config.ProgressColumn(
+                    "Hardcord Score", min_value=0, max_value=max_score, format="%.4f")},
+            )
+
         buf = io.StringIO()
         pd.DataFrame(ranked[:top_n]).to_csv(buf, index=False)
-        st.download_button("⬇️ Download CSV", buf.getvalue(),
-                           file_name=f"trending_{region_code}_{date.today()}.csv", mime="text/csv")
+        st.download_button(
+            "⬇️ Download CSV", buf.getvalue(),
+            file_name=f"trending_{region_code}_{date.today()}.csv", mime="text/csv",
+            key="t_download",
+        )
     else:
-        st.info("👈 Configure settings in the sidebar and click **Run Trending Analysis**.")
+        st.info("👆 Configure settings above and click **Run Trending Analysis**.")
