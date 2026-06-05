@@ -80,6 +80,8 @@ SRI_LANKA_LOCAL_CHANNELS = {
     "Dhanith Sri":            ("UCyCNFZZpmyZQEgtar98I8tA", "🎥 Creator"),
     "DilShan L Silva":        ("UC5A7foGvdlddb0b6iHaqUBg", "🎥 Creator"),
     "Thiwanka Dilshan":       ("UCmr1WFY6P4PCmPlbic02iRA", "🎥 Creator"),
+    "Siril Ayya":             ("UCms4dlxLWI7SZNWPTxzDr-A", "🎥 Creator"),
+    "Vini Productions":       ("UCGkzF25IZBE1SF9ykM64xEA", "🎥 Creator"),
     # ── Music Artists ────────────────────────────────────────────────────
     "IRAJ":                   ("UCNO4dUilYfOikKlcbk5uBTg", "🎵 Music"),
     "Bathiya N Santhush":     ("UCvivK4AwTrkPBnmrObTFxaQ", "🎵 Music"),
