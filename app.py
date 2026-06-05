@@ -115,6 +115,32 @@ SRI_LANKA_LOCAL_CHANNELS = {
     "Allen K S L":            ("UCWrJW5qgCKGpYAxyMCp5Hxg", "🎮 Gaming"),
     # ── Vlog / Travel ────────────────────────────────────────────────────
     "Travel With Chatura":    ("UCwXfRdTtVeVnXXF4poaYw0Q", "🎥 Creator"),
+    # ── Expanded set ─────────────────────────────────────────────────────
+    "ITN Sri Lanka":          ("UCQTcNhAZidy1i9wwmdgf2Lw", "📰 News"),
+    "Sinhala Fairy Tales":    ("UC4j_fc1OaX2Up6UtizVmNKQ", "🧒 Kids"),
+    "SL Animation Cartoon":   ("UCVOZ_y2K3fnUOmuMtnxLk1Q", "🧒 Kids"),
+    "Lakai Sikai":            ("UCkuoWSLw-SNu8dvVCU0MjMQ", "🎥 Creator"),
+    "Rj Chandru Menaka":      ("UC9Slp55-nJIx-q1g_TJEY3Q", "🎥 Creator"),
+    "Meanwhile in SL":        ("UC5IDHX2sg9Hg_FPkXGUj_gw", "🎥 Creator"),
+    "Heshan Vlog":            ("UCiOEgWwAKbfrVb795hqQc9A", "🎥 Creator"),
+    "MCC Prime":              ("UC5R7F4Mw_ZV1c4tYe4UKLIg", "🎥 Creator"),
+    "ElaKiri":                ("UC-RZIjGh-BMEfzY1gb3XCCg", "🎥 Creator"),
+    "Dilip Kanakarathna":     ("UCOcVy09yuWmrbZnm_flr18A", "🎥 Creator"),
+    "Sri Lanka Cricket Vlog": ("UCiaD_MM6omMaxjTANcNPIeQ", "🎥 Creator"),
+    "SK VLOG":                ("UCR4TNhT3Bers8lIfmIucY7Q", "🎥 Creator"),
+    "SL VLOG":                ("UCo51bjbXU1YxOkv7EIlTi1g", "🎥 Creator"),
+    "Thamath Adare Nathnam":  ("UCxPInZUzPis7B5UWJN3ZXLA", "🎥 Creator"),
+    "දෙයියා (Deyya)":          ("UC4c_aCuQ9hfqHQJxdwRHlRA", "🎥 Creator"),
+    "Ape kama TV":            ("UCaPEESxxEokUiwxEJqD2U7w", "🎥 Creator"),
+    "iCrazeTech සිංහල":        ("UCHas-PlfQmgkcJK_JwLn_AA", "💻 Tech"),
+    "Sashika Nisansala":      ("UCFkXBw7ilY4pr7noFVK4S8Q", "🎵 Music"),
+    "Mihindu Ariyaratne":     ("UCOpRwp8jY6lAZRcTB_FbTuA", "🎵 Music"),
+    "Dushyanth Weeraman":     ("UClEUyN3C6oIAMOkc8TEN8Xg", "🎵 Music"),
+    "Torana Video Movies":    ("UCOiMY00_ZLijPF6InrCl0TA", "🎵 Music"),
+    "Ruwan Hettiarachchi":    ("UCsfvxX_dsfWS0Kker_HefQg", "🎵 Music"),
+    "Samitha Mudunkotuwa":    ("UCM575NP1NdR9SvgEtrcgfTg", "🎵 Music"),
+    "Ravi Royster":           ("UCZKBrRLW4o3J92VS3xSSDgw", "🎵 Music"),
+    "Siyatha FM":             ("UCHhk9EHspPZejY9PnR1PLVg", "📻 Radio"),
 }
 
 # ---------------------------------------------------------------------------
