@@ -21,7 +21,17 @@ import pandas as pd
 # Config
 # ---------------------------------------------------------------------------
 
-YOUTUBE_API_KEY = st.secrets.get("YOUTUBE_API_KEY", os.getenv("YOUTUBE_API_KEY", ""))
+def _load_api_keys():
+    """Collect all configured API keys (supports YOUTUBE_API_KEY, YOUTUBE_API_KEY2, ...)."""
+    keys = []
+    for name in ("YOUTUBE_API_KEY", "YOUTUBE_API_KEY2", "YOUTUBE_API_KEY3"):
+        val = st.secrets.get(name, os.getenv(name, "")) if hasattr(st, "secrets") else os.getenv(name, "")
+        if val and val not in keys:
+            keys.append(val)
+    return keys
+
+API_KEYS = _load_api_keys()
+YOUTUBE_API_KEY = API_KEYS[0] if API_KEYS else ""
 YT_API_BASE = "https://www.googleapis.com/youtube/v3"
 
 CATEGORY_NAMES = {
@@ -141,6 +151,30 @@ SRI_LANKA_LOCAL_CHANNELS = {
     "Samitha Mudunkotuwa":    ("UCM575NP1NdR9SvgEtrcgfTg", "🎵 Music"),
     "Ravi Royster":           ("UCZKBrRLW4o3J92VS3xSSDgw", "🎵 Music"),
     "Siyatha FM":             ("UCHhk9EHspPZejY9PnR1PLVg", "📻 Radio"),
+    # ── Expanded set 2 (to 100) ──────────────────────────────────────────
+    "Sri Lanka Cricket":      ("UCJA-NQ4MtcRIog66wziD8fA", "⚽ Sports"),
+    "Apé Amma":               ("UC4UaWbUUwVvCxWNqhb4f16Q", "🎥 Creator"),
+    "Traditional Me":         ("UCfCw8GGyGpXmtxDTNJ7J5VA", "🎥 Creator"),
+    "Poorna - Nature Girl":   ("UCtVDQNGBmS8DTP5fPzM_GmQ", "🎥 Creator"),
+    "Blok & Dino":            ("UCTcATaNqlaCF4zkZp29BJRQ", "🎥 Creator"),
+    "Village Kitchen":        ("UC3DxQF4wzjUjRlsLZxxkOLA", "🎥 Creator"),
+    "Oshan Liyanage Dance":   ("UCwrJnrHM2qRjjiSVk1nlx4Q", "🎥 Creator"),
+    "Raamuwa":                ("UCUFYmdx-eTBO0-s2qTG6cDw", "🎥 Creator"),
+    "Travel With Wife":       ("UCiJfplrc7idtWYpDsI325yQ", "🎥 Creator"),
+    "Cosmo Beauty Studio":    ("UCsF6mvxEdYLDrYNOj4aykPw", "🎥 Creator"),
+    "VIDU":                   ("UCgPL5V2N_KEDSyWvMwHt2nw", "🎥 Creator"),
+    "Travel Today":           ("UCEHs7ymn9hxSJMHLlcFLj0w", "🎥 Creator"),
+    "Trip Pisso":             ("UC7hqTC-ChL-_PUKhctTt50A", "🎥 Creator"),
+    "Jayspot Productions":    ("UC3CpNSEEj5KWOeaJ00ZHKcA", "🎥 Creator"),
+    "RaMoD with COOL STEPS":  ("UCMBCoqwqNVVKwGDMcOraXBA", "🎥 Creator"),
+    "beauty with sumu":       ("UCa151heZf71ui28zh5OnhsA", "🎥 Creator"),
+    "The Sailor":             ("UCTi36zetYBtNR4MW2zSmPjQ", "🎥 Creator"),
+    "Magic Compass":          ("UCJL33sl0UYzAgAc0g3Yq5LQ", "🎥 Creator"),
+    "The Voice Kids LK":      ("UCtBhlCYSLlz2TO9hK93micg", "🎤 Reality"),
+    "Desawana Remix":         ("UCnGcBhZNMIm490OrdkI0JIg", "🎵 Music"),
+    "Mohan Palliyaguru":      ("UC7Gw2ithc7T3ZvGA4AOgOsg", "🎵 Music"),
+    "Science With Ruchira":   ("UCR5y9OV23c0jJ4RGwDvGnLw", "💻 Tech"),
+    "B I L L A":              ("UC1dfhQyj962rwYPVLi3OHLg", "🎮 Gaming"),
 }
 
 # ---------------------------------------------------------------------------
@@ -188,13 +222,20 @@ st.markdown("""
 # ---------------------------------------------------------------------------
 
 def api_get(endpoint, params):
-    params["key"] = YOUTUBE_API_KEY
-    resp = requests.get(f"{YT_API_BASE}/{endpoint}", params=params, timeout=30)
-    if resp.status_code == 403:
-        st.error("⚠️ API quota exceeded or key invalid. Try again later or reduce the date range / scan depth.")
-        st.stop()
-    resp.raise_for_status()
-    return resp.json()
+    """GET with automatic failover across all configured API keys on quota (403)."""
+    last_resp = None
+    for key in (API_KEYS or [YOUTUBE_API_KEY]):
+        params["key"] = key
+        resp = requests.get(f"{YT_API_BASE}/{endpoint}", params=params, timeout=30)
+        if resp.status_code == 403:
+            last_resp = resp
+            continue  # try next key
+        resp.raise_for_status()
+        return resp.json()
+    # all keys exhausted
+    st.error("⚠️ API quota exceeded on all keys. Try again after midnight US Pacific, "
+             "or reduce the date range / scan depth.")
+    st.stop()
 
 
 def safe_int(value, default=0):
