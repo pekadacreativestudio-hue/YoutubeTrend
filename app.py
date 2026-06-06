@@ -16,6 +16,8 @@ from math import log10
 import requests
 import streamlit as st
 import pandas as pd
+import plotly.graph_objects as go
+import plotly.express as px
 
 # ---------------------------------------------------------------------------
 # Config
@@ -887,8 +889,141 @@ tab1, tab2 = st.tabs(["🎭 Program Comparison", "📊 Trending Channels"])
 # TAB 1 — Program Comparison
 # ===========================================================================
 
+PLOTLY_COLORS = ["#FF0000", "#0066FF", "#00AA44", "#FF8800", "#9900CC"]
+
+
+def _plotly_line(analyses):
+    """Interactive Plotly line chart — hover shows episode title + views."""
+    fig = go.Figure()
+    for i, a in enumerate(analyses):
+        eps = sorted(a["episodes"], key=lambda e: e["date"])
+        dates = [e["date"] for e in eps]
+        views = [e["views"] for e in eps]
+        titles = [e["title"][:60] for e in eps]
+        fig.add_trace(go.Scatter(
+            x=dates, y=views,
+            mode="lines+markers",
+            name=a["name"][:30],
+            line=dict(color=PLOTLY_COLORS[i % len(PLOTLY_COLORS)], width=2.5),
+            marker=dict(size=7, symbol="circle"),
+            hovertemplate=(
+                "<b>%{customdata}</b><br>"
+                "Views: <b>%{y:,}</b><br>"
+                "Date: %{x}<extra>" + a["name"][:20] + "</extra>"
+            ),
+            customdata=titles,
+        ))
+    fig.update_layout(
+        paper_bgcolor="white", plot_bgcolor="#fafafa",
+        font=dict(family="Inter, sans-serif", size=12, color="#1a1a2e"),
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="left", x=0),
+        xaxis=dict(showgrid=True, gridcolor="#f0f0f0", title=""),
+        yaxis=dict(showgrid=True, gridcolor="#f0f0f0", title="Views",
+                   tickformat=".2s"),
+        hovermode="closest",
+        margin=dict(l=10, r=10, t=40, b=10),
+        height=320,
+    )
+    return fig
+
+
+def _plotly_bar(ranked_analyses):
+    """Interactive bar chart — avg views per program."""
+    names = [a["name"][:28] for a in ranked_analyses]
+    values = [a["avg_views"] for a in ranked_analyses]
+    colors = [PLOTLY_COLORS[i % len(PLOTLY_COLORS)] for i in range(len(ranked_analyses))]
+    fig = go.Figure(go.Bar(
+        x=values, y=names, orientation="h",
+        marker_color=colors,
+        hovertemplate="<b>%{y}</b><br>Avg Views: <b>%{x:,}</b><extra></extra>",
+        text=[format_number(v) for v in values],
+        textposition="outside",
+    ))
+    fig.update_layout(
+        paper_bgcolor="white", plot_bgcolor="#fafafa",
+        font=dict(family="Inter, sans-serif", size=12, color="#1a1a2e"),
+        xaxis=dict(showgrid=True, gridcolor="#f0f0f0", tickformat=".2s"),
+        yaxis=dict(showgrid=False),
+        margin=dict(l=10, r=60, t=20, b=10),
+        height=260,
+    )
+    return fig
+
+
+def _plotly_radar(ranked_analyses):
+    """Spider/radar chart comparing programs across 4 dimensions."""
+    categories = ["Avg Views", "Engagement", "Episodes", "Trend Score"]
+    fig = go.Figure()
+    for i, a in enumerate(ranked_analyses):
+        # Normalise each axis 0-100 relative to peers
+        max_views = max(x["avg_views"] for x in ranked_analyses) or 1
+        max_eng = max(x["avg_engagement"] for x in ranked_analyses) or 1
+        max_eps = max(x["episode_count"] for x in ranked_analyses) or 1
+        trend_map = {"Growing": 100, "Stable": 60, "Declining": 20}
+        vals = [
+            round(a["avg_views"] / max_views * 100, 1),
+            round(a["avg_engagement"] / max_eng * 100, 1),
+            round(a["episode_count"] / max_eps * 100, 1),
+            trend_map.get(a["trend"], 60),
+        ]
+        vals_closed = vals + [vals[0]]
+        cats_closed = categories + [categories[0]]
+        fig.add_trace(go.Scatterpolar(
+            r=vals_closed, theta=cats_closed,
+            fill="toself", name=a["name"][:25],
+            line=dict(color=PLOTLY_COLORS[i % len(PLOTLY_COLORS)], width=2),
+            fillcolor=PLOTLY_COLORS[i % len(PLOTLY_COLORS)],
+            opacity=0.18,
+        ))
+    fig.update_layout(
+        polar=dict(
+            bgcolor="#fafafa",
+            radialaxis=dict(visible=True, range=[0, 100], tickfont=dict(size=9)),
+        ),
+        paper_bgcolor="white",
+        font=dict(family="Inter, sans-serif", size=11, color="#1a1a2e"),
+        legend=dict(orientation="h", yanchor="top", y=-0.1),
+        margin=dict(l=30, r=30, t=30, b=30),
+        height=300,
+        showlegend=True,
+    )
+    return fig
+
+
+def _plotly_episode_detail(a):
+    """Per-program interactive line with episode title on hover."""
+    eps = sorted(a["episodes"], key=lambda e: e["date"])
+    fig = go.Figure(go.Scatter(
+        x=[e["date"] for e in eps],
+        y=[e["views"] for e in eps],
+        mode="lines+markers",
+        line=dict(color="#FF0000", width=2.5),
+        marker=dict(size=8, color="#FF0000",
+                    line=dict(color="white", width=1.5)),
+        hovertemplate=(
+            "<b>%{customdata}</b><br>"
+            "Views: <b>%{y:,}</b><br>"
+            "Date: %{x}"
+            "<extra></extra>"
+        ),
+        customdata=[e["title"][:65] for e in eps],
+        fill="tozeroy",
+        fillcolor="rgba(255,0,0,0.06)",
+    ))
+    fig.update_layout(
+        paper_bgcolor="white", plot_bgcolor="#fafafa",
+        font=dict(family="Inter, sans-serif", size=11),
+        xaxis=dict(showgrid=True, gridcolor="#f0f0f0", title=""),
+        yaxis=dict(showgrid=True, gridcolor="#f0f0f0",
+                   tickformat=".2s", title="Views"),
+        margin=dict(l=10, r=10, t=10, b=10),
+        height=240,
+    )
+    return fig
+
+
 def render_program_comparison():
-    # ── Date Range ──────────────────────────────────────────────────────────
+    # ── Date Range with quick preset pills ──────────────────────────────────
     st.markdown("""
     <div class="section-header">
         <span class="step-badge">📅</span>
@@ -896,17 +1031,36 @@ def render_program_comparison():
     </div>
     """, unsafe_allow_html=True)
 
-    with st.container():
-        dc1, dc2, dc3 = st.columns([1, 1, 1])
-        with dc1:
-            date_from = st.date_input("From", value=date.today() - timedelta(days=30), key="date_from")
-        with dc2:
-            date_to = st.date_input("To", value=date.today(), key="date_to")
-        with dc3:
-            max_scan = st.select_slider(
-                "Scan depth (uploads to check)",
-                options=[200, 500, 1000, 1500, 2500], value=1000,
-            )
+    # Quick preset buttons
+    preset_cols = st.columns(6)
+    presets = {"7D": 7, "14D": 14, "30D": 30, "60D": 60, "90D": 90, "Custom": None}
+    if "date_preset" not in st.session_state:
+        st.session_state.date_preset = "30D"
+
+    for col, (label, days) in zip(preset_cols, presets.items()):
+        active = st.session_state.date_preset == label
+        if col.button(
+            label,
+            key=f"preset_{label}",
+            type="primary" if active else "secondary",
+        ):
+            st.session_state.date_preset = label
+            st.rerun()
+
+    # Date inputs — shown always; presets control defaults
+    preset_days = presets.get(st.session_state.date_preset)
+    default_from = (date.today() - timedelta(days=preset_days)) if preset_days else (date.today() - timedelta(days=30))
+
+    dc1, dc2, dc3 = st.columns([1, 1, 1])
+    with dc1:
+        date_from = st.date_input("From", value=default_from, key="date_from")
+    with dc2:
+        date_to = st.date_input("To", value=date.today(), key="date_to")
+    with dc3:
+        max_scan = st.select_slider(
+            "Scan depth",
+            options=[200, 500, 1000, 1500, 2500], value=1000,
+        )
 
     if date_from > date_to:
         st.error("'From' date must be before 'To' date.")
@@ -914,21 +1068,42 @@ def render_program_comparison():
 
     st.markdown("---")
 
-    # ── STEP 1: Channel Comparison ───────────────────────────────────────────
+    # ── STEP 1: Channel Selection ────────────────────────────────────────────
     st.markdown("""
     <div class="section-header">
         <span class="step-badge">1</span>
-        <span class="section-title">Channel Comparison</span>
+        <span class="section-title">Select a Channel</span>
     </div>
     """, unsafe_allow_html=True)
-    st.caption("Sri Lankan channels ranked by total views. Click a row to select a channel.")
 
     with st.spinner("Loading channels..."):
         chan_stats = get_curated_channel_stats()
+    st.toast(f"✅ Loaded {len(chan_stats)} Sri Lankan channels", icon="📺")
 
+    # Live search bar
+    search_q = st.text_input("🔍 Search channels", placeholder="Type a channel name…", key="chan_search")
+
+    # Type filter chips (inline pills using columns)
     all_ch_types = sorted({c["Type"] for c in chan_stats})
-    sel_types = st.multiselect("Filter channel type", all_ch_types, default=all_ch_types, key="ch_type_filter")
-    filtered_chans = [c for c in chan_stats if c["Type"] in sel_types]
+    if "sel_types" not in st.session_state:
+        st.session_state.sel_types = set(all_ch_types)
+
+    chip_cols = st.columns(len(all_ch_types))
+    for col, t in zip(chip_cols, all_ch_types):
+        active = t in st.session_state.sel_types
+        if col.button(t, key=f"chip_{t}", type="primary" if active else "secondary"):
+            if active:
+                st.session_state.sel_types.discard(t)
+            else:
+                st.session_state.sel_types.add(t)
+            st.rerun()
+
+    # Filter channels
+    filtered_chans = [
+        c for c in chan_stats
+        if c["Type"] in st.session_state.sel_types
+        and (not search_q or search_q.lower() in c["Channel"].lower())
+    ]
 
     chan_df = pd.DataFrame([{
         "Rank": f"#{c['Rank']}",
@@ -951,36 +1126,43 @@ def render_program_comparison():
             st.session_state.selected_channel_id = chosen["channel_id"]
             st.session_state.selected_channel_name = chosen["Channel"]
             st.session_state.compare = []
+            st.toast(f"📺 Selected: {chosen['Channel']}", icon="✅")
 
     if not st.session_state.selected_channel_id:
-        st.info("👆 Click a channel above to load its programs.")
+        st.info("👆 Click a channel row above to load its programs.")
         return
 
-    st.success(f"Selected channel: **{st.session_state.selected_channel_name}**")
+    st.success(f"**{st.session_state.selected_channel_name}** selected — showing programs from {date_from} → {date_to}")
     st.markdown("---")
 
-    # ── STEP 2: Program list ─────────────────────────────────────────────────
+    # ── STEP 2: Program List ─────────────────────────────────────────────────
     st.markdown("""
     <div class="section-header">
         <span class="step-badge">2</span>
         <span class="section-title">Programs in Date Range</span>
     </div>
     """, unsafe_allow_html=True)
-    st.caption(f"Top programs on **{st.session_state.selected_channel_name}** "
-               f"from {date_from} to {date_to}, ranked by views. Add up to 4 to compare.")
 
-    with st.spinner("Fetching & grouping programs..."):
+    prog_status = st.empty()
+    prog_bar = st.progress(0, text="Fetching channel info…")
+    prog_bar.progress(20, text="Scanning uploads…")
+    with st.spinner(""):
         programs = get_channel_programs(
             st.session_state.selected_channel_id,
             date_from.strftime("%Y-%m-%d"), date_to.strftime("%Y-%m-%d"), max_scan,
         )
+    prog_bar.progress(100, text="Done!")
+    prog_bar.empty()
 
     if not programs:
         st.warning("No uploads found in this date range. Try widening the range or increasing scan depth.")
         return
 
+    st.toast(f"✅ Found {len(programs)} programs on {st.session_state.selected_channel_name}", icon="🎬")
+
     ranked_programs = sorted(programs.items(), key=lambda x: x[1]["total_views"], reverse=True)
 
+    # Queued comparison pills
     if st.session_state.compare:
         st.markdown("**🗂️ Queued for comparison:**")
         qcols = st.columns(4)
@@ -990,14 +1172,49 @@ def render_program_comparison():
                 if st.button("✖ Remove", key=f"rm_{i}"):
                     st.session_state.compare.remove(pname)
                     st.rerun()
-        st.markdown("")
 
-    all_types = sorted({p["category"] for _, p in ranked_programs})
-    type_filter = st.multiselect("Filter by type", all_types, default=all_types)
+    # Sort + type filter controls
+    ctrl1, ctrl2, ctrl3 = st.columns([2, 2, 1])
+    with ctrl1:
+        sort_by = st.selectbox("Sort by", ["Most Views", "Best Engagement", "Most Episodes", "Growing Trend"], key="prog_sort")
+    with ctrl2:
+        all_prog_types = sorted({p["category"] for _, p in ranked_programs})
+        type_filter = st.multiselect("Filter type", all_prog_types, default=all_prog_types, key="prog_type_filter")
+    with ctrl3:
+        prog_search = st.text_input("🔍 Search programs", placeholder="Name…", key="prog_search")
 
-    filtered = [(n, p) for n, p in ranked_programs if p["category"] in type_filter]
-    for idx, (pname, pdata) in enumerate(filtered[:25]):
-        c1, c2, c3, c4, c5 = st.columns([3.4, 1.5, 1.3, 1.1, 1.3])
+    # Apply sort
+    def sort_key(item):
+        _, p = item
+        if sort_by == "Best Engagement":
+            eps = p["episodes"]
+            return sum(e["engagement"] for e in eps) / max(len(eps), 1)
+        if sort_by == "Most Episodes":
+            return p["episode_count"]
+        if sort_by == "Growing Trend":
+            eps = sorted(p["episodes"], key=lambda e: e["date"])
+            if len(eps) >= 4:
+                k = min(5, len(eps) // 2)
+                first = sum(e["views"] for e in eps[:k]) / k
+                last = sum(e["views"] for e in eps[-k:]) / k
+                return (last - first) / max(first, 1)
+            return 0
+        return p["total_views"]
+
+    filtered = [
+        (n, p) for n, p in sorted(ranked_programs, key=sort_key, reverse=True)
+        if p["category"] in type_filter
+        and (not prog_search or prog_search.lower() in n.lower())
+    ]
+
+    # Program rows
+    hdr = st.columns([3.2, 1.6, 1.4, 1.0, 1.4])
+    for h, t in zip(hdr, ["Program", "Type", "Views", "Episodes", "Action"]):
+        h.markdown(f"**{t}**")
+    st.markdown("<hr style='margin:4px 0 8px'>", unsafe_allow_html=True)
+
+    for idx, (pname, pdata) in enumerate(filtered[:30]):
+        c1, c2, c3, c4, c5 = st.columns([3.2, 1.6, 1.4, 1.0, 1.4])
         c1.markdown(f"**{pname}**")
         c2.markdown(pdata["category"])
         c3.markdown(f"👁 {format_number(pdata['total_views'])}")
@@ -1011,6 +1228,7 @@ def render_program_comparison():
         else:
             if c5.button("➕ Add", key=f"add_{idx}"):
                 st.session_state.compare.append(pname)
+                st.toast(f"➕ Added: {pname[:30]}", icon="🎬")
                 st.rerun()
 
     if not st.session_state.compare:
@@ -1030,7 +1248,42 @@ def render_program_comparison():
     analyses = [analyze_program(p, programs[p]) for p in st.session_state.compare if p in programs]
     ranked_analyses = sorted(analyses, key=lambda a: a["hardcord"], reverse=True)
 
+    # ── 🎯 Ad Placement Recommendation Banner ─────────────────────────────
+    best_ep = max(
+        (e for a in analyses for e in a["episodes"]),
+        key=lambda e: e["views"],
+    )
+    best_prog = next(a for a in analyses if best_ep in a["episodes"])
+    st.markdown(f"""
+    <div style="
+        background: linear-gradient(135deg, #FF0000, #cc0000);
+        border-radius: 14px; padding: 1.2rem 1.6rem; margin-bottom: 1rem;
+        box-shadow: 0 6px 20px rgba(255,0,0,0.3); color: white;
+    ">
+        <div style="font-size:0.8rem; text-transform:uppercase; letter-spacing:1px; opacity:0.85; margin-bottom:4px;">
+            🎯 Best Episode to Place Your Ad RIGHT NOW
+        </div>
+        <div style="font-size:1.4rem; font-weight:800; line-height:1.2; margin-bottom:6px;">
+            {best_ep['title'][:70]}
+        </div>
+        <div style="display:flex; gap:24px; flex-wrap:wrap; font-size:0.95rem; opacity:0.95;">
+            <span>👁 <b>{format_number(best_ep['views'])}</b> views</span>
+            <span>📺 <b>{best_prog['name'][:25]}</b></span>
+            <span>📅 <b>{best_ep['date']}</b></span>
+            <span>💬 <b>{best_ep['engagement']}%</b> engagement</span>
+        </div>
+        <div style="margin-top:8px;">
+            <a href="{best_ep['url']}" target="_blank"
+               style="color:white; text-decoration:underline; font-weight:600; font-size:0.9rem;">
+                ▶ Watch Episode →
+            </a>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # ── Priority Ranking Table ─────────────────────────────────────────────
     st.markdown("##### 🏆 Hardcord Priority Ranking")
+    max_hc = max((a["hardcord"] for a in analyses), default=1)
     rank_df = pd.DataFrame([{
         "Priority": f"#{i+1}",
         "Program": a["name"],
@@ -1042,36 +1295,29 @@ def render_program_comparison():
         "Trend": f"{a['trend_icon']} {a['trend']}",
         "Hardcord Score": a["hardcord"],
     } for i, a in enumerate(ranked_analyses)])
-    max_hc = max((a["hardcord"] for a in analyses), default=1)
     st.dataframe(
         rank_df, use_container_width=True, hide_index=True,
         column_config={"Hardcord Score": st.column_config.ProgressColumn(
             "Hardcord Score", min_value=0, max_value=max_hc, format="%.0f")},
     )
 
-    cc1, cc2 = st.columns([3, 2])
-    with cc1:
-        st.markdown("##### 📈 Episode Views Trend")
-        frames = []
-        for a in analyses:
-            df = pd.DataFrame(a["episodes"])[["date", "views"]].copy()
-            df["date"] = pd.to_datetime(df["date"])
-            df = df.groupby("date")["views"].mean().rename(a["name"][:25])
-            frames.append(df)
-        combined = pd.concat(frames, axis=1).sort_index()
-        st.line_chart(combined, use_container_width=True)
-        st.caption("Peaks = best episodes to embed your 6-sec ad.")
+    # ── Interactive Charts ─────────────────────────────────────────────────
+    st.markdown("##### 📈 Episode Views Trend — hover a point to see episode title")
+    st.plotly_chart(_plotly_line(analyses), use_container_width=True)
+    st.caption("Click legend items to show/hide programs. Drag to zoom. Double-click to reset.")
 
-    with cc2:
+    ch_left, ch_right = st.columns([1, 1])
+    with ch_left:
         st.markdown("##### 📊 Avg Views per Episode")
-        bar_df = pd.DataFrame({
-            "Program": [a["name"][:22] for a in ranked_analyses],
-            "Avg Views": [a["avg_views"] for a in ranked_analyses],
-        }).set_index("Program")
-        st.bar_chart(bar_df, use_container_width=True)
+        st.plotly_chart(_plotly_bar(ranked_analyses), use_container_width=True)
+    with ch_right:
+        st.markdown("##### 🕸️ Program Comparison Radar")
+        st.caption("Scores normalised to 100 across all compared programs.")
+        st.plotly_chart(_plotly_radar(ranked_analyses), use_container_width=True)
 
     st.markdown("---")
 
+    # ── Per-Program Detail ─────────────────────────────────────────────────
     st.markdown("##### 🔍 Per-Program Detail & Ad-Placement Guide")
     for a in ranked_analyses:
         with st.expander(
@@ -1092,9 +1338,8 @@ def render_program_comparison():
             hc2.markdown(f"🔻 **Lowest:** {format_number(a['lowest']['views'])} views — "
                          f"[{a['lowest']['title'][:55]}]({a['lowest']['url']})")
 
-            pdf = pd.DataFrame(a["episodes"])[["date", "views"]].copy()
-            pdf["date"] = pd.to_datetime(pdf["date"])
-            st.line_chart(pdf.set_index("date")["views"], use_container_width=True)
+            # Interactive per-program line
+            st.plotly_chart(_plotly_episode_detail(a), use_container_width=True)
 
             top3 = sorted(a["episodes"], key=lambda e: e["views"], reverse=True)[:3]
             st.markdown("**🎯 Best episodes to place your ad:**")
@@ -1114,7 +1359,7 @@ def render_program_comparison():
             csv_buf = io.StringIO()
             pd.DataFrame(a["episodes"]).to_csv(csv_buf, index=False)
             st.download_button(
-                f"⬇️ Download '{a['name'][:20]}' episodes (CSV)", csv_buf.getvalue(),
+                f"⬇️ Download '{a['name'][:20]}' CSV", csv_buf.getvalue(),
                 file_name=f"{re.sub(r'[^A-Za-z0-9]+','_',a['name'])[:30]}_{date_to}.csv",
                 mime="text/csv", key=f"dl_{a['name']}",
             )
