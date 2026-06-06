@@ -325,6 +325,21 @@ st.markdown("""
         transform: translateY(-1px);
     }
 
+    /* ── Secondary buttons — white gradient pill style ── */
+    .stButton > button[kind="secondary"] {
+        background: linear-gradient(135deg, #ffffff 0%, #f1f3f5 100%) !important;
+        color: #444444 !important;
+        border: 1.5px solid #d0d0d0 !important;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.08) !important;
+    }
+    .stButton > button[kind="secondary"]:hover {
+        background: linear-gradient(135deg, #f8f8f8 0%, #e8eaed 100%) !important;
+        border-color: #b0b0b0 !important;
+        color: #FF0000 !important;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.12) !important;
+        transform: translateY(-1px);
+    }
+
     /* ═══════════════════════════════════════════════════════════
        TABS
     ═══════════════════════════════════════════════════════════ */
