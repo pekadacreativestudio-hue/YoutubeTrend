@@ -615,6 +615,11 @@ def format_number(n):
     return str(int(n))
 
 
+def thumb_url(video_id, quality="mqdefault"):
+    """Return YouTube thumbnail URL for a video ID (no API call needed)."""
+    return f"https://img.youtube.com/vi/{video_id}/{quality}.jpg"
+
+
 # ---------------------------------------------------------------------------
 # Trending helpers (Tab 2)
 # ---------------------------------------------------------------------------
@@ -914,6 +919,7 @@ def get_channel_programs(channel_id, date_from_str, date_to_str, max_scan):
         likes = safe_int(s.get("likeCount"))
         comments = safe_int(s.get("commentCount"))
         groups[name].append({
+            "video_id": vid,
             "title": snippet["title"],
             "date": snippet["publishedAt"][:10],
             "views": views,
@@ -922,6 +928,7 @@ def get_channel_programs(channel_id, date_from_str, date_to_str, max_scan):
             "engagement": round((likes / max(views, 1)) * 100, 2),
             "category_id": snippet.get("categoryId", ""),
             "url": f"https://youtube.com/watch?v={vid}",
+            "thumbnail": thumb_url(vid),
         })
 
     programs = {}
@@ -1409,27 +1416,35 @@ def render_program_comparison():
         key=lambda e: e["views"],
     )
     best_prog = next(a for a in analyses if best_ep in a["episodes"])
+    best_thumb = best_ep.get("thumbnail", thumb_url(best_ep.get("video_id", "")))
     st.markdown(f"""
     <div style="
         background: linear-gradient(135deg, #FF0000, #cc0000);
-        border-radius: 14px; padding: 1.2rem 1.6rem; margin-bottom: 1rem;
-        box-shadow: 0 6px 20px rgba(255,0,0,0.3); color: white;
+        border-radius: 16px; padding: 0; margin-bottom: 1rem;
+        box-shadow: 0 6px 28px rgba(255,0,0,0.35); color: white;
+        display:flex; overflow:hidden;
     ">
-        <div style="font-size:0.8rem; text-transform:uppercase; letter-spacing:1px; opacity:0.85; margin-bottom:4px;">
-            🎯 Best Episode to Place Your Ad RIGHT NOW
-        </div>
-        <div style="font-size:1.4rem; font-weight:800; line-height:1.2; margin-bottom:6px;">
-            {best_ep['title'][:70]}
-        </div>
-        <div style="display:flex; gap:24px; flex-wrap:wrap; font-size:0.95rem; opacity:0.95;">
-            <span>👁 <b>{format_number(best_ep['views'])}</b> views</span>
-            <span>📺 <b>{best_prog['name'][:25]}</b></span>
-            <span>📅 <b>{best_ep['date']}</b></span>
-            <span>💬 <b>{best_ep['engagement']}%</b> engagement</span>
-        </div>
-        <div style="margin-top:8px;">
+        <img src="{best_thumb}" alt="thumbnail"
+             style="width:220px; min-width:220px; object-fit:cover; display:block; flex-shrink:0;"
+             onerror="this.style.display='none'">
+        <div style="padding:1.2rem 1.6rem; flex:1;">
+            <div style="font-size:0.78rem; text-transform:uppercase; letter-spacing:1px; opacity:0.85; margin-bottom:4px;">
+                🎯 Best Episode to Place Your Ad RIGHT NOW
+            </div>
+            <div style="font-size:1.35rem; font-weight:800; line-height:1.25; margin-bottom:8px;">
+                {best_ep['title'][:70]}
+            </div>
+            <div style="display:flex; gap:20px; flex-wrap:wrap; font-size:0.9rem; opacity:0.95; margin-bottom:10px;">
+                <span>👁 <b>{format_number(best_ep['views'])}</b> views</span>
+                <span>📺 <b>{best_prog['name'][:25]}</b></span>
+                <span>📅 <b>{best_ep['date']}</b></span>
+                <span>💬 <b>{best_ep['engagement']}%</b> engagement</span>
+            </div>
             <a href="{best_ep['url']}" target="_blank"
-               style="color:white; text-decoration:underline; font-weight:600; font-size:0.9rem;">
+               style="background:rgba(255,255,255,0.2); color:white; text-decoration:none;
+                      font-weight:700; font-size:0.88rem; padding:6px 18px;
+                      border-radius:50px; border:1.5px solid rgba(255,255,255,0.5);
+                      display:inline-block;">
                 ▶ Watch Episode →
             </a>
         </div>
@@ -1498,18 +1513,49 @@ def render_program_comparison():
 
             top3 = sorted(a["episodes"], key=lambda e: e["views"], reverse=True)[:3]
             st.markdown("**🎯 Best episodes to place your ad:**")
-            for e in top3:
-                st.markdown(f"- **{format_number(e['views'])} views** · {e['date']} · "
-                            f"[{e['title'][:60]}]({e['url']})")
+            t3cols = st.columns(len(top3))
+            for col, e in zip(t3cols, top3):
+                t = e.get("thumbnail", thumb_url(e.get("video_id", "")))
+                col.markdown(f"""
+                <div style="border-radius:12px;overflow:hidden;background:#fff;
+                    box-shadow:0 4px 16px rgba(0,0,0,0.1);border:1px solid #f0f0f0;">
+                    <a href="{e['url']}" target="_blank" style="text-decoration:none;">
+                        <div style="position:relative;">
+                            <img src="{t}" style="width:100%;display:block;aspect-ratio:16/9;object-fit:cover;"
+                                 onerror="this.src='https://img.youtube.com/vi/default/mqdefault.jpg'">
+                            <div style="position:absolute;bottom:6px;right:8px;
+                                background:rgba(0,0,0,0.75);color:#fff;
+                                font-size:0.7rem;font-weight:700;padding:2px 8px;
+                                border-radius:4px;">▶ Watch</div>
+                        </div>
+                        <div style="padding:10px 12px;">
+                            <div style="font-size:0.82rem;font-weight:700;color:#111;
+                                line-height:1.3;margin-bottom:5px;
+                                display:-webkit-box;-webkit-line-clamp:2;
+                                -webkit-box-orient:vertical;overflow:hidden;">
+                                {e['title'][:65]}</div>
+                            <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:0.75rem;color:#6b7280;">
+                                <span>👁 <b style="color:#FF0000;">{format_number(e['views'])}</b></span>
+                                <span>💬 {e['engagement']}%</span>
+                                <span>📅 {e['date']}</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                """, unsafe_allow_html=True)
 
             ep_disp = pd.DataFrame([{
+                "Thumbnail": e.get("thumbnail", thumb_url(e.get("video_id", ""))),
                 "Date": e["date"], "Episode": e["title"],
                 "Views": format_number(e["views"]), "Likes": format_number(e["likes"]),
                 "Comments": format_number(e["comments"]), "Engagement %": f"{e['engagement']}%",
                 "Watch": e["url"],
             } for e in sorted(a["episodes"], key=lambda e: e["date"], reverse=True)])
             st.dataframe(ep_disp, use_container_width=True, hide_index=True,
-                         column_config={"Watch": st.column_config.LinkColumn("▶️", display_text="Watch")})
+                         column_config={
+                             "Thumbnail": st.column_config.ImageColumn("🖼", width="small"),
+                             "Watch": st.column_config.LinkColumn("▶️", display_text="Watch"),
+                         })
 
             csv_buf = io.StringIO()
             pd.DataFrame(a["episodes"]).to_csv(csv_buf, index=False)
@@ -1846,23 +1892,31 @@ def render_inter_channel():
     # ── Ad Placement Recommendation Banner ───────────────────────────────────
     best_ep = max((e for a in analyses for e in a["episodes"]), key=lambda e: e["views"])
     best_prog = next(a for a in analyses if best_ep in a["episodes"])
+    best_thumb2 = best_ep.get("thumbnail", thumb_url(best_ep.get("video_id", "")))
     st.markdown(f"""
     <div style="background:linear-gradient(135deg,#FF0000,#cc0000);
-        border-radius:14px;padding:1.2rem 1.6rem;margin-bottom:1rem;
-        box-shadow:0 6px 20px rgba(255,0,0,0.3);color:white;">
-        <div style="font-size:0.78rem;text-transform:uppercase;letter-spacing:1px;
-            opacity:0.85;margin-bottom:4px;">🎯 Best Episode to Place Your Ad RIGHT NOW</div>
-        <div style="font-size:1.35rem;font-weight:800;line-height:1.2;margin-bottom:6px;">
-            {best_ep['title'][:70]}</div>
-        <div style="display:flex;gap:24px;flex-wrap:wrap;font-size:0.92rem;opacity:0.95;">
-            <span>👁 <b>{format_number(best_ep['views'])}</b> views</span>
-            <span>📺 <b>{best_prog['name'][:30]}</b></span>
-            <span>📅 <b>{best_ep['date']}</b></span>
-            <span>💬 <b>{best_ep['engagement']}%</b> engagement</span>
-        </div>
-        <div style="margin-top:8px;">
+        border-radius:16px;padding:0;margin-bottom:1rem;
+        box-shadow:0 6px 28px rgba(255,0,0,0.35);color:white;
+        display:flex;overflow:hidden;">
+        <img src="{best_thumb2}" alt="thumbnail"
+             style="width:220px;min-width:220px;object-fit:cover;display:block;flex-shrink:0;"
+             onerror="this.style.display='none'">
+        <div style="padding:1.2rem 1.6rem;flex:1;">
+            <div style="font-size:0.78rem;text-transform:uppercase;letter-spacing:1px;
+                opacity:0.85;margin-bottom:4px;">🎯 Best Episode to Place Your Ad RIGHT NOW</div>
+            <div style="font-size:1.35rem;font-weight:800;line-height:1.25;margin-bottom:8px;">
+                {best_ep['title'][:70]}</div>
+            <div style="display:flex;gap:20px;flex-wrap:wrap;font-size:0.9rem;opacity:0.95;margin-bottom:10px;">
+                <span>👁 <b>{format_number(best_ep['views'])}</b> views</span>
+                <span>📺 <b>{best_prog['name'][:30]}</b></span>
+                <span>📅 <b>{best_ep['date']}</b></span>
+                <span>💬 <b>{best_ep['engagement']}%</b> engagement</span>
+            </div>
             <a href="{best_ep['url']}" target="_blank"
-               style="color:white;text-decoration:underline;font-weight:600;font-size:0.88rem;">
+               style="background:rgba(255,255,255,0.2);color:white;text-decoration:none;
+                      font-weight:700;font-size:0.88rem;padding:6px 18px;
+                      border-radius:50px;border:1.5px solid rgba(255,255,255,0.5);
+                      display:inline-block;">
                 ▶ Watch Episode →</a>
         </div>
     </div>
@@ -1927,18 +1981,49 @@ def render_inter_channel():
 
             top3 = sorted(a["episodes"], key=lambda e: e["views"], reverse=True)[:3]
             st.markdown("**🎯 Best episodes to place your ad:**")
-            for e in top3:
-                st.markdown(f"- **{format_number(e['views'])} views** · {e['date']} · "
-                            f"[{e['title'][:60]}]({e['url']})")
+            t3cols = st.columns(len(top3))
+            for col, e in zip(t3cols, top3):
+                t = e.get("thumbnail", thumb_url(e.get("video_id", "")))
+                col.markdown(f"""
+                <div style="border-radius:12px;overflow:hidden;background:#fff;
+                    box-shadow:0 4px 16px rgba(0,0,0,0.1);border:1px solid #f0f0f0;">
+                    <a href="{e['url']}" target="_blank" style="text-decoration:none;">
+                        <div style="position:relative;">
+                            <img src="{t}" style="width:100%;display:block;aspect-ratio:16/9;object-fit:cover;"
+                                 onerror="this.src='https://img.youtube.com/vi/default/mqdefault.jpg'">
+                            <div style="position:absolute;bottom:6px;right:8px;
+                                background:rgba(0,0,0,0.75);color:#fff;
+                                font-size:0.7rem;font-weight:700;padding:2px 8px;
+                                border-radius:4px;">▶ Watch</div>
+                        </div>
+                        <div style="padding:10px 12px;">
+                            <div style="font-size:0.82rem;font-weight:700;color:#111;
+                                line-height:1.3;margin-bottom:5px;
+                                display:-webkit-box;-webkit-line-clamp:2;
+                                -webkit-box-orient:vertical;overflow:hidden;">
+                                {e['title'][:65]}</div>
+                            <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:0.75rem;color:#6b7280;">
+                                <span>👁 <b style="color:#FF0000;">{format_number(e['views'])}</b></span>
+                                <span>💬 {e['engagement']}%</span>
+                                <span>📅 {e['date']}</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                """, unsafe_allow_html=True)
 
             ep_disp = pd.DataFrame([{
+                "Thumbnail": e.get("thumbnail", thumb_url(e.get("video_id", ""))),
                 "Date": e["date"], "Episode": e["title"],
                 "Views": format_number(e["views"]), "Likes": format_number(e["likes"]),
                 "Comments": format_number(e["comments"]), "Engagement %": f"{e['engagement']}%",
                 "Watch": e["url"],
             } for e in sorted(a["episodes"], key=lambda e: e["date"], reverse=True)])
             st.dataframe(ep_disp, use_container_width=True, hide_index=True,
-                         column_config={"Watch": st.column_config.LinkColumn("▶️", display_text="Watch")})
+                         column_config={
+                             "Thumbnail": st.column_config.ImageColumn("🖼", width="small"),
+                             "Watch": st.column_config.LinkColumn("▶️", display_text="Watch"),
+                         })
 
             csv_buf = io.StringIO()
             pd.DataFrame(a["episodes"]).to_csv(csv_buf, index=False)
