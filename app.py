@@ -187,280 +187,270 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-    /* ═══════════════════════════════════════════════
-       GLOBAL BASE — near-black background everywhere
-    ═══════════════════════════════════════════════ */
-    html, body, [data-testid="stAppViewContainer"],
-    [data-testid="stApp"], .main, .block-container {
-        background-color: #0d0d0d !important;
-        color: #e0e0e0 !important;
+    /* ═══════════════════════════════════════════════════════════
+       GOOGLE FONTS
+    ═══════════════════════════════════════════════════════════ */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+    /* ═══════════════════════════════════════════════════════════
+       BASE — clean white/light-grey
+    ═══════════════════════════════════════════════════════════ */
+    html, body, [data-testid="stApp"],
+    [data-testid="stAppViewContainer"], .main, .block-container {
+        background-color: #f4f5f7 !important;
+        color: #1a1a2e !important;
+        font-family: 'Inter', sans-serif !important;
     }
     [data-testid="block-container"] {
-        padding-top: 1.2rem !important;
-        max-width: 1200px;
+        padding-top: 0.8rem !important;
+        max-width: 1280px !important;
     }
-
-    /* Sidebar (kept clean even though unused for settings) */
     [data-testid="stSidebar"],
     [data-testid="stSidebarContent"] {
-        background-color: #0d0d0d !important;
-        border-right: 1px solid #1a2e2a !important;
+        background-color: #ffffff !important;
+        border-right: 1px solid #e2e8f0 !important;
     }
 
-    /* ═══════════════════════════════════════════════
-       TYPOGRAPHY — all headings teal
-    ═══════════════════════════════════════════════ */
-    h1, h2, h3, h4, h5, h6 { color: #e0e0e0 !important; }
-    p, li, span, label { color: #c0ccc8 !important; }
-    a { color: #00d4aa !important; }
-    a:hover { color: #00ffcc !important; }
-
-    /* ═══════════════════════════════════════════════
-       HEADER BANNER
-    ═══════════════════════════════════════════════ */
-    .main-header {
-        background: linear-gradient(135deg, #0d1a17 0%, #0a2018 60%, #071a13 100%);
-        border: 1px solid #00d4aa40;
-        padding: 1.8rem 2rem; border-radius: 16px; margin-bottom: 1.6rem;
-        text-align: center;
+    /* ═══════════════════════════════════════════════════════════
+       HEADER BANNER — YouTube brand red gradient
+    ═══════════════════════════════════════════════════════════ */
+    .yt-header {
+        background: linear-gradient(135deg, #FF0000 0%, #cc0000 40%, #990000 100%);
+        border-radius: 16px; padding: 0; margin-bottom: 1.4rem;
+        box-shadow: 0 8px 32px rgba(255,0,0,0.25);
+        overflow: hidden; position: relative;
     }
-    .main-header h1 {
-        color: #00d4aa !important; margin: 0; font-size: 2.1rem;
-        letter-spacing: -0.5px; font-weight: 800;
+    .yt-header-inner {
+        display: flex; align-items: center; justify-content: center;
+        gap: 20px; padding: 1.6rem 2rem;
     }
-    .main-header p { color: #6a9e96 !important; margin: 0.4rem 0 0; font-size: 0.93rem; }
+    .yt-logo-wrap {
+        background: #ffffff; border-radius: 12px;
+        padding: 8px 12px 6px; display: flex; align-items: center;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+        flex-shrink: 0;
+    }
+    .yt-logo-wrap svg { display: block; }
+    .yt-header-text { text-align: left; }
+    .yt-header-text h1 {
+        color: #ffffff !important; margin: 0;
+        font-size: 1.85rem; font-weight: 800; letter-spacing: -0.5px;
+        line-height: 1.1; text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    .yt-header-text p {
+        color: rgba(255,255,255,0.88) !important; margin: 0.3rem 0 0;
+        font-size: 0.9rem; font-weight: 400;
+    }
+    /* decorative circles */
+    .yt-header::before {
+        content: ''; position: absolute; top: -40px; right: -40px;
+        width: 180px; height: 180px; border-radius: 50%;
+        background: rgba(255,255,255,0.08);
+    }
+    .yt-header::after {
+        content: ''; position: absolute; bottom: -30px; left: 60px;
+        width: 120px; height: 120px; border-radius: 50%;
+        background: rgba(255,255,255,0.06);
+    }
 
-    /* ═══════════════════════════════════════════════
+    /* ═══════════════════════════════════════════════════════════
        SECTION HEADERS
-    ═══════════════════════════════════════════════ */
+    ═══════════════════════════════════════════════════════════ */
     .section-header {
         display: flex; align-items: center; gap: 10px;
-        margin: 1.4rem 0 0.6rem; padding: 0;
+        margin: 1.6rem 0 0.7rem; padding: 0;
     }
     .step-badge {
-        background: #00d4aa; color: #0a0a0a; border-radius: 50%;
+        background: linear-gradient(135deg, #FF0000, #cc0000);
+        color: #fff; border-radius: 50%;
         width: 30px; height: 30px; display: inline-flex; align-items: center;
-        justify-content: center; font-weight: 900; font-size: 0.82rem; flex-shrink: 0;
+        justify-content: center; font-weight: 900; font-size: 0.82rem;
+        flex-shrink: 0; box-shadow: 0 2px 6px rgba(255,0,0,0.35);
     }
     .section-title {
-        color: #e0e0e0 !important; font-size: 1.15rem;
+        color: #1a1a2e !important; font-size: 1.1rem;
         font-weight: 700; margin: 0;
     }
 
-    /* ═══════════════════════════════════════════════
+    /* ═══════════════════════════════════════════════════════════
        METRIC CARDS
-    ═══════════════════════════════════════════════ */
+    ═══════════════════════════════════════════════════════════ */
     .metric-card {
-        background: #101a18; border: 1px solid #1a3530;
+        background: #ffffff; border: 1px solid #e2e8f0;
+        border-top: 3px solid #FF0000;
         border-radius: 12px; padding: 1.1rem 0.8rem; text-align: center;
-        transition: border-color 0.25s, box-shadow 0.25s;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        transition: box-shadow 0.2s, transform 0.2s;
     }
     .metric-card:hover {
-        border-color: #00d4aa60;
-        box-shadow: 0 0 14px #00d4aa15;
+        box-shadow: 0 6px 20px rgba(255,0,0,0.12);
+        transform: translateY(-2px);
     }
     .metric-card h2 {
-        color: #00d4aa !important; margin: 0;
-        font-size: 1.7rem; font-weight: 800;
+        color: #FF0000 !important; margin: 0;
+        font-size: 1.75rem; font-weight: 800;
     }
     .metric-card p {
-        color: #6a9e96 !important; margin: 0.25rem 0 0;
-        font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.8px;
+        color: #64748b !important; margin: 0.2rem 0 0;
+        font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 600;
     }
 
-    /* ═══════════════════════════════════════════════
+    /* ═══════════════════════════════════════════════════════════
        PROGRAM QUEUE CARDS
-    ═══════════════════════════════════════════════ */
+    ═══════════════════════════════════════════════════════════ */
     .prog-card {
-        background: #101a18; border: 1px solid #1a3530;
-        border-left: 3px solid #00d4aa;
+        background: #fff5f5; border: 1px solid #fed7d7;
+        border-left: 4px solid #FF0000;
         border-radius: 8px; padding: 0.65rem 1rem; margin-bottom: 0.4rem;
-        color: #d0e0dc !important; font-size: 0.88rem;
+        color: #1a1a2e !important; font-size: 0.88rem;
+        box-shadow: 0 1px 4px rgba(255,0,0,0.08);
     }
 
-    /* ═══════════════════════════════════════════════
+    /* ═══════════════════════════════════════════════════════════
        BUTTONS
-    ═══════════════════════════════════════════════ */
+    ═══════════════════════════════════════════════════════════ */
     .stButton > button {
-        background: #00d4aa !important; color: #0a0a0a !important;
-        border: none !important; border-radius: 8px !important;
-        padding: 0.5rem 1.3rem !important; font-weight: 700 !important;
-        font-size: 0.9rem !important; letter-spacing: 0.3px;
-        transition: background 0.2s, box-shadow 0.2s !important;
+        background: linear-gradient(135deg, #FF0000, #cc0000) !important;
+        color: #ffffff !important; border: none !important;
+        border-radius: 8px !important; padding: 0.5rem 1.4rem !important;
+        font-weight: 700 !important; font-size: 0.9rem !important;
+        letter-spacing: 0.3px; box-shadow: 0 3px 10px rgba(255,0,0,0.3) !important;
+        transition: all 0.2s !important;
     }
     .stButton > button:hover {
-        background: #00f0c0 !important;
-        box-shadow: 0 0 12px #00d4aa55 !important;
+        background: linear-gradient(135deg, #e60000, #b30000) !important;
+        box-shadow: 0 5px 16px rgba(255,0,0,0.45) !important;
+        transform: translateY(-1px);
     }
 
-    /* ═══════════════════════════════════════════════
+    /* ═══════════════════════════════════════════════════════════
        TABS
-    ═══════════════════════════════════════════════ */
-    [data-testid="stTabs"] {
-        background: transparent !important;
-    }
+    ═══════════════════════════════════════════════════════════ */
     [data-testid="stTabs"] [role="tablist"] {
-        background: #0d0d0d !important;
-        border-bottom: 1px solid #1a3530 !important;
-        gap: 4px;
+        background: #ffffff !important;
+        border-bottom: 2px solid #e2e8f0 !important;
+        border-radius: 10px 10px 0 0;
+        padding: 0 0.5rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     }
     [data-testid="stTabs"] button[role="tab"] {
-        color: #7a9e96 !important; font-weight: 600 !important;
-        font-size: 0.95rem !important; padding: 0.6rem 1.4rem !important;
-        border-radius: 6px 6px 0 0 !important; background: transparent !important;
-        border: none !important; border-bottom: 2px solid transparent !important;
-        transition: color 0.2s, border-color 0.2s !important;
+        color: #64748b !important; font-weight: 600 !important;
+        font-size: 0.95rem !important; padding: 0.75rem 1.5rem !important;
+        border: none !important; border-bottom: 3px solid transparent !important;
+        background: transparent !important;
+        transition: all 0.2s !important;
     }
     [data-testid="stTabs"] button[role="tab"]:hover {
-        color: #00d4aa !important; background: #101a18 !important;
+        color: #FF0000 !important; background: #fff5f5 !important;
     }
     [data-testid="stTabs"] button[aria-selected="true"] {
-        color: #00d4aa !important;
-        border-bottom: 2px solid #00d4aa !important;
-        background: #101a18 !important;
+        color: #FF0000 !important; border-bottom: 3px solid #FF0000 !important;
+        background: #fff5f5 !important; font-weight: 700 !important;
     }
 
-    /* ═══════════════════════════════════════════════
-       FORM CONTROLS — inputs, selects, sliders, toggles
-    ═══════════════════════════════════════════════ */
-    /* Input backgrounds */
+    /* ═══════════════════════════════════════════════════════════
+       FORM CONTROLS
+    ═══════════════════════════════════════════════════════════ */
     [data-testid="stTextInput"] input,
     [data-testid="stNumberInput"] input,
     [data-testid="stSelectbox"] > div > div,
     [data-testid="stMultiSelect"] > div > div,
     [data-testid="stDateInput"] input {
-        background-color: #101a18 !important;
-        border: 1px solid #1a3530 !important;
-        color: #e0e0e0 !important;
-        border-radius: 8px !important;
+        background-color: #ffffff !important;
+        border: 1.5px solid #e2e8f0 !important;
+        color: #1a1a2e !important; border-radius: 8px !important;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.04) !important;
     }
     [data-testid="stSelectbox"] > div > div:focus-within,
     [data-testid="stMultiSelect"] > div > div:focus-within {
-        border-color: #00d4aa !important;
-        box-shadow: 0 0 0 2px #00d4aa25 !important;
+        border-color: #FF0000 !important;
+        box-shadow: 0 0 0 3px rgba(255,0,0,0.12) !important;
     }
-
-    /* Dropdown menu */
-    [data-testid="stSelectbox"] ul,
     [data-baseweb="popover"] {
-        background: #101a18 !important;
-        border: 1px solid #1a3530 !important;
+        background: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.12) !important;
+        border-radius: 10px !important;
     }
-    [data-testid="stSelectbox"] li:hover,
     [data-baseweb="option"]:hover {
-        background: #1a3530 !important; color: #00d4aa !important;
+        background: #fff5f5 !important; color: #FF0000 !important;
     }
-
-    /* Slider */
-    [data-testid="stSlider"] [data-baseweb="slider"] div[role="slider"] {
-        background: #00d4aa !important;
-        border-color: #00d4aa !important;
+    [data-baseweb="option"][aria-selected="true"] {
+        background: #fff0f0 !important; color: #FF0000 !important;
     }
-    [data-testid="stSlider"] [data-baseweb="slider"] [class*="Track"] div:first-child {
-        background: #00d4aa !important;
-    }
-
-    /* Toggle */
-    [data-testid="stToggle"] input:checked + div {
-        background: #00d4aa !important;
-    }
-
     /* Multiselect tags */
     [data-baseweb="tag"] {
-        background: #1a3530 !important; border-color: #00d4aa40 !important;
-        color: #00d4aa !important; border-radius: 6px !important;
+        background: #fff0f0 !important; border-color: #fca5a5 !important;
+        color: #cc0000 !important; border-radius: 6px !important;
+        font-weight: 600 !important;
     }
-
     /* Labels */
-    [data-testid="stWidgetLabel"] p,
-    .stSlider label p,
-    .stSelectbox label p,
-    .stMultiSelect label p,
-    .stDateInput label p,
-    .stToggle label p {
-        color: #7a9e96 !important; font-size: 0.82rem !important;
+    [data-testid="stWidgetLabel"] p {
+        color: #475569 !important; font-size: 0.8rem !important;
         font-weight: 600 !important; text-transform: uppercase !important;
         letter-spacing: 0.5px !important;
     }
 
-    /* ═══════════════════════════════════════════════
-       DATAFRAME / TABLE
-    ═══════════════════════════════════════════════ */
+    /* ═══════════════════════════════════════════════════════════
+       DATAFRAME
+    ═══════════════════════════════════════════════════════════ */
     [data-testid="stDataFrame"] {
-        border-radius: 10px !important;
-        border: 1px solid #1a3530 !important;
-        overflow: hidden !important;
-    }
-    [data-testid="stDataFrame"] iframe {
-        border-radius: 10px !important;
+        border-radius: 12px !important; overflow: hidden !important;
+        border: 1px solid #e2e8f0 !important;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06) !important;
     }
 
-    /* ═══════════════════════════════════════════════
+    /* ═══════════════════════════════════════════════════════════
        EXPANDER
-    ═══════════════════════════════════════════════ */
+    ═══════════════════════════════════════════════════════════ */
     [data-testid="stExpander"] {
-        background: #101a18 !important;
-        border: 1px solid #1a3530 !important;
+        background: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
         border-radius: 10px !important;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.05) !important;
     }
     [data-testid="stExpander"] summary {
-        color: #c0d0cc !important; font-weight: 600 !important;
+        color: #334155 !important; font-weight: 600 !important;
     }
-    [data-testid="stExpander"] summary:hover { color: #00d4aa !important; }
-    [data-testid="stExpander"] > div { background: #101a18 !important; }
+    [data-testid="stExpander"] summary:hover { color: #FF0000 !important; }
 
-    /* ═══════════════════════════════════════════════
-       ALERTS — info / success / warning / error
-    ═══════════════════════════════════════════════ */
+    /* ═══════════════════════════════════════════════════════════
+       ALERTS
+    ═══════════════════════════════════════════════════════════ */
     [data-testid="stAlert"] {
-        border-radius: 8px !important;
-        background-color: #101a18 !important;
-        border: 1px solid #1a3530 !important;
-    }
-    /* success */
-    [data-testid="stAlert"][kind="success"],
-    div[data-testid="stAlert"] > div[class*="success"] {
-        border-left: 3px solid #00d4aa !important;
-    }
-    /* info */
-    [data-testid="stAlert"][kind="info"],
-    div[data-testid="stAlert"] > div[class*="info"] {
-        border-left: 3px solid #00a8ff !important;
-    }
-    /* warning */
-    [data-testid="stAlert"][kind="warning"],
-    div[data-testid="stAlert"] > div[class*="warning"] {
-        border-left: 3px solid #ffaa00 !important;
+        border-radius: 10px !important;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.05) !important;
     }
 
-    /* ═══════════════════════════════════════════════
-       SPINNER
-    ═══════════════════════════════════════════════ */
-    [data-testid="stSpinner"] > div { border-top-color: #00d4aa !important; }
-
-    /* ═══════════════════════════════════════════════
+    /* ═══════════════════════════════════════════════════════════
        DOWNLOAD BUTTON
-    ═══════════════════════════════════════════════ */
+    ═══════════════════════════════════════════════════════════ */
     [data-testid="stDownloadButton"] button {
-        background: transparent !important;
-        border: 1px solid #00d4aa !important;
-        color: #00d4aa !important; border-radius: 8px !important;
-        font-weight: 600 !important;
+        background: #ffffff !important;
+        border: 1.5px solid #FF0000 !important;
+        color: #FF0000 !important; border-radius: 8px !important;
+        font-weight: 600 !important; transition: all 0.2s !important;
     }
     [data-testid="stDownloadButton"] button:hover {
-        background: #00d4aa15 !important;
+        background: #fff0f0 !important;
+        box-shadow: 0 3px 10px rgba(255,0,0,0.2) !important;
     }
 
-    /* ═══════════════════════════════════════════════
-       DIVIDERS & CAPTIONS
-    ═══════════════════════════════════════════════ */
-    hr { border: none !important; border-top: 1px solid #1a3530 !important; margin: 1rem 0 !important; }
-    [data-testid="stCaption"] p { color: #5a8a82 !important; font-size: 0.8rem !important; }
+    /* ═══════════════════════════════════════════════════════════
+       DIVIDERS, CAPTIONS, GENERAL TEXT
+    ═══════════════════════════════════════════════════════════ */
+    hr { border: none !important; border-top: 1.5px solid #e2e8f0 !important; margin: 1.2rem 0 !important; }
+    [data-testid="stCaption"] p { color: #94a3b8 !important; font-size: 0.8rem !important; }
+    h1,h2,h3,h4,h5,h6 { color: #1a1a2e !important; }
+    p, li { color: #334155 !important; }
+    a { color: #FF0000 !important; }
+    a:hover { color: #cc0000 !important; }
+    progress { accent-color: #FF0000 !important; }
 
-    /* ═══════════════════════════════════════════════
-       SPINNER / PROGRESS BAR INSIDE DATAFRAME
-    ═══════════════════════════════════════════════ */
-    progress { accent-color: #00d4aa !important; }
+    /* ═══════════════════════════════════════════════════════════
+       SPINNER
+    ═══════════════════════════════════════════════════════════ */
+    [data-testid="stSpinner"] > div { border-top-color: #FF0000 !important; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -859,9 +849,23 @@ def analyze_program(name, prog):
 # ---------------------------------------------------------------------------
 
 st.markdown("""
-<div class="main-header">
-    <h1>📺 YouTube Program Analyzer</h1>
-    <p>Hardcord Ad Targeting · Compare Programs · Find the Best Episodes for 6-Second Ad Placement</p>
+<div class="yt-header">
+  <div class="yt-header-inner">
+    <div class="yt-logo-wrap">
+      <!-- Official YouTube logo SVG -->
+      <svg height="32" viewBox="0 0 90 20" xmlns="http://www.w3.org/2000/svg">
+        <g fill="none" fill-rule="evenodd">
+          <path d="M27.973 3.123C27.676 2.009 26.808 1.13 25.71.83 23.711.28 14.985.28 14.985.28S6.26.28 4.26.83C3.162 1.13 2.294 2.009 1.997 3.123 1.455 5.147 1.455 9.369 1.455 9.369s0 4.222.542 6.247c.297 1.113 1.165 1.993 2.263 2.293 2 .549 10.725.549 10.725.549s8.726 0 10.725-.549c1.098-.3 1.966-1.18 2.263-2.293.542-2.025.542-6.247.542-6.247s0-4.222-.542-6.246z" fill="#FF0000"/>
+          <path d="M12.152 13.197l7.17-3.828-7.17-3.828v7.656z" fill="#fff"/>
+          <path d="M36.879 16.539c-.523-.35-.898-.878-1.126-1.579-.228-.704-.341-1.638-.341-2.803v-1.59c0-1.176.124-2.119.374-2.83.25-.71.639-1.237 1.17-1.578.532-.342 1.22-.513 2.065-.513.832 0 1.508.173 2.027.519.52.344.902.872 1.147 1.581.246.71.368 1.65.368 2.821v1.59c0 1.165-.118 2.099-.352 2.803-.234.704-.616 1.228-1.148 1.579-.531.35-1.22.526-2.065.526-.866 0-1.566-.176-2.12-.526zm3.043-1.498c.155-.39.233-.991.233-1.802v-3.553c0-.79-.078-1.382-.233-1.775-.157-.394-.412-.59-.769-.59-.345 0-.594.196-.748.59-.154.393-.232.985-.232 1.775v3.553c0 .81.075 1.41.224 1.802.15.393.401.588.755.588.358 0 .615-.195.77-.588zM55.39 18.073h-1.966l-.22-1.383h-.05c-.504.98-1.238 1.472-2.2 1.472-.656 0-1.142-.215-1.458-.645-.315-.43-.473-1.1-.473-2.009V6.754h2.247v8.564c0 .44.052.754.154.942.104.188.27.281.501.281.197 0 .393-.06.588-.179.193-.12.334-.276.42-.468V6.754h2.457v11.319zM47.413 4.735h-2.269V18.073H42.89V4.735h-2.268V2.695h6.79v2.04zM63.624 6.754v11.319h-1.947l-.22-1.383h-.049c-.516 1.01-1.27 1.516-2.26 1.516-.677 0-1.17-.227-1.48-.682-.31-.455-.463-1.163-.463-2.127V6.754h2.247v8.497c0 .465.052.8.155.998.102.199.275.299.517.299.197 0 .385-.06.567-.18.18-.12.31-.278.39-.473V6.754h2.543zm8.45 3.158c-.126-.664-.37-1.14-.735-1.428-.363-.288-.853-.433-1.47-.433-.484 0-.931.139-1.341.417a2.77 2.77 0 00-.937 1.111h-.018V1.839h-2.18v16.234h1.868l.232-1.077h.049c.22.383.53.683.93.898.4.217.844.325 1.334.325.87 0 1.505-.406 1.907-1.218.4-.812.601-2.077.601-3.793v-1.689c0-1.24-.08-2.197-.24-2.606zm-2.195 4.085c0 .82-.04 1.47-.118 1.952-.08.48-.205.822-.376 1.025-.172.202-.4.303-.684.303-.196 0-.383-.048-.56-.143a1.216 1.216 0 01-.42-.405V9.54c.063-.304.193-.547.388-.731.197-.183.415-.275.657-.275.275 0 .48.107.614.32.135.213.233.578.295 1.094.062.517.093 1.234.093 2.15v1.099h.111z" fill="#282828"/>
+        </g>
+      </svg>
+    </div>
+    <div class="yt-header-text">
+      <h1>Program Analyzer</h1>
+      <p>Hardcord Ad Targeting &nbsp;·&nbsp; Compare Programs &nbsp;·&nbsp; Find the Best Episodes for 6-Second Ad Placement</p>
+    </div>
+  </div>
 </div>
 """, unsafe_allow_html=True)
 
