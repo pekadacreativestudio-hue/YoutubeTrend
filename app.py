@@ -1130,15 +1130,27 @@ st.markdown("""
       </div>
     </div>
 
-    <!-- STATS BLOCK — right side like landing page badge -->
-    <div style="display:flex;flex-direction:column;gap:10px;flex-shrink:0;">
-      <div style="background:rgba(74,222,128,0.12);border:1px solid rgba(74,222,128,0.25);
-          border-radius:16px;padding:1rem 1.4rem;text-align:center;min-width:130px;">
-        <div class="hero-stat"><span class="num">100</span><span class="lbl">Channels</span></div>
+    <!-- STATS BLOCK — 2×2 grid badge on right like landing page certification badge -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;flex-shrink:0;min-width:240px;">
+      <div style="background:rgba(74,222,128,0.14);border:1px solid rgba(74,222,128,0.28);
+          border-radius:14px;padding:0.9rem 1rem;text-align:center;">
+        <div style="color:#4ade80;font-size:1.5rem;font-weight:900;line-height:1;">100</div>
+        <div style="color:rgba(255,255,255,0.5);font-size:0.62rem;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Channels</div>
       </div>
-      <div style="background:rgba(74,222,128,0.12);border:1px solid rgba(74,222,128,0.25);
-          border-radius:16px;padding:1rem 1.4rem;text-align:center;">
-        <div class="hero-stat"><span class="num">6s</span><span class="lbl">Ad Format</span></div>
+      <div style="background:rgba(74,222,128,0.14);border:1px solid rgba(74,222,128,0.28);
+          border-radius:14px;padding:0.9rem 1rem;text-align:center;">
+        <div style="color:#4ade80;font-size:1.5rem;font-weight:900;line-height:1;">6s</div>
+        <div style="color:rgba(255,255,255,0.5);font-size:0.62rem;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Ad Format</div>
+      </div>
+      <div style="background:rgba(74,222,128,0.14);border:1px solid rgba(74,222,128,0.28);
+          border-radius:14px;padding:0.9rem 1rem;text-align:center;">
+        <div style="color:#4ade80;font-size:1.5rem;font-weight:900;line-height:1;">3</div>
+        <div style="color:rgba(255,255,255,0.5);font-size:0.62rem;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Modes</div>
+      </div>
+      <div style="background:rgba(74,222,128,0.14);border:1px solid rgba(74,222,128,0.28);
+          border-radius:14px;padding:0.9rem 1rem;text-align:center;">
+        <div style="color:#4ade80;font-size:1.5rem;font-weight:900;line-height:1;">Live</div>
+        <div style="color:rgba(255,255,255,0.5);font-size:0.62rem;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">YouTube Data</div>
       </div>
     </div>
   </div>
@@ -1381,44 +1393,47 @@ def render_program_comparison():
 
     # ── Featured top-4 channels strip ───────────────────────────────────────
     top4 = chan_stats[:4]
-    feat_html = '<div class="chan-feat-strip">'
+    max_subs = top4[0]["Subscribers"] if top4 else 1
+    feat_cols = st.columns(4)
     type_icons = {"📺 TV Channel": "📺", "🎥 Creator": "🎥", "🎵 Music": "🎵",
                   "📰 News": "📰", "🎤 Reality": "🎤", "📻 Radio": "📻",
                   "🎮 Gaming": "🎮", "🧒 Kids": "🧒", "💻 Tech": "💻", "⚽ Sports": "⚽"}
-    for c in top4:
+    for col, c in zip(feat_cols, top4):
         icon = type_icons.get(c["Type"], "📺")
-        feat_html += f"""
+        pct = int(c["Subscribers"] / max(max_subs, 1) * 100)
+        col.markdown(f"""
         <div class="chan-feat-card">
             <div class="cf-icon">{icon}</div>
             <div class="cf-name">{c['Channel']}</div>
             <div class="cf-subs">{format_number(c['Subscribers'])}</div>
-            <div class="cf-type">subscribers</div>
-        </div>"""
-    feat_html += "</div>"
-    st.markdown(feat_html, unsafe_allow_html=True)
+            <div class="cf-type">SUBSCRIBERS</div>
+            <div style="background:#e8f5e9;border-radius:4px;height:5px;margin-top:10px;overflow:hidden;">
+                <div style="background:linear-gradient(90deg,#16a34a,#4ade80);
+                    height:100%;width:{pct}%;border-radius:4px;"></div>
+            </div>
+            <div style="font-size:0.6rem;color:#9ca3af;margin-top:3px;">{c['Type']}</div>
+        </div>
+        """, unsafe_allow_html=True)
 
     # ── Search + type filter ─────────────────────────────────────────────────
-    sf1, sf2 = st.columns([2, 3])
-    with sf1:
-        search_q = st.text_input("🔍 Search channels", placeholder="Type a channel name…", key="chan_search")
-    with sf2:
-        all_ch_types = sorted({c["Type"] for c in chan_stats})
-        if "sel_types" not in st.session_state:
-            st.session_state.sel_types = set(all_ch_types)
-        chip_cols = st.columns(len(all_ch_types))
-        for col, t in zip(chip_cols, all_ch_types):
-            active = t in st.session_state.sel_types
-            if col.button(t, key=f"chip_{t}", type="primary" if active else "secondary"):
-                if active:
-                    st.session_state.sel_types.discard(t)
-                else:
-                    st.session_state.sel_types.add(t)
-                st.rerun()
+    all_ch_types = sorted({c["Type"] for c in chan_stats})
+
+    filt_a, filt_b = st.columns([1, 2])
+    with filt_a:
+        search_q = st.text_input("", placeholder="🔍  Search channels by name…", key="chan_search",
+                                 label_visibility="collapsed")
+    with filt_b:
+        sel_types_ms = st.multiselect(
+            "", all_ch_types, default=all_ch_types,
+            key="sel_types_ms", label_visibility="collapsed",
+            placeholder="Filter by channel type…",
+        )
 
     # Filter channels
+    sel_set = set(sel_types_ms) if sel_types_ms else set(all_ch_types)
     filtered_chans = [
         c for c in chan_stats
-        if c["Type"] in st.session_state.sel_types
+        if c["Type"] in sel_set
         and (not search_q or search_q.lower() in c["Channel"].lower())
     ]
 
