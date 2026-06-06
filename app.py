@@ -890,8 +890,12 @@ if "selected_channel_id" not in st.session_state:
     st.session_state.selected_channel_name = None
 if "compare" not in st.session_state:
     st.session_state.compare = []
+if "inter_slots" not in st.session_state:
+    st.session_state.inter_slots = []   # list of {channel_id, channel_name, program_name}
+if "inter_adding" not in st.session_state:
+    st.session_state.inter_adding = {"channel_id": None, "channel_name": None}
 
-tab1, tab2 = st.tabs(["🎭 Program Comparison", "📊 Trending Channels"])
+tab1, tab2, tab3 = st.tabs(["🎭 Program Comparison", "🔀 Cross-Channel Compare", "📊 Trending Channels"])
 
 
 # ===========================================================================
@@ -1511,6 +1515,305 @@ trending chart. Use **Local SL Channels Only** toggle to see a curated Sri Lanka
 
 
 # ===========================================================================
+# TAB 2 — Cross-Channel Comparison
+# ===========================================================================
+
+def render_inter_channel():
+    st.markdown("""
+    <div class="section-header">
+        <span class="step-badge">🔀</span>
+        <span class="section-title">Cross-Channel Program Comparison</span>
+    </div>
+    """, unsafe_allow_html=True)
+    st.caption("Compare programs from **different channels** side by side — e.g. Deweni Inima (TV Derana) vs Pata Kurullo (Hiru TV).")
+
+    # ── Shared date range ────────────────────────────────────────────────────
+    preset_cols = st.columns(6)
+    presets = {"7D": 7, "14D": 14, "30D": 30, "60D": 60, "90D": 90, "Custom": None}
+    if "inter_date_preset" not in st.session_state:
+        st.session_state.inter_date_preset = "30D"
+    for col, (label, days) in zip(preset_cols, presets.items()):
+        active = st.session_state.inter_date_preset == label
+        if col.button(label, key=f"inter_preset_{label}",
+                      type="primary" if active else "secondary"):
+            st.session_state.inter_date_preset = label
+            st.rerun()
+
+    preset_days = presets.get(st.session_state.inter_date_preset)
+    default_from = date.today() - timedelta(days=preset_days or 30)
+    ic1, ic2, ic3 = st.columns([1, 1, 1])
+    with ic1:
+        inter_from = st.date_input("From", value=default_from, key="inter_from")
+    with ic2:
+        inter_to = st.date_input("To", value=date.today(), key="inter_to")
+    with ic3:
+        inter_scan = st.select_slider("Scan depth", options=[200, 500, 1000, 1500, 2500],
+                                      value=500, key="inter_scan")
+
+    if inter_from > inter_to:
+        st.error("'From' date must be before 'To' date.")
+        return
+
+    st.markdown("---")
+
+    # ── Slot cards (queued programs) ─────────────────────────────────────────
+    st.markdown("""
+    <div class="section-header">
+        <span class="step-badge">1</span>
+        <span class="section-title">Build Your Comparison (up to 4 programs)</span>
+    </div>
+    """, unsafe_allow_html=True)
+
+    with st.spinner("Loading channel list…"):
+        chan_stats = get_curated_channel_stats()
+    chan_lookup = {c["channel_id"]: c for c in chan_stats}
+
+    # Display existing slots as cards
+    if st.session_state.inter_slots:
+        slot_cols = st.columns(len(st.session_state.inter_slots))
+        for i, slot in enumerate(st.session_state.inter_slots):
+            with slot_cols[i]:
+                st.markdown(f"""
+                <div style="background:#fff5f5;border:1.5px solid #fca5a5;
+                    border-left:4px solid #FF0000;border-radius:10px;
+                    padding:0.8rem 1rem;margin-bottom:0.5rem;">
+                    <div style="font-size:0.72rem;color:#888;text-transform:uppercase;
+                        letter-spacing:0.5px;margin-bottom:2px;">Slot {i+1}</div>
+                    <div style="font-weight:700;color:#1a1a2e;font-size:0.95rem;">
+                        📺 {slot['channel_name']}</div>
+                    <div style="color:#FF0000;font-weight:600;font-size:0.88rem;
+                        margin-top:2px;">🎬 {slot['program_name'][:32]}</div>
+                </div>
+                """, unsafe_allow_html=True)
+                if st.button("✖ Remove", key=f"inter_rm_{i}"):
+                    st.session_state.inter_slots.pop(i)
+                    st.rerun()
+
+    # ── Add new slot ─────────────────────────────────────────────────────────
+    if len(st.session_state.inter_slots) < 4:
+        with st.expander(
+            f"➕ Add Program (slot {len(st.session_state.inter_slots)+1} of 4)",
+            expanded=len(st.session_state.inter_slots) == 0,
+        ):
+            # Channel search
+            ch_search = st.text_input("🔍 Search channel", placeholder="e.g. Hiru, Derana…",
+                                      key="inter_ch_search")
+            filtered_ch = [
+                c for c in chan_stats
+                if not ch_search or ch_search.lower() in c["Channel"].lower()
+            ]
+            ch_options = {c["Channel"]: c["channel_id"] for c in filtered_ch}
+
+            if not ch_options:
+                st.warning("No channels match your search.")
+            else:
+                chosen_name = st.selectbox(
+                    "Select channel", list(ch_options.keys()), key="inter_ch_pick"
+                )
+                chosen_id = ch_options[chosen_name]
+
+                # Load programs for selected channel
+                with st.spinner(f"Loading programs from {chosen_name}…"):
+                    progs = get_channel_programs(
+                        chosen_id,
+                        inter_from.strftime("%Y-%m-%d"),
+                        inter_to.strftime("%Y-%m-%d"),
+                        inter_scan,
+                    )
+
+                if not progs:
+                    st.warning("No programs found in this date range for that channel. Try a wider range.")
+                else:
+                    prog_ranked = sorted(progs.items(),
+                                         key=lambda x: x[1]["total_views"], reverse=True)
+                    prog_options = [
+                        f"{name}  |  👁 {format_number(p['total_views'])}  |  🎞 {p['episode_count']} eps"
+                        for name, p in prog_ranked[:40]
+                    ]
+                    prog_name_map = {
+                        f"{name}  |  👁 {format_number(p['total_views'])}  |  🎞 {p['episode_count']} eps": name
+                        for name, p in prog_ranked[:40]
+                    }
+                    chosen_prog_label = st.selectbox(
+                        "Select program", prog_options, key="inter_prog_pick"
+                    )
+                    chosen_prog_name = prog_name_map[chosen_prog_label]
+
+                    # Preview
+                    prev = progs[chosen_prog_name]
+                    pc1, pc2, pc3 = st.columns(3)
+                    pc1.metric("Total Views", format_number(prev["total_views"]))
+                    pc2.metric("Episodes", prev["episode_count"])
+                    pc3.metric("Category", prev["category"])
+
+                    already = any(
+                        s["channel_id"] == chosen_id and s["program_name"] == chosen_prog_name
+                        for s in st.session_state.inter_slots
+                    )
+                    if already:
+                        st.info("This program is already in your comparison.")
+                    elif st.button("➕ Add to Comparison", key="inter_add_btn", type="primary"):
+                        st.session_state.inter_slots.append({
+                            "channel_id": chosen_id,
+                            "channel_name": chosen_name,
+                            "program_name": chosen_prog_name,
+                        })
+                        st.toast(f"✅ Added: {chosen_prog_name[:30]} ({chosen_name})", icon="🎬")
+                        st.rerun()
+
+    if len(st.session_state.inter_slots) < 2:
+        st.info("👆 Add at least 2 programs from different channels to see the comparison.")
+        return
+
+    if st.button("🗑️ Clear All", key="inter_clear"):
+        st.session_state.inter_slots = []
+        st.rerun()
+
+    st.markdown("---")
+
+    # ── Fetch all slot data & run analysis ───────────────────────────────────
+    st.markdown("""
+    <div class="section-header">
+        <span class="step-badge">2</span>
+        <span class="section-title">Comparison Dashboard</span>
+    </div>
+    """, unsafe_allow_html=True)
+
+    analyses = []
+    load_bar = st.progress(0, text="Loading program data…")
+    for i, slot in enumerate(st.session_state.inter_slots):
+        load_bar.progress(
+            int((i / len(st.session_state.inter_slots)) * 90),
+            text=f"Fetching {slot['program_name'][:25]} ({slot['channel_name']})…"
+        )
+        progs = get_channel_programs(
+            slot["channel_id"],
+            inter_from.strftime("%Y-%m-%d"),
+            inter_to.strftime("%Y-%m-%d"),
+            inter_scan,
+        )
+        if slot["program_name"] in progs:
+            a = analyze_program(slot["program_name"], progs[slot["program_name"]])
+            # Tag with channel name so charts label correctly
+            a["label"] = f"{slot['program_name'][:22]} ({slot['channel_name'][:12]})"
+            a["name"] = a["label"]
+            analyses.append(a)
+    load_bar.progress(100, text="Done!")
+    load_bar.empty()
+
+    if not analyses:
+        st.warning("Could not load data for the selected programs. Try widening the date range.")
+        return
+
+    ranked_analyses = sorted(analyses, key=lambda a: a["hardcord"], reverse=True)
+
+    # ── Ad Placement Recommendation Banner ───────────────────────────────────
+    best_ep = max((e for a in analyses for e in a["episodes"]), key=lambda e: e["views"])
+    best_prog = next(a for a in analyses if best_ep in a["episodes"])
+    st.markdown(f"""
+    <div style="background:linear-gradient(135deg,#FF0000,#cc0000);
+        border-radius:14px;padding:1.2rem 1.6rem;margin-bottom:1rem;
+        box-shadow:0 6px 20px rgba(255,0,0,0.3);color:white;">
+        <div style="font-size:0.78rem;text-transform:uppercase;letter-spacing:1px;
+            opacity:0.85;margin-bottom:4px;">🎯 Best Episode to Place Your Ad RIGHT NOW</div>
+        <div style="font-size:1.35rem;font-weight:800;line-height:1.2;margin-bottom:6px;">
+            {best_ep['title'][:70]}</div>
+        <div style="display:flex;gap:24px;flex-wrap:wrap;font-size:0.92rem;opacity:0.95;">
+            <span>👁 <b>{format_number(best_ep['views'])}</b> views</span>
+            <span>📺 <b>{best_prog['name'][:30]}</b></span>
+            <span>📅 <b>{best_ep['date']}</b></span>
+            <span>💬 <b>{best_ep['engagement']}%</b> engagement</span>
+        </div>
+        <div style="margin-top:8px;">
+            <a href="{best_ep['url']}" target="_blank"
+               style="color:white;text-decoration:underline;font-weight:600;font-size:0.88rem;">
+                ▶ Watch Episode →</a>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # ── Hardcord Priority Ranking ─────────────────────────────────────────────
+    st.markdown("##### 🏆 Hardcord Priority Ranking")
+    max_hc = max((a["hardcord"] for a in analyses), default=1)
+    rank_df = pd.DataFrame([{
+        "Priority": f"#{i+1}",
+        "Program": a["name"],
+        "Avg Views/Ep": format_number(a["avg_views"]),
+        "Total Views": format_number(a["total_views"]),
+        "Episodes": a["episode_count"],
+        "Engagement %": f"{a['avg_engagement']}%",
+        "Trend": f"{a['trend_icon']} {a['trend']}",
+        "Hardcord Score": a["hardcord"],
+    } for i, a in enumerate(ranked_analyses)])
+    st.dataframe(
+        rank_df, use_container_width=True, hide_index=True,
+        column_config={"Hardcord Score": st.column_config.ProgressColumn(
+            "Hardcord Score", min_value=0, max_value=max_hc, format="%.0f")},
+    )
+
+    # ── Charts ────────────────────────────────────────────────────────────────
+    st.markdown("##### 📈 Episode Views Trend — hover for episode details")
+    st.plotly_chart(_plotly_line(analyses), use_container_width=True)
+    st.caption("Click legend to show/hide. Drag to zoom. Double-click to reset.")
+
+    cr1, cr2 = st.columns([1, 1])
+    with cr1:
+        st.markdown("##### 📊 Avg Views per Episode")
+        st.plotly_chart(_plotly_bar(ranked_analyses), use_container_width=True)
+    with cr2:
+        st.markdown("##### 🕸️ Radar Comparison")
+        st.caption("Scores normalised across all compared programs.")
+        st.plotly_chart(_plotly_radar(ranked_analyses), use_container_width=True)
+
+    st.markdown("---")
+
+    # ── Per-program detail ────────────────────────────────────────────────────
+    st.markdown("##### 🔍 Per-Program Detail")
+    for a in ranked_analyses:
+        with st.expander(
+            f"{a['trend_icon']} {a['name']} — {format_number(a['avg_views'])} avg views · {a['trend']}",
+            expanded=True,
+        ):
+            m1, m2, m3, m4, m5 = st.columns(5)
+            m1.markdown(f'<div class="metric-card"><h2>{a["episode_count"]}</h2><p>Episodes</p></div>', unsafe_allow_html=True)
+            m2.markdown(f'<div class="metric-card"><h2>{format_number(a["total_views"])}</h2><p>Total Views</p></div>', unsafe_allow_html=True)
+            m3.markdown(f'<div class="metric-card"><h2>{format_number(a["avg_views"])}</h2><p>Avg / Episode</p></div>', unsafe_allow_html=True)
+            m4.markdown(f'<div class="metric-card"><h2>{a["avg_engagement"]}%</h2><p>Engagement</p></div>', unsafe_allow_html=True)
+            m5.markdown(f'<div class="metric-card"><h2>{a["trend_icon"]}</h2><p>{a["trend"]} ({a["trend_change"]:+.0f}%)</p></div>', unsafe_allow_html=True)
+
+            hc1, hc2 = st.columns(2)
+            hc1.markdown(f"🔺 **Highest:** {format_number(a['highest']['views'])} views — "
+                         f"[{a['highest']['title'][:55]}]({a['highest']['url']})")
+            hc2.markdown(f"🔻 **Lowest:** {format_number(a['lowest']['views'])} views — "
+                         f"[{a['lowest']['title'][:55]}]({a['lowest']['url']})")
+
+            st.plotly_chart(_plotly_episode_detail(a), use_container_width=True)
+
+            top3 = sorted(a["episodes"], key=lambda e: e["views"], reverse=True)[:3]
+            st.markdown("**🎯 Best episodes to place your ad:**")
+            for e in top3:
+                st.markdown(f"- **{format_number(e['views'])} views** · {e['date']} · "
+                            f"[{e['title'][:60]}]({e['url']})")
+
+            ep_disp = pd.DataFrame([{
+                "Date": e["date"], "Episode": e["title"],
+                "Views": format_number(e["views"]), "Likes": format_number(e["likes"]),
+                "Comments": format_number(e["comments"]), "Engagement %": f"{e['engagement']}%",
+                "Watch": e["url"],
+            } for e in sorted(a["episodes"], key=lambda e: e["date"], reverse=True)])
+            st.dataframe(ep_disp, use_container_width=True, hide_index=True,
+                         column_config={"Watch": st.column_config.LinkColumn("▶️", display_text="Watch")})
+
+            csv_buf = io.StringIO()
+            pd.DataFrame(a["episodes"]).to_csv(csv_buf, index=False)
+            st.download_button(
+                f"⬇️ Download CSV", csv_buf.getvalue(),
+                file_name=f"inter_{re.sub(r'[^A-Za-z0-9]+','_',a['name'])[:30]}_{inter_to}.csv",
+                mime="text/csv", key=f"inter_dl_{a['name']}",
+            )
+
+
+# ===========================================================================
 # Render tabs
 # ===========================================================================
 
@@ -1518,4 +1821,7 @@ with tab1:
     render_program_comparison()
 
 with tab2:
+    render_inter_channel()
+
+with tab3:
     render_trending_channels()
