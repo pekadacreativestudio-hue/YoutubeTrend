@@ -1100,17 +1100,23 @@ def render_program_comparison():
     ]
 
     chan_df = pd.DataFrame([{
-        "Rank": f"#{c['Rank']}",
+        "Rank": c["Rank"],
         "Type": c["Type"],
         "Channel": c["Channel"],
-        "Subscribers": format_number(c["Subscribers"]),
-        "Total Views": format_number(c["Total Views"]),
-        "Total Videos": f"{c['Total Videos']:,}",
+        "Subscribers": c["Subscribers"],
+        "Total Views": c["Total Views"],
+        "Total Videos": c["Total Videos"],
     } for c in filtered_chans])
 
     event = st.dataframe(
         chan_df, use_container_width=True, hide_index=True,
         on_select="rerun", selection_mode="single-row", key="chan_table",
+        column_config={
+            "Rank": st.column_config.NumberColumn("Rank", format="%d"),
+            "Subscribers": st.column_config.NumberColumn("Subscribers", format="%.2f"),
+            "Total Views": st.column_config.NumberColumn("Total Views", format="%.2f"),
+            "Total Videos": st.column_config.NumberColumn("Total Videos", format="%d"),
+        },
     )
 
     sel_rows = event.selection.rows if hasattr(event, "selection") else []
