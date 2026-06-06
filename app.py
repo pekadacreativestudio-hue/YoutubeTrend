@@ -189,285 +189,396 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-    /* ═══════════════════════════════════════════════════════════
-       GOOGLE FONTS
-    ═══════════════════════════════════════════════════════════ */
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    /* ══════════════════════════════════════════════════════════════
+       FONTS
+    ══════════════════════════════════════════════════════════════ */
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap');
 
-    /* ═══════════════════════════════════════════════════════════
-       BASE — clean white/light-grey
-    ═══════════════════════════════════════════════════════════ */
+    /* ══════════════════════════════════════════════════════════════
+       BASE
+    ══════════════════════════════════════════════════════════════ */
     html, body, [data-testid="stApp"],
     [data-testid="stAppViewContainer"], .main, .block-container {
-        background-color: #f4f5f7 !important;
-        color: #1a1a2e !important;
-        font-family: 'Inter', sans-serif !important;
+        background-color: #f0f4f1 !important;
+        color: #111827 !important;
+        font-family: 'Poppins', sans-serif !important;
     }
     [data-testid="block-container"] {
-        padding-top: 0.8rem !important;
-        max-width: 1280px !important;
+        padding-top: 0 !important;
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+        max-width: 1300px !important;
     }
-    [data-testid="stSidebar"],
-    [data-testid="stSidebarContent"] {
-        background-color: #ffffff !important;
-        border-right: 1px solid #e2e8f0 !important;
+    [data-testid="stSidebar"], [data-testid="stSidebarContent"] {
+        background-color: #0f1f12 !important;
+        border-right: none !important;
     }
 
-    /* ═══════════════════════════════════════════════════════════
-       HEADER BANNER — YouTube brand red gradient
-    ═══════════════════════════════════════════════════════════ */
-    .yt-header {
-        background: linear-gradient(135deg, #FF0000 0%, #cc0000 40%, #990000 100%);
-        border-radius: 16px; padding: 0; margin-bottom: 1.4rem;
-        box-shadow: 0 8px 32px rgba(255,0,0,0.25);
-        overflow: hidden; position: relative;
+    /* ══════════════════════════════════════════════════════════════
+       TOP UTILITY BAR
+    ══════════════════════════════════════════════════════════════ */
+    .top-bar {
+        background: #0f1f12;
+        padding: 6px 2rem;
+        font-size: 0.75rem;
+        color: rgba(255,255,255,0.7);
+        display: flex; align-items: center; justify-content: space-between;
+        margin: -1rem -1rem 0; /* full bleed */
     }
-    .yt-header-inner {
-        display: flex; align-items: center; justify-content: center;
-        gap: 20px; padding: 1.6rem 2rem;
+    .top-bar span { display: flex; align-items: center; gap: 18px; }
+    .top-bar b { color: #4ade80; }
+
+    /* ══════════════════════════════════════════════════════════════
+       HERO HEADER
+    ══════════════════════════════════════════════════════════════ */
+    .hero-header {
+        background: #0f1f12;
+        border-radius: 0 0 24px 24px;
+        padding: 1.4rem 2.5rem 2rem;
+        margin: 0 -1rem 1.8rem;
+        position: relative; overflow: hidden;
+        box-shadow: 0 8px 40px rgba(0,0,0,0.18);
     }
-    .yt-logo-wrap {
-        background: #ffffff; border-radius: 12px;
-        padding: 8px 12px 6px; display: flex; align-items: center;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.25);
-        flex-shrink: 0;
+    .hero-header::before {
+        content: ''; position: absolute;
+        top: -60px; right: -60px;
+        width: 260px; height: 260px; border-radius: 50%;
+        background: rgba(255,0,0,0.07);
     }
-    .yt-logo-wrap svg { display: block; }
-    .yt-header-text { text-align: left; }
-    .yt-header-text h1 {
-        color: #ffffff !important; margin: 0;
-        font-size: 1.85rem; font-weight: 800; letter-spacing: -0.5px;
-        line-height: 1.1; text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-    }
-    .yt-header-text p {
-        color: rgba(255,255,255,0.88) !important; margin: 0.3rem 0 0;
-        font-size: 0.9rem; font-weight: 400;
-    }
-    /* decorative circles */
-    .yt-header::before {
-        content: ''; position: absolute; top: -40px; right: -40px;
+    .hero-header::after {
+        content: ''; position: absolute;
+        bottom: -40px; left: 120px;
         width: 180px; height: 180px; border-radius: 50%;
-        background: rgba(255,255,255,0.08);
+        background: rgba(74,222,128,0.06);
     }
-    .yt-header::after {
-        content: ''; position: absolute; bottom: -30px; left: 60px;
-        width: 120px; height: 120px; border-radius: 50%;
-        background: rgba(255,255,255,0.06);
+    .hero-nav {
+        display: flex; align-items: center;
+        justify-content: space-between; margin-bottom: 1.2rem;
     }
-
-    /* ═══════════════════════════════════════════════════════════
-       SECTION HEADERS
-    ═══════════════════════════════════════════════════════════ */
-    .section-header {
-        display: flex; align-items: center; gap: 10px;
-        margin: 1.6rem 0 0.7rem; padding: 0;
+    .hero-logo-wrap {
+        background: #fff; border-radius: 10px;
+        padding: 6px 14px 4px;
+        display: flex; align-items: center;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.3);
     }
-    .step-badge {
-        background: linear-gradient(135deg, #FF0000, #cc0000);
-        color: #fff; border-radius: 50%;
-        width: 30px; height: 30px; display: inline-flex; align-items: center;
-        justify-content: center; font-weight: 900; font-size: 0.82rem;
-        flex-shrink: 0; box-shadow: 0 2px 6px rgba(255,0,0,0.35);
+    .hero-tagline {
+        display: flex; gap: 18px; align-items: center;
     }
-    .section-title {
-        color: #1a1a2e !important; font-size: 1.1rem;
-        font-weight: 700; margin: 0;
+    .hero-tagline span {
+        color: rgba(255,255,255,0.6);
+        font-size: 0.78rem; font-weight: 500;
     }
-
-    /* ═══════════════════════════════════════════════════════════
-       METRIC CARDS
-    ═══════════════════════════════════════════════════════════ */
-    .metric-card {
-        background: #ffffff; border: 1px solid #e2e8f0;
-        border-top: 3px solid #FF0000;
-        border-radius: 12px; padding: 1.1rem 0.8rem; text-align: center;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-        transition: box-shadow 0.2s, transform 0.2s;
+    .hero-tagline .pill {
+        background: rgba(255,0,0,0.2); color: #ff6b6b;
+        border: 1px solid rgba(255,0,0,0.3);
+        border-radius: 20px; padding: 2px 12px;
+        font-size: 0.72rem; font-weight: 600;
+        text-transform: uppercase; letter-spacing: 0.5px;
     }
-    .metric-card:hover {
-        box-shadow: 0 6px 20px rgba(255,0,0,0.12);
-        transform: translateY(-2px);
+    .hero-body { position: relative; z-index: 1; }
+    .hero-body h1 {
+        color: #ffffff !important; margin: 0;
+        font-size: 2.2rem; font-weight: 900;
+        line-height: 1.15; letter-spacing: -0.5px;
     }
-    .metric-card h2 {
-        color: #FF0000 !important; margin: 0;
-        font-size: 1.75rem; font-weight: 800;
+    .hero-body h1 .accent { color: #4ade80; }
+    .hero-body p {
+        color: rgba(255,255,255,0.65) !important;
+        margin: 0.5rem 0 1rem; font-size: 0.92rem;
+        font-weight: 400; max-width: 580px;
     }
-    .metric-card p {
-        color: #64748b !important; margin: 0.2rem 0 0;
-        font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 600;
+    .hero-stats {
+        display: flex; gap: 28px; flex-wrap: wrap;
+        margin-top: 0.8rem;
     }
-
-    /* ═══════════════════════════════════════════════════════════
-       PROGRAM QUEUE CARDS
-    ═══════════════════════════════════════════════════════════ */
-    .prog-card {
-        background: #fff5f5; border: 1px solid #fed7d7;
-        border-left: 4px solid #FF0000;
-        border-radius: 8px; padding: 0.65rem 1rem; margin-bottom: 0.4rem;
-        color: #1a1a2e !important; font-size: 0.88rem;
-        box-shadow: 0 1px 4px rgba(255,0,0,0.08);
+    .hero-stat {
+        display: flex; flex-direction: column;
+    }
+    .hero-stat .num {
+        color: #4ade80; font-size: 1.5rem;
+        font-weight: 800; line-height: 1;
+    }
+    .hero-stat .lbl {
+        color: rgba(255,255,255,0.5); font-size: 0.7rem;
+        text-transform: uppercase; letter-spacing: 0.5px;
     }
 
-    /* ═══════════════════════════════════════════════════════════
-       BUTTONS
-    ═══════════════════════════════════════════════════════════ */
-    .stButton > button {
-        background: linear-gradient(135deg, #FF0000, #cc0000) !important;
-        color: #ffffff !important; border: none !important;
-        border-radius: 8px !important; padding: 0.5rem 1.4rem !important;
-        font-weight: 700 !important; font-size: 0.9rem !important;
-        letter-spacing: 0.3px; box-shadow: 0 3px 10px rgba(255,0,0,0.3) !important;
-        transition: all 0.2s !important;
-    }
-    .stButton > button:hover {
-        background: linear-gradient(135deg, #e60000, #b30000) !important;
-        box-shadow: 0 5px 16px rgba(255,0,0,0.45) !important;
-        transform: translateY(-1px);
-    }
-
-    /* ── Secondary buttons — white gradient pill style ── */
-    .stButton > button[kind="secondary"] {
-        background: linear-gradient(135deg, #ffffff 0%, #f1f3f5 100%) !important;
-        color: #444444 !important;
-        border: 1.5px solid #d0d0d0 !important;
-        box-shadow: 0 1px 4px rgba(0,0,0,0.08) !important;
-    }
-    .stButton > button[kind="secondary"]:hover {
-        background: linear-gradient(135deg, #f8f8f8 0%, #e8eaed 100%) !important;
-        border-color: #b0b0b0 !important;
-        color: #FF0000 !important;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.12) !important;
-        transform: translateY(-1px);
-    }
-
-    /* ═══════════════════════════════════════════════════════════
-       TABS
-    ═══════════════════════════════════════════════════════════ */
+    /* ══════════════════════════════════════════════════════════════
+       TABS — styled like website nav links
+    ══════════════════════════════════════════════════════════════ */
     [data-testid="stTabs"] [role="tablist"] {
         background: #ffffff !important;
-        border-bottom: 2px solid #e2e8f0 !important;
-        border-radius: 10px 10px 0 0;
-        padding: 0 0.5rem;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        border-bottom: 2px solid #e5e7eb !important;
+        border-radius: 14px 14px 0 0 !important;
+        padding: 0 1rem !important;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.06) !important;
+        gap: 0 !important;
     }
     [data-testid="stTabs"] button[role="tab"] {
-        color: #64748b !important; font-weight: 600 !important;
-        font-size: 0.95rem !important; padding: 0.75rem 1.5rem !important;
+        color: #6b7280 !important; font-weight: 600 !important;
+        font-size: 0.9rem !important; padding: 0.9rem 1.8rem !important;
         border: none !important; border-bottom: 3px solid transparent !important;
-        background: transparent !important;
+        background: transparent !important; border-radius: 0 !important;
+        font-family: 'Poppins', sans-serif !important;
         transition: all 0.2s !important;
     }
     [data-testid="stTabs"] button[role="tab"]:hover {
-        color: #FF0000 !important; background: #fff5f5 !important;
+        color: #FF0000 !important; background: #fff8f8 !important;
     }
     [data-testid="stTabs"] button[aria-selected="true"] {
-        color: #FF0000 !important; border-bottom: 3px solid #FF0000 !important;
-        background: #fff5f5 !important; font-weight: 700 !important;
+        color: #FF0000 !important;
+        border-bottom: 3px solid #FF0000 !important;
+        background: #fff8f8 !important; font-weight: 700 !important;
     }
 
-    /* ═══════════════════════════════════════════════════════════
+    /* ══════════════════════════════════════════════════════════════
+       SECTION CARDS — white floating panels (like website sections)
+    ══════════════════════════════════════════════════════════════ */
+    .section-card {
+        background: #ffffff;
+        border-radius: 18px;
+        padding: 1.6rem 2rem;
+        margin-bottom: 1.4rem;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+        border: 1px solid #f3f4f6;
+    }
+    .section-card-dark {
+        background: #0f1f12;
+        border-radius: 18px;
+        padding: 1.6rem 2rem;
+        margin-bottom: 1.4rem;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       SECTION HEADERS — "Bold Title" style
+    ══════════════════════════════════════════════════════════════ */
+    .section-header {
+        display: flex; align-items: center; gap: 12px;
+        margin: 1.6rem 0 0.8rem; padding: 0;
+    }
+    .step-badge {
+        background: #FF0000;
+        color: #fff; border-radius: 50%;
+        width: 32px; height: 32px;
+        display: inline-flex; align-items: center; justify-content: center;
+        font-weight: 900; font-size: 0.85rem; flex-shrink: 0;
+        box-shadow: 0 4px 12px rgba(255,0,0,0.35);
+    }
+    .section-title {
+        color: #111827 !important; font-size: 1.15rem;
+        font-weight: 700; margin: 0;
+        font-family: 'Poppins', sans-serif !important;
+    }
+    .section-title .green { color: #16a34a; }
+    .section-title .red   { color: #FF0000; }
+
+    /* ══════════════════════════════════════════════════════════════
+       METRIC CARDS — clean white, green top border
+    ══════════════════════════════════════════════════════════════ */
+    .metric-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-top: 4px solid #FF0000;
+        border-radius: 14px; padding: 1.2rem 0.9rem;
+        text-align: center;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .metric-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 28px rgba(255,0,0,0.1);
+    }
+    .metric-card h2 {
+        color: #FF0000 !important; margin: 0;
+        font-size: 1.8rem; font-weight: 800;
+        font-family: 'Poppins', sans-serif !important;
+    }
+    .metric-card p {
+        color: #9ca3af !important; margin: 0.2rem 0 0;
+        font-size: 0.68rem; text-transform: uppercase;
+        letter-spacing: 1px; font-weight: 600;
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       PROGRAM QUEUE CARDS
+    ══════════════════════════════════════════════════════════════ */
+    .prog-card {
+        background: #f0fdf4;
+        border: 1px solid #bbf7d0;
+        border-left: 4px solid #16a34a;
+        border-radius: 10px; padding: 0.7rem 1rem; margin-bottom: 0.4rem;
+        color: #111827 !important; font-size: 0.88rem;
+        box-shadow: 0 2px 8px rgba(22,163,74,0.08);
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       BUTTONS — pill style like website
+    ══════════════════════════════════════════════════════════════ */
+    .stButton > button {
+        background: #FF0000 !important;
+        color: #ffffff !important; border: none !important;
+        border-radius: 50px !important;
+        padding: 0.55rem 1.8rem !important;
+        font-weight: 700 !important; font-size: 0.88rem !important;
+        font-family: 'Poppins', sans-serif !important;
+        box-shadow: 0 4px 14px rgba(255,0,0,0.3) !important;
+        transition: all 0.2s !important;
+        letter-spacing: 0.2px;
+    }
+    .stButton > button:hover {
+        background: #cc0000 !important;
+        box-shadow: 0 6px 20px rgba(255,0,0,0.45) !important;
+        transform: translateY(-2px) !important;
+    }
+    /* Secondary — white pill */
+    .stButton > button[kind="secondary"] {
+        background: #ffffff !important;
+        color: #374151 !important;
+        border: 1.5px solid #d1d5db !important;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.06) !important;
+    }
+    .stButton > button[kind="secondary"]:hover {
+        background: #f9fafb !important;
+        border-color: #FF0000 !important;
+        color: #FF0000 !important;
+        box-shadow: 0 4px 12px rgba(255,0,0,0.12) !important;
+        transform: translateY(-2px) !important;
+    }
+
+    /* ══════════════════════════════════════════════════════════════
        FORM CONTROLS
-    ═══════════════════════════════════════════════════════════ */
+    ══════════════════════════════════════════════════════════════ */
     [data-testid="stTextInput"] input,
     [data-testid="stNumberInput"] input,
     [data-testid="stSelectbox"] > div > div,
     [data-testid="stMultiSelect"] > div > div,
     [data-testid="stDateInput"] input {
         background-color: #ffffff !important;
-        border: 1.5px solid #e2e8f0 !important;
-        color: #1a1a2e !important; border-radius: 8px !important;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.04) !important;
+        border: 1.5px solid #e5e7eb !important;
+        color: #111827 !important;
+        border-radius: 10px !important;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.04) !important;
+        font-family: 'Poppins', sans-serif !important;
     }
     [data-testid="stSelectbox"] > div > div:focus-within,
     [data-testid="stMultiSelect"] > div > div:focus-within {
         border-color: #FF0000 !important;
-        box-shadow: 0 0 0 3px rgba(255,0,0,0.12) !important;
+        box-shadow: 0 0 0 3px rgba(255,0,0,0.1) !important;
     }
     [data-baseweb="popover"] {
         background: #ffffff !important;
-        border: 1px solid #e2e8f0 !important;
-        box-shadow: 0 8px 24px rgba(0,0,0,0.12) !important;
-        border-radius: 10px !important;
+        border: 1px solid #e5e7eb !important;
+        box-shadow: 0 12px 32px rgba(0,0,0,0.12) !important;
+        border-radius: 12px !important;
     }
     [data-baseweb="option"]:hover {
-        background: #fff5f5 !important; color: #FF0000 !important;
+        background: #fff8f8 !important; color: #FF0000 !important;
     }
     [data-baseweb="option"][aria-selected="true"] {
         background: #fff0f0 !important; color: #FF0000 !important;
     }
-    /* Multiselect tags */
     [data-baseweb="tag"] {
-        background: #fff0f0 !important; border-color: #fca5a5 !important;
-        color: #cc0000 !important; border-radius: 6px !important;
-        font-weight: 600 !important;
+        background: #f0fdf4 !important; border-color: #86efac !important;
+        color: #16a34a !important; border-radius: 20px !important;
+        font-weight: 600 !important; font-size: 0.78rem !important;
     }
-    /* Labels */
     [data-testid="stWidgetLabel"] p {
-        color: #475569 !important; font-size: 0.8rem !important;
+        color: #6b7280 !important; font-size: 0.75rem !important;
         font-weight: 600 !important; text-transform: uppercase !important;
-        letter-spacing: 0.5px !important;
+        letter-spacing: 0.6px !important;
+        font-family: 'Poppins', sans-serif !important;
     }
 
-    /* ═══════════════════════════════════════════════════════════
+    /* ══════════════════════════════════════════════════════════════
        DATAFRAME
-    ═══════════════════════════════════════════════════════════ */
+    ══════════════════════════════════════════════════════════════ */
     [data-testid="stDataFrame"] {
-        border-radius: 12px !important; overflow: hidden !important;
-        border: 1px solid #e2e8f0 !important;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.06) !important;
+        border-radius: 14px !important; overflow: hidden !important;
+        border: 1px solid #e5e7eb !important;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.06) !important;
     }
 
-    /* ═══════════════════════════════════════════════════════════
-       EXPANDER
-    ═══════════════════════════════════════════════════════════ */
+    /* ══════════════════════════════════════════════════════════════
+       EXPANDER — white card style
+    ══════════════════════════════════════════════════════════════ */
     [data-testid="stExpander"] {
         background: #ffffff !important;
-        border: 1px solid #e2e8f0 !important;
-        border-radius: 10px !important;
-        box-shadow: 0 1px 4px rgba(0,0,0,0.05) !important;
+        border: 1px solid #e5e7eb !important;
+        border-radius: 14px !important;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05) !important;
+        margin-bottom: 0.8rem !important;
     }
     [data-testid="stExpander"] summary {
-        color: #334155 !important; font-weight: 600 !important;
+        color: #111827 !important; font-weight: 700 !important;
+        font-size: 0.95rem !important;
+        font-family: 'Poppins', sans-serif !important;
+        padding: 1rem 1.2rem !important;
     }
     [data-testid="stExpander"] summary:hover { color: #FF0000 !important; }
-
-    /* ═══════════════════════════════════════════════════════════
-       ALERTS
-    ═══════════════════════════════════════════════════════════ */
-    [data-testid="stAlert"] {
-        border-radius: 10px !important;
-        box-shadow: 0 1px 4px rgba(0,0,0,0.05) !important;
+    [data-testid="stExpander"] > div {
+        background: #ffffff !important;
+        padding: 0.2rem 1rem 1rem !important;
     }
 
-    /* ═══════════════════════════════════════════════════════════
+    /* ══════════════════════════════════════════════════════════════
+       ALERTS
+    ══════════════════════════════════════════════════════════════ */
+    [data-testid="stAlert"] {
+        border-radius: 12px !important;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05) !important;
+        font-family: 'Poppins', sans-serif !important;
+    }
+
+    /* ══════════════════════════════════════════════════════════════
        DOWNLOAD BUTTON
-    ═══════════════════════════════════════════════════════════ */
+    ══════════════════════════════════════════════════════════════ */
     [data-testid="stDownloadButton"] button {
         background: #ffffff !important;
-        border: 1.5px solid #FF0000 !important;
-        color: #FF0000 !important; border-radius: 8px !important;
-        font-weight: 600 !important; transition: all 0.2s !important;
+        border: 2px solid #FF0000 !important;
+        color: #FF0000 !important;
+        border-radius: 50px !important;
+        font-weight: 700 !important;
+        transition: all 0.2s !important;
     }
     [data-testid="stDownloadButton"] button:hover {
-        background: #fff0f0 !important;
-        box-shadow: 0 3px 10px rgba(255,0,0,0.2) !important;
+        background: #FF0000 !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 14px rgba(255,0,0,0.3) !important;
     }
 
-    /* ═══════════════════════════════════════════════════════════
-       DIVIDERS, CAPTIONS, GENERAL TEXT
-    ═══════════════════════════════════════════════════════════ */
-    hr { border: none !important; border-top: 1.5px solid #e2e8f0 !important; margin: 1.2rem 0 !important; }
-    [data-testid="stCaption"] p { color: #94a3b8 !important; font-size: 0.8rem !important; }
-    h1,h2,h3,h4,h5,h6 { color: #1a1a2e !important; }
-    p, li { color: #334155 !important; }
+    /* ══════════════════════════════════════════════════════════════
+       DIVIDERS, TEXT, LINKS
+    ══════════════════════════════════════════════════════════════ */
+    hr {
+        border: none !important;
+        border-top: 2px solid #f3f4f6 !important;
+        margin: 1.4rem 0 !important;
+    }
+    [data-testid="stCaption"] p {
+        color: #9ca3af !important; font-size: 0.78rem !important;
+    }
+    h1,h2,h3,h4,h5,h6 {
+        color: #111827 !important;
+        font-family: 'Poppins', sans-serif !important;
+    }
+    p, li { color: #374151 !important; }
     a { color: #FF0000 !important; }
     a:hover { color: #cc0000 !important; }
     progress { accent-color: #FF0000 !important; }
 
-    /* ═══════════════════════════════════════════════════════════
+    /* ══════════════════════════════════════════════════════════════
        SPINNER
-    ═══════════════════════════════════════════════════════════ */
+    ══════════════════════════════════════════════════════════════ */
     [data-testid="stSpinner"] > div { border-top-color: #FF0000 !important; }
+
+    /* ══════════════════════════════════════════════════════════════
+       PROGRESS BAR
+    ══════════════════════════════════════════════════════════════ */
+    [data-testid="stProgressBar"] > div > div {
+        background: linear-gradient(90deg, #FF0000, #ff6b6b) !important;
+        border-radius: 10px !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -866,15 +977,40 @@ def analyze_program(name, prog):
 # ---------------------------------------------------------------------------
 
 st.markdown("""
-<div class="yt-header">
-  <div class="yt-header-inner">
-    <div class="yt-logo-wrap">
+<!-- TOP UTILITY BAR -->
+<div class="top-bar">
+  <span>
+    <b>📺 YouTube Program Analyzer</b>
+    &nbsp;|&nbsp; Hardcord Ad Targeting Tool for Sri Lankan Broadcast Industry
+  </span>
+  <span>
+    <span class="pill">🇱🇰 Sri Lanka</span>
+    <span>100 Verified Channels</span>
+  </span>
+</div>
+
+<!-- HERO HEADER -->
+<div class="hero-header">
+  <div class="hero-nav">
+    <div class="hero-logo-wrap">
       <img src="https://logos-world.net/wp-content/uploads/2020/06/YouTube-Logo.png"
-           alt="YouTube" height="36" style="display:block;">
+           alt="YouTube" height="30" style="display:block;">
     </div>
-    <div class="yt-header-text">
-      <h1>Program Analyzer</h1>
-      <p>Hardcord Ad Targeting &nbsp;·&nbsp; Compare Programs &nbsp;·&nbsp; Find the Best Episodes for 6-Second Ad Placement</p>
+    <div class="hero-tagline">
+      <span>📊 Program Comparison</span>
+      <span>🔀 Cross-Channel</span>
+      <span>📈 Trending</span>
+    </div>
+  </div>
+  <div class="hero-body">
+    <h1>Find the <span class="accent">Best Programs</span><br>for Your 6-Second Ad</h1>
+    <p>Compare viewership, engagement &amp; trends across Sri Lanka's top YouTube channels.
+       Identify the exact episodes where your hardcord ad gets maximum reach.</p>
+    <div class="hero-stats">
+      <div class="hero-stat"><span class="num">100</span><span class="lbl">Verified Channels</span></div>
+      <div class="hero-stat"><span class="num">3</span><span class="lbl">Compare Modes</span></div>
+      <div class="hero-stat"><span class="num">6s</span><span class="lbl">Ad Placement</span></div>
+      <div class="hero-stat"><span class="num">Live</span><span class="lbl">YouTube Data</span></div>
     </div>
   </div>
 </div>
