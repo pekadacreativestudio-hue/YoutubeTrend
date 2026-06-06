@@ -591,6 +591,96 @@ st.markdown("""
 # API helpers
 # ---------------------------------------------------------------------------
 
+st.markdown("""
+<style>
+/* ── Top channel feature cards ─────────────────────────── */
+.chan-feat-strip {
+    display:flex; gap:12px; flex-wrap:wrap; margin-bottom:1rem;
+}
+.chan-feat-card {
+    background:#ffffff; border:1px solid #d1fae5;
+    border-top:4px solid #16a34a; border-radius:16px;
+    padding:1rem 1.2rem; min-width:150px; flex:1;
+    text-align:center; box-shadow:0 2px 14px rgba(22,163,74,0.09);
+    transition:all 0.2s;
+}
+.chan-feat-card:hover { transform:translateY(-3px); box-shadow:0 8px 24px rgba(22,163,74,0.18); }
+.chan-feat-card .cf-icon { font-size:1.8rem; margin-bottom:4px; }
+.chan-feat-card .cf-name { font-weight:800; color:#1a2e1a; font-size:0.88rem; margin-bottom:4px; line-height:1.2; }
+.chan-feat-card .cf-subs { color:#16a34a; font-size:1.15rem; font-weight:800; margin-bottom:2px; }
+.chan-feat-card .cf-type { color:#9ca3af; font-size:0.65rem; text-transform:uppercase; letter-spacing:0.6px; }
+
+/* ── Selected channel banner ────────────────────────────── */
+.sel-channel-banner {
+    background:linear-gradient(135deg,#0f2d14,#1a5c28);
+    border-radius:16px; padding:1rem 1.6rem;
+    display:flex; align-items:center; gap:16px;
+    border:1px solid rgba(74,222,128,0.2);
+    box-shadow:0 4px 20px rgba(15,45,20,0.25);
+    margin-bottom:1rem;
+}
+.sel-channel-banner .scb-icon { font-size:2rem; }
+.sel-channel-banner .scb-name { color:#fff; font-size:1.1rem; font-weight:800; }
+.sel-channel-banner .scb-sub  { color:#4ade80; font-size:0.8rem; font-weight:500; }
+
+/* ── Program grid cards ─────────────────────────────────── */
+.pgc {
+    background:#ffffff; border:1px solid #e8f5e9;
+    border-radius:18px; overflow:hidden;
+    box-shadow:0 4px 20px rgba(15,45,20,0.08);
+    margin-bottom:1rem; transition:transform 0.2s,box-shadow 0.2s;
+    display:flex; flex-direction:column;
+}
+.pgc:hover { transform:translateY(-4px); box-shadow:0 12px 32px rgba(15,45,20,0.16); }
+.pgc.dark { background:#0f2d14; border-color:transparent; box-shadow:0 4px 24px rgba(15,45,20,0.3); }
+.pgc img { width:100%; height:150px; object-fit:cover; display:block; }
+.pgc .pgc-body { padding:1rem 1.15rem 0.5rem; flex:1; }
+.pgc .pgc-rank {
+    display:inline-block; background:#dcfce7; color:#15803d;
+    font-size:0.65rem; font-weight:800; padding:2px 8px;
+    border-radius:20px; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.4px;
+}
+.pgc.dark .pgc-rank { background:rgba(74,222,128,0.2); color:#4ade80; }
+.pgc .pgc-cat {
+    font-size:0.68rem; font-weight:700; text-transform:uppercase;
+    letter-spacing:0.6px; color:#16a34a; margin-bottom:3px;
+}
+.pgc.dark .pgc-cat { color:#4ade80; }
+.pgc .pgc-name {
+    font-size:0.96rem; font-weight:800; color:#1a2e1a;
+    line-height:1.3; margin-bottom:8px;
+    display:-webkit-box; -webkit-line-clamp:2;
+    -webkit-box-orient:vertical; overflow:hidden;
+}
+.pgc.dark .pgc-name { color:#ffffff; }
+.pgc .pgc-stats {
+    display:flex; gap:12px; font-size:0.75rem;
+    color:#6b7280; flex-wrap:wrap; margin-bottom:4px;
+}
+.pgc.dark .pgc-stats { color:rgba(255,255,255,0.55); }
+.pgc .pgc-views { color:#16a34a; font-weight:800; font-size:0.88rem; }
+.pgc.dark .pgc-views { color:#4ade80; }
+.pgc .pgc-divider {
+    border:none; border-top:1px solid #e8f5e9; margin:8px 0;
+}
+.pgc.dark .pgc-divider { border-top-color:rgba(74,222,128,0.15); }
+
+/* ── Comparison queue bar ───────────────────────────────── */
+.queue-strip { display:flex; gap:10px; flex-wrap:wrap; margin:0 0 14px; }
+.queue-card {
+    background:#f0fdf4; border:1.5px solid #86efac;
+    border-left:4px solid #16a34a; border-radius:12px;
+    padding:0.55rem 0.9rem; display:flex; align-items:center; gap:8px;
+    box-shadow:0 2px 8px rgba(22,163,74,0.09);
+}
+.queue-card img { width:44px; height:30px; object-fit:cover; border-radius:6px; flex-shrink:0; }
+.queue-card .qcn { font-weight:700; color:#1a2e1a; font-size:0.8rem; max-width:130px;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.queue-card .qcv { font-size:0.7rem; color:#16a34a; font-weight:600; }
+</style>
+""", unsafe_allow_html=True)
+
+
 def api_get(endpoint, params):
     """GET with automatic failover across all configured API keys on quota (403)."""
     for key in (API_KEYS or [YOUTUBE_API_KEY]):
@@ -993,36 +1083,84 @@ st.markdown("""
 <div class="top-bar">
   <span>
     <b>📺 YouTube Program Analyzer</b>
-    &nbsp;|&nbsp; Hardcord Ad Targeting Tool for Sri Lankan Broadcast Industry
+    &nbsp;|&nbsp; Hardcord Ad Targeting — Sri Lankan Broadcast Industry
   </span>
   <span>
-    <span class="pill">🌿 Sri Lanka</span>
-    <span>100 Verified Channels</span>
+    <span class="pill">🌿 100 Verified Channels</span>
+    <span style="color:#4ade80;">Live YouTube Data</span>
   </span>
 </div>
 
 <!-- HERO HEADER -->
 <div class="hero-header">
+  <!-- NAV ROW -->
   <div class="hero-nav">
     <div class="hero-logo-wrap">
       <img src="https://logos-world.net/wp-content/uploads/2020/06/YouTube-Logo.png"
-           alt="YouTube" height="30" style="display:block;">
+           alt="YouTube" height="28" style="display:block;">
     </div>
     <div class="hero-tagline">
-      <span>📊 Program Comparison</span>
+      <span>📊 Program Compare</span>
       <span>🔀 Cross-Channel</span>
       <span>📈 Trending</span>
+      <span class="pill" style="background:rgba(74,222,128,0.15);color:#4ade80;border-color:rgba(74,222,128,0.3);">🇱🇰 Sri Lanka</span>
     </div>
   </div>
-  <div class="hero-body">
-    <h1>Find the <span class="accent">Best Programs</span><br>for Your 6-Second Ad</h1>
-    <p>Compare viewership, engagement &amp; trends across Sri Lanka's top YouTube channels.
-       Identify the exact episodes where your hardcord ad gets maximum reach.</p>
-    <div class="hero-stats">
-      <div class="hero-stat"><span class="num">100</span><span class="lbl">Verified Channels</span></div>
-      <div class="hero-stat"><span class="num">3</span><span class="lbl">Compare Modes</span></div>
-      <div class="hero-stat"><span class="num">6s</span><span class="lbl">Ad Placement</span></div>
-      <div class="hero-stat"><span class="num">Live</span><span class="lbl">YouTube Data</span></div>
+
+  <!-- HERO BODY — 2 column layout like landing page -->
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:2rem;">
+    <div class="hero-body" style="flex:1;">
+      <div style="font-size:0.72rem;color:#4ade80;font-weight:700;text-transform:uppercase;
+          letter-spacing:1.5px;margin-bottom:8px;">
+        🎯 HARDCORD AD TARGETING TOOL
+      </div>
+      <h1 style="font-size:2.4rem;">
+        Find the <span class="accent">Best Programs</span><br>
+        for Your <span style="color:#fff;">6-Second Ad</span>
+      </h1>
+      <p style="margin-top:0.6rem;max-width:520px;">
+        Compare viewership, engagement &amp; trends across Sri Lanka's top YouTube channels.
+        Identify the exact episodes where your hardcord ad gets maximum reach.
+      </p>
+      <!-- Feature checklist like landing page -->
+      <div style="display:flex;flex-wrap:wrap;gap:10px;margin:0.8rem 0 1rem;">
+        <span style="color:rgba(255,255,255,0.75);font-size:0.78rem;">✅ 100 Verified Sri Lankan Channels</span>
+        <span style="color:rgba(255,255,255,0.75);font-size:0.78rem;">✅ Live YouTube API Data</span>
+        <span style="color:rgba(255,255,255,0.75);font-size:0.78rem;">✅ Hardcord Score Algorithm</span>
+      </div>
+    </div>
+
+    <!-- STATS BLOCK — right side like landing page badge -->
+    <div style="display:flex;flex-direction:column;gap:10px;flex-shrink:0;">
+      <div style="background:rgba(74,222,128,0.12);border:1px solid rgba(74,222,128,0.25);
+          border-radius:16px;padding:1rem 1.4rem;text-align:center;min-width:130px;">
+        <div class="hero-stat"><span class="num">100</span><span class="lbl">Channels</span></div>
+      </div>
+      <div style="background:rgba(74,222,128,0.12);border:1px solid rgba(74,222,128,0.25);
+          border-radius:16px;padding:1rem 1.4rem;text-align:center;">
+        <div class="hero-stat"><span class="num">6s</span><span class="lbl">Ad Format</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS STRIP bottom -->
+  <div style="display:flex;gap:0;margin-top:1.2rem;
+      background:rgba(0,0,0,0.2);border-radius:12px;overflow:hidden;">
+    <div style="flex:1;padding:0.7rem 1.2rem;border-right:1px solid rgba(255,255,255,0.08);">
+      <div style="color:#4ade80;font-weight:800;font-size:1rem;">📊 Compare</div>
+      <div style="color:rgba(255,255,255,0.5);font-size:0.68rem;">Up to 4 programs at once</div>
+    </div>
+    <div style="flex:1;padding:0.7rem 1.2rem;border-right:1px solid rgba(255,255,255,0.08);">
+      <div style="color:#4ade80;font-weight:800;font-size:1rem;">🔀 Cross-Channel</div>
+      <div style="color:rgba(255,255,255,0.5);font-size:0.68rem;">Compare across different channels</div>
+    </div>
+    <div style="flex:1;padding:0.7rem 1.2rem;border-right:1px solid rgba(255,255,255,0.08);">
+      <div style="color:#4ade80;font-weight:800;font-size:1rem;">📈 Trending</div>
+      <div style="color:rgba(255,255,255,0.5);font-size:0.68rem;">Live trending channel rankings</div>
+    </div>
+    <div style="flex:1;padding:0.7rem 1.2rem;">
+      <div style="color:#4ade80;font-weight:800;font-size:1rem;">🎯 Ad Placement</div>
+      <div style="color:rgba(255,255,255,0.5);font-size:0.68rem;">Best episode recommendations</div>
     </div>
   </div>
 </div>
@@ -1241,23 +1379,41 @@ def render_program_comparison():
         chan_stats = get_curated_channel_stats()
     st.toast(f"✅ Loaded {len(chan_stats)} Sri Lankan channels", icon="📺")
 
-    # Live search bar
-    search_q = st.text_input("🔍 Search channels", placeholder="Type a channel name…", key="chan_search")
+    # ── Featured top-4 channels strip ───────────────────────────────────────
+    top4 = chan_stats[:4]
+    feat_html = '<div class="chan-feat-strip">'
+    type_icons = {"📺 TV Channel": "📺", "🎥 Creator": "🎥", "🎵 Music": "🎵",
+                  "📰 News": "📰", "🎤 Reality": "🎤", "📻 Radio": "📻",
+                  "🎮 Gaming": "🎮", "🧒 Kids": "🧒", "💻 Tech": "💻", "⚽ Sports": "⚽"}
+    for c in top4:
+        icon = type_icons.get(c["Type"], "📺")
+        feat_html += f"""
+        <div class="chan-feat-card">
+            <div class="cf-icon">{icon}</div>
+            <div class="cf-name">{c['Channel']}</div>
+            <div class="cf-subs">{format_number(c['Subscribers'])}</div>
+            <div class="cf-type">subscribers</div>
+        </div>"""
+    feat_html += "</div>"
+    st.markdown(feat_html, unsafe_allow_html=True)
 
-    # Type filter chips (inline pills using columns)
-    all_ch_types = sorted({c["Type"] for c in chan_stats})
-    if "sel_types" not in st.session_state:
-        st.session_state.sel_types = set(all_ch_types)
-
-    chip_cols = st.columns(len(all_ch_types))
-    for col, t in zip(chip_cols, all_ch_types):
-        active = t in st.session_state.sel_types
-        if col.button(t, key=f"chip_{t}", type="primary" if active else "secondary"):
-            if active:
-                st.session_state.sel_types.discard(t)
-            else:
-                st.session_state.sel_types.add(t)
-            st.rerun()
+    # ── Search + type filter ─────────────────────────────────────────────────
+    sf1, sf2 = st.columns([2, 3])
+    with sf1:
+        search_q = st.text_input("🔍 Search channels", placeholder="Type a channel name…", key="chan_search")
+    with sf2:
+        all_ch_types = sorted({c["Type"] for c in chan_stats})
+        if "sel_types" not in st.session_state:
+            st.session_state.sel_types = set(all_ch_types)
+        chip_cols = st.columns(len(all_ch_types))
+        for col, t in zip(chip_cols, all_ch_types):
+            active = t in st.session_state.sel_types
+            if col.button(t, key=f"chip_{t}", type="primary" if active else "secondary"):
+                if active:
+                    st.session_state.sel_types.discard(t)
+                else:
+                    st.session_state.sel_types.add(t)
+                st.rerun()
 
     # Filter channels
     filtered_chans = [
@@ -1296,10 +1452,29 @@ def render_program_comparison():
             st.toast(f"📺 Selected: {chosen['Channel']}", icon="✅")
 
     if not st.session_state.selected_channel_id:
-        st.info("👆 Click a channel row above to load its programs.")
+        st.markdown("""
+        <div style="background:#f0fdf4;border:1.5px dashed #86efac;border-radius:14px;
+            padding:1.2rem;text-align:center;color:#15803d;font-weight:600;">
+            👆 Click any row in the table above to load its programs
+        </div>
+        """, unsafe_allow_html=True)
         return
 
-    st.success(f"**{st.session_state.selected_channel_name}** selected — showing programs from {date_from} → {date_to}")
+    # Selected channel banner
+    ch_meta = next((c for c in chan_stats if c["channel_id"] == st.session_state.selected_channel_id), {})
+    st.markdown(f"""
+    <div class="sel-channel-banner">
+        <div class="scb-icon">📺</div>
+        <div>
+            <div class="scb-name">{st.session_state.selected_channel_name}</div>
+            <div class="scb-sub">
+                {format_number(ch_meta.get('Subscribers', 0))} subscribers &nbsp;·&nbsp;
+                {format_number(ch_meta.get('Total Videos', 0))} videos &nbsp;·&nbsp;
+                Showing programs from {date_from} → {date_to}
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
     st.markdown("---")
 
     # ── STEP 2: Program List ─────────────────────────────────────────────────
@@ -1329,18 +1504,37 @@ def render_program_comparison():
 
     ranked_programs = sorted(programs.items(), key=lambda x: x[1]["total_views"], reverse=True)
 
-    # Queued comparison pills
+    # ── Comparison queue (thumbnail cards) ──────────────────────────────────
     if st.session_state.compare:
-        st.markdown("**🗂️ Queued for comparison:**")
-        qcols = st.columns(4)
-        for i, pname in enumerate(st.session_state.compare):
-            with qcols[i]:
-                st.markdown(f'<div class="prog-card">🎬 <b>{pname[:28]}</b></div>', unsafe_allow_html=True)
-                if st.button("✖ Remove", key=f"rm_{i}"):
-                    st.session_state.compare.remove(pname)
-                    st.rerun()
+        st.markdown("""
+        <div class="section-header" style="margin-top:0.5rem;">
+            <span class="step-badge" style="background:#15803d;">🗂️</span>
+            <span class="section-title">Queued for Comparison</span>
+        </div>
+        """, unsafe_allow_html=True)
+        queue_html = '<div class="queue-strip">'
+        for pname in st.session_state.compare:
+            pdata_q = programs.get(pname, {})
+            eps_q = pdata_q.get("episodes", [])
+            t_q = max(eps_q, key=lambda e: e["views"]).get("thumbnail", "") if eps_q else ""
+            views_q = format_number(pdata_q.get("total_views", 0))
+            img_tag = f'<img src="{t_q}" onerror="this.style.display:none">' if t_q else ""
+            queue_html += (
+                f'<div class="queue-card">{img_tag}'
+                f'<div><div class="qcn">{pname[:30]}</div>'
+                f'<div class="qcv">👁 {views_q}</div></div></div>'
+            )
+        queue_html += "</div>"
+        st.markdown(queue_html, unsafe_allow_html=True)
+        # Remove buttons in a row
+        rm_cols = st.columns(len(st.session_state.compare))
+        for i, (pname, col) in enumerate(zip(list(st.session_state.compare), rm_cols)):
+            if col.button(f"✖ Remove", key=f"rm_{i}", type="secondary"):
+                st.session_state.compare.remove(pname)
+                st.rerun()
+        st.markdown("---")
 
-    # Sort + type filter controls
+    # ── Sort + filter controls ───────────────────────────────────────────────
     ctrl1, ctrl2, ctrl3 = st.columns([2, 2, 1])
     with ctrl1:
         sort_by = st.selectbox("Sort by", ["Most Views", "Best Engagement", "Most Episodes", "Growing Trend"], key="prog_sort")
@@ -1348,7 +1542,7 @@ def render_program_comparison():
         all_prog_types = sorted({p["category"] for _, p in ranked_programs})
         type_filter = st.multiselect("Filter type", all_prog_types, default=all_prog_types, key="prog_type_filter")
     with ctrl3:
-        prog_search = st.text_input("🔍 Search programs", placeholder="Name…", key="prog_search")
+        prog_search = st.text_input("🔍 Search", placeholder="Program name…", key="prog_search")
 
     # Apply sort
     def sort_key(item):
@@ -1374,32 +1568,70 @@ def render_program_comparison():
         and (not prog_search or prog_search.lower() in n.lower())
     ]
 
-    # Program rows
-    hdr = st.columns([3.2, 1.6, 1.4, 1.0, 1.4])
-    for h, t in zip(hdr, ["Program", "Type", "Views", "Episodes", "Action"]):
-        h.markdown(f"**{t}**")
-    st.markdown("<hr style='margin:4px 0 8px'>", unsafe_allow_html=True)
+    # ── Program card grid (2 columns, alternating light/dark like landing page) ──
+    st.markdown(f"<p style='color:#6b7280;font-size:0.82rem;margin-bottom:0.6rem;'>"
+                f"Showing <b>{min(len(filtered),20)}</b> of {len(filtered)} programs — click <b>Add to Compare</b></p>",
+                unsafe_allow_html=True)
 
-    for idx, (pname, pdata) in enumerate(filtered[:30]):
-        c1, c2, c3, c4, c5 = st.columns([3.2, 1.6, 1.4, 1.0, 1.4])
-        c1.markdown(f"**{pname}**")
-        c2.markdown(pdata["category"])
-        c3.markdown(f"👁 {format_number(pdata['total_views'])}")
-        c4.markdown(f"🎞 {pdata['episode_count']}")
-        already = pname in st.session_state.compare
-        full = len(st.session_state.compare) >= 4
-        if already:
-            c5.markdown("✅ Added")
-        elif full:
-            c5.markdown("—")
-        else:
-            if c5.button("➕ Add", key=f"add_{idx}"):
-                st.session_state.compare.append(pname)
-                st.toast(f"➕ Added: {pname[:30]}", icon="🎬")
-                st.rerun()
+    for row_start in range(0, min(len(filtered), 20), 2):
+        pair = filtered[row_start:row_start + 2]
+        gcols = st.columns(len(pair))
+        for col, (idx_offset, (pname, pdata)) in zip(gcols, enumerate(pair)):
+            card_idx = row_start + idx_offset
+            eps = pdata.get("episodes", [])
+            top_ep = max(eps, key=lambda e: e["views"]) if eps else None
+            thumb = top_ep.get("thumbnail", "") if top_ep else ""
+            already = pname in st.session_state.compare
+            full = len(st.session_state.compare) >= 4
+            dark = (card_idx % 4) in (1, 2)  # cards 1,2 dark; 0,3 light (like landing page pattern)
+
+            dark_cls = " dark" if dark else ""
+            rank_label = f"#{card_idx + 1} by {sort_by}"
+            views_disp = format_number(pdata["total_views"])
+            eng = round(sum(e["engagement"] for e in eps) / max(len(eps), 1), 1) if eps else 0
+            trend_icons = {"Growing": "📈", "Stable": "➡️", "Declining": "📉"}
+
+            fallback_bg = "#1a5c28" if dark else "#f0fdf4"
+            if thumb:
+                card_top = f'<img src="{thumb}" onerror="this.style.display=\'none\'">'
+            else:
+                card_top = f'<div style="height:80px;background:{fallback_bg};display:flex;align-items:center;justify-content:center;font-size:2rem;">🎬</div>'
+            col.markdown(
+                f'<div class="pgc{dark_cls}">'
+                f'{card_top}'
+                f'<div class="pgc-body">'
+                f'<span class="pgc-rank">{rank_label}</span>'
+                f'<div class="pgc-cat">{pdata["category"]}</div>'
+                f'<div class="pgc-name">{pname}</div>'
+                f'<div class="pgc-stats">'
+                f'<span>👁 <span class="pgc-views">{views_disp}</span></span>'
+                f'<span>🎞 {pdata["episode_count"]} episodes</span>'
+                f'<span>💬 {eng}% eng.</span>'
+                f'</div></div></div>',
+                unsafe_allow_html=True,
+            )
+
+            if already:
+                col.markdown('<div style="text-align:center;color:#16a34a;font-weight:700;'
+                             'font-size:0.82rem;padding:4px 0 10px;">✅ Added to comparison</div>',
+                             unsafe_allow_html=True)
+            elif full:
+                col.markdown('<div style="text-align:center;color:#9ca3af;font-size:0.8rem;'
+                             'padding:4px 0 10px;">Max 4 programs reached</div>',
+                             unsafe_allow_html=True)
+            else:
+                if col.button("➕ Add to Compare", key=f"add_{card_idx}"):
+                    st.session_state.compare.append(pname)
+                    st.toast(f"➕ Added: {pname[:30]}", icon="🎬")
+                    st.rerun()
 
     if not st.session_state.compare:
-        st.info("➕ Add at least one program above to see the comparison.")
+        st.markdown("""
+        <div style="background:#f0fdf4;border:1.5px dashed #86efac;border-radius:14px;
+            padding:1.4rem;text-align:center;color:#15803d;font-weight:600;margin-top:0.5rem;">
+            ➕ Click <b>Add to Compare</b> on any program card above to build your comparison
+        </div>
+        """, unsafe_allow_html=True)
         return
 
     st.markdown("---")
