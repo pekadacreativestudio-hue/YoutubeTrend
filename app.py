@@ -195,12 +195,12 @@ st.markdown("""
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap');
 
     /* ══════════════════════════════════════════════════════════════
-       BASE
+       BASE — light green-tinted background like the landing page
     ══════════════════════════════════════════════════════════════ */
     html, body, [data-testid="stApp"],
     [data-testid="stAppViewContainer"], .main, .block-container {
-        background-color: #f0f4f1 !important;
-        color: #111827 !important;
+        background-color: #f2f7f2 !important;
+        color: #1a2e1a !important;
         font-family: 'Poppins', sans-serif !important;
     }
     [data-testid="block-container"] {
@@ -210,45 +210,45 @@ st.markdown("""
         max-width: 1300px !important;
     }
     [data-testid="stSidebar"], [data-testid="stSidebarContent"] {
-        background-color: #0f1f12 !important;
+        background-color: #0f2d14 !important;
         border-right: none !important;
     }
 
     /* ══════════════════════════════════════════════════════════════
-       TOP UTILITY BAR
+       TOP UTILITY BAR — dark forest green
     ══════════════════════════════════════════════════════════════ */
     .top-bar {
-        background: #0f1f12;
+        background: #0f2d14;
         padding: 6px 2rem;
         font-size: 0.75rem;
         color: rgba(255,255,255,0.7);
         display: flex; align-items: center; justify-content: space-between;
-        margin: -1rem -1rem 0; /* full bleed */
+        margin: -1rem -1rem 0;
     }
     .top-bar span { display: flex; align-items: center; gap: 18px; }
     .top-bar b { color: #4ade80; }
 
     /* ══════════════════════════════════════════════════════════════
-       HERO HEADER
+       HERO HEADER — dark forest green with green glow circles
     ══════════════════════════════════════════════════════════════ */
     .hero-header {
-        background: #0f1f12;
-        border-radius: 0 0 24px 24px;
+        background: linear-gradient(135deg, #0f2d14 0%, #1a4a22 100%);
+        border-radius: 0 0 28px 28px;
         padding: 1.4rem 2.5rem 2rem;
         margin: 0 -1rem 1.8rem;
         position: relative; overflow: hidden;
-        box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+        box-shadow: 0 8px 40px rgba(15,45,20,0.35);
     }
     .hero-header::before {
         content: ''; position: absolute;
-        top: -60px; right: -60px;
-        width: 260px; height: 260px; border-radius: 50%;
-        background: rgba(255,0,0,0.07);
+        top: -70px; right: -70px;
+        width: 280px; height: 280px; border-radius: 50%;
+        background: rgba(74,222,128,0.09);
     }
     .hero-header::after {
         content: ''; position: absolute;
-        bottom: -40px; left: 120px;
-        width: 180px; height: 180px; border-radius: 50%;
+        bottom: -50px; left: 100px;
+        width: 200px; height: 200px; border-radius: 50%;
         background: rgba(74,222,128,0.06);
     }
     .hero-nav {
@@ -259,18 +259,18 @@ st.markdown("""
         background: #fff; border-radius: 10px;
         padding: 6px 14px 4px;
         display: flex; align-items: center;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        box-shadow: 0 2px 12px rgba(0,0,0,0.25);
     }
     .hero-tagline {
         display: flex; gap: 18px; align-items: center;
     }
     .hero-tagline span {
-        color: rgba(255,255,255,0.6);
+        color: rgba(255,255,255,0.65);
         font-size: 0.78rem; font-weight: 500;
     }
     .hero-tagline .pill {
-        background: rgba(255,0,0,0.2); color: #ff6b6b;
-        border: 1px solid rgba(255,0,0,0.3);
+        background: rgba(74,222,128,0.18); color: #4ade80;
+        border: 1px solid rgba(74,222,128,0.35);
         border-radius: 20px; padding: 2px 12px;
         font-size: 0.72rem; font-weight: 600;
         text-transform: uppercase; letter-spacing: 0.5px;
@@ -291,9 +291,7 @@ st.markdown("""
         display: flex; gap: 28px; flex-wrap: wrap;
         margin-top: 0.8rem;
     }
-    .hero-stat {
-        display: flex; flex-direction: column;
-    }
+    .hero-stat { display: flex; flex-direction: column; }
     .hero-stat .num {
         color: #4ade80; font-size: 1.5rem;
         font-weight: 800; line-height: 1;
@@ -304,11 +302,11 @@ st.markdown("""
     }
 
     /* ══════════════════════════════════════════════════════════════
-       TABS — styled like website nav links
+       TABS — green active underline, like website nav
     ══════════════════════════════════════════════════════════════ */
     [data-testid="stTabs"] [role="tablist"] {
         background: #ffffff !important;
-        border-bottom: 2px solid #e5e7eb !important;
+        border-bottom: 2px solid #d1fae5 !important;
         border-radius: 14px 14px 0 0 !important;
         padding: 0 1rem !important;
         box-shadow: 0 4px 16px rgba(0,0,0,0.06) !important;
@@ -323,74 +321,74 @@ st.markdown("""
         transition: all 0.2s !important;
     }
     [data-testid="stTabs"] button[role="tab"]:hover {
-        color: #FF0000 !important; background: #fff8f8 !important;
+        color: #16a34a !important; background: #f0fdf4 !important;
     }
     [data-testid="stTabs"] button[aria-selected="true"] {
-        color: #FF0000 !important;
-        border-bottom: 3px solid #FF0000 !important;
-        background: #fff8f8 !important; font-weight: 700 !important;
+        color: #16a34a !important;
+        border-bottom: 3px solid #16a34a !important;
+        background: #f0fdf4 !important; font-weight: 700 !important;
     }
 
     /* ══════════════════════════════════════════════════════════════
-       SECTION CARDS — white floating panels (like website sections)
+       SECTION CARDS — white floating panels
     ══════════════════════════════════════════════════════════════ */
     .section-card {
         background: #ffffff;
-        border-radius: 18px;
+        border-radius: 20px;
         padding: 1.6rem 2rem;
         margin-bottom: 1.4rem;
-        box-shadow: 0 4px 24px rgba(0,0,0,0.07);
-        border: 1px solid #f3f4f6;
+        box-shadow: 0 4px 24px rgba(15,45,20,0.08);
+        border: 1px solid #e8f5e9;
     }
     .section-card-dark {
-        background: #0f1f12;
-        border-radius: 18px;
+        background: #0f2d14;
+        border-radius: 20px;
         padding: 1.6rem 2rem;
         margin-bottom: 1.4rem;
-        box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+        box-shadow: 0 4px 28px rgba(15,45,20,0.25);
     }
 
     /* ══════════════════════════════════════════════════════════════
-       SECTION HEADERS — "Bold Title" style
+       SECTION HEADERS
     ══════════════════════════════════════════════════════════════ */
     .section-header {
         display: flex; align-items: center; gap: 12px;
         margin: 1.6rem 0 0.8rem; padding: 0;
     }
     .step-badge {
-        background: #FF0000;
+        background: #16a34a;
         color: #fff; border-radius: 50%;
         width: 32px; height: 32px;
         display: inline-flex; align-items: center; justify-content: center;
         font-weight: 900; font-size: 0.85rem; flex-shrink: 0;
-        box-shadow: 0 4px 12px rgba(255,0,0,0.35);
+        box-shadow: 0 4px 12px rgba(22,163,74,0.4);
     }
     .section-title {
-        color: #111827 !important; font-size: 1.15rem;
+        color: #1a2e1a !important; font-size: 1.15rem;
         font-weight: 700; margin: 0;
         font-family: 'Poppins', sans-serif !important;
     }
-    .section-title .green { color: #16a34a; }
-    .section-title .red   { color: #FF0000; }
+    .section-title .green  { color: #16a34a; }
+    .section-title .accent { color: #4ade80; }
 
     /* ══════════════════════════════════════════════════════════════
-       METRIC CARDS — clean white, green top border
+       METRIC CARDS — white with green top border
     ══════════════════════════════════════════════════════════════ */
     .metric-card {
         background: #ffffff;
-        border: 1px solid #e5e7eb;
-        border-top: 4px solid #FF0000;
+        border: 1px solid #d1fae5;
+        border-top: 4px solid #16a34a;
         border-radius: 14px; padding: 1.2rem 0.9rem;
         text-align: center;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        box-shadow: 0 2px 12px rgba(22,163,74,0.07);
         transition: transform 0.2s, box-shadow 0.2s;
     }
     .metric-card:hover {
         transform: translateY(-3px);
-        box-shadow: 0 8px 28px rgba(255,0,0,0.1);
+        box-shadow: 0 8px 28px rgba(22,163,74,0.14);
     }
     .metric-card h2 {
-        color: #FF0000 !important; margin: 0;
+        color: #16a34a !important; margin: 0;
         font-size: 1.8rem; font-weight: 800;
         font-family: 'Poppins', sans-serif !important;
     }
@@ -408,30 +406,30 @@ st.markdown("""
         border: 1px solid #bbf7d0;
         border-left: 4px solid #16a34a;
         border-radius: 10px; padding: 0.7rem 1rem; margin-bottom: 0.4rem;
-        color: #111827 !important; font-size: 0.88rem;
+        color: #1a2e1a !important; font-size: 0.88rem;
         box-shadow: 0 2px 8px rgba(22,163,74,0.08);
     }
 
     /* ══════════════════════════════════════════════════════════════
-       BUTTONS — pill style like website
+       BUTTONS — green pill (primary) + white pill (secondary)
     ══════════════════════════════════════════════════════════════ */
     .stButton > button {
-        background: #FF0000 !important;
+        background: #16a34a !important;
         color: #ffffff !important; border: none !important;
         border-radius: 50px !important;
         padding: 0.55rem 1.8rem !important;
         font-weight: 700 !important; font-size: 0.88rem !important;
         font-family: 'Poppins', sans-serif !important;
-        box-shadow: 0 4px 14px rgba(255,0,0,0.3) !important;
+        box-shadow: 0 4px 14px rgba(22,163,74,0.35) !important;
         transition: all 0.2s !important;
         letter-spacing: 0.2px;
     }
     .stButton > button:hover {
-        background: #cc0000 !important;
-        box-shadow: 0 6px 20px rgba(255,0,0,0.45) !important;
+        background: #15803d !important;
+        box-shadow: 0 6px 22px rgba(22,163,74,0.5) !important;
         transform: translateY(-2px) !important;
     }
-    /* Secondary — white pill */
+    /* Secondary — white pill with green hover */
     .stButton > button[kind="secondary"] {
         background: #ffffff !important;
         color: #374151 !important;
@@ -439,15 +437,15 @@ st.markdown("""
         box-shadow: 0 2px 6px rgba(0,0,0,0.06) !important;
     }
     .stButton > button[kind="secondary"]:hover {
-        background: #f9fafb !important;
-        border-color: #FF0000 !important;
-        color: #FF0000 !important;
-        box-shadow: 0 4px 12px rgba(255,0,0,0.12) !important;
+        background: #f0fdf4 !important;
+        border-color: #16a34a !important;
+        color: #16a34a !important;
+        box-shadow: 0 4px 14px rgba(22,163,74,0.18) !important;
         transform: translateY(-2px) !important;
     }
 
     /* ══════════════════════════════════════════════════════════════
-       FORM CONTROLS
+       FORM CONTROLS — green focus ring
     ══════════════════════════════════════════════════════════════ */
     [data-testid="stTextInput"] input,
     [data-testid="stNumberInput"] input,
@@ -455,28 +453,28 @@ st.markdown("""
     [data-testid="stMultiSelect"] > div > div,
     [data-testid="stDateInput"] input {
         background-color: #ffffff !important;
-        border: 1.5px solid #e5e7eb !important;
-        color: #111827 !important;
+        border: 1.5px solid #d1fae5 !important;
+        color: #1a2e1a !important;
         border-radius: 10px !important;
         box-shadow: 0 1px 4px rgba(0,0,0,0.04) !important;
         font-family: 'Poppins', sans-serif !important;
     }
     [data-testid="stSelectbox"] > div > div:focus-within,
     [data-testid="stMultiSelect"] > div > div:focus-within {
-        border-color: #FF0000 !important;
-        box-shadow: 0 0 0 3px rgba(255,0,0,0.1) !important;
+        border-color: #16a34a !important;
+        box-shadow: 0 0 0 3px rgba(22,163,74,0.12) !important;
     }
     [data-baseweb="popover"] {
         background: #ffffff !important;
-        border: 1px solid #e5e7eb !important;
-        box-shadow: 0 12px 32px rgba(0,0,0,0.12) !important;
+        border: 1px solid #d1fae5 !important;
+        box-shadow: 0 12px 32px rgba(0,0,0,0.10) !important;
         border-radius: 12px !important;
     }
     [data-baseweb="option"]:hover {
-        background: #fff8f8 !important; color: #FF0000 !important;
+        background: #f0fdf4 !important; color: #16a34a !important;
     }
     [data-baseweb="option"][aria-selected="true"] {
-        background: #fff0f0 !important; color: #FF0000 !important;
+        background: #dcfce7 !important; color: #15803d !important;
     }
     [data-baseweb="tag"] {
         background: #f0fdf4 !important; border-color: #86efac !important;
@@ -495,27 +493,27 @@ st.markdown("""
     ══════════════════════════════════════════════════════════════ */
     [data-testid="stDataFrame"] {
         border-radius: 14px !important; overflow: hidden !important;
-        border: 1px solid #e5e7eb !important;
-        box-shadow: 0 4px 16px rgba(0,0,0,0.06) !important;
+        border: 1px solid #d1fae5 !important;
+        box-shadow: 0 4px 16px rgba(22,163,74,0.07) !important;
     }
 
     /* ══════════════════════════════════════════════════════════════
-       EXPANDER — white card style
+       EXPANDER — white card, green hover
     ══════════════════════════════════════════════════════════════ */
     [data-testid="stExpander"] {
         background: #ffffff !important;
-        border: 1px solid #e5e7eb !important;
+        border: 1px solid #d1fae5 !important;
         border-radius: 14px !important;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.05) !important;
+        box-shadow: 0 2px 10px rgba(22,163,74,0.06) !important;
         margin-bottom: 0.8rem !important;
     }
     [data-testid="stExpander"] summary {
-        color: #111827 !important; font-weight: 700 !important;
+        color: #1a2e1a !important; font-weight: 700 !important;
         font-size: 0.95rem !important;
         font-family: 'Poppins', sans-serif !important;
         padding: 1rem 1.2rem !important;
     }
-    [data-testid="stExpander"] summary:hover { color: #FF0000 !important; }
+    [data-testid="stExpander"] summary:hover { color: #16a34a !important; }
     [data-testid="stExpander"] > div {
         background: #ffffff !important;
         padding: 0.2rem 1rem 1rem !important;
@@ -535,16 +533,16 @@ st.markdown("""
     ══════════════════════════════════════════════════════════════ */
     [data-testid="stDownloadButton"] button {
         background: #ffffff !important;
-        border: 2px solid #FF0000 !important;
-        color: #FF0000 !important;
+        border: 2px solid #16a34a !important;
+        color: #16a34a !important;
         border-radius: 50px !important;
         font-weight: 700 !important;
         transition: all 0.2s !important;
     }
     [data-testid="stDownloadButton"] button:hover {
-        background: #FF0000 !important;
+        background: #16a34a !important;
         color: #ffffff !important;
-        box-shadow: 0 4px 14px rgba(255,0,0,0.3) !important;
+        box-shadow: 0 4px 14px rgba(22,163,74,0.35) !important;
     }
 
     /* ══════════════════════════════════════════════════════════════
@@ -552,32 +550,39 @@ st.markdown("""
     ══════════════════════════════════════════════════════════════ */
     hr {
         border: none !important;
-        border-top: 2px solid #f3f4f6 !important;
+        border-top: 2px solid #e8f5e9 !important;
         margin: 1.4rem 0 !important;
     }
     [data-testid="stCaption"] p {
         color: #9ca3af !important; font-size: 0.78rem !important;
     }
     h1,h2,h3,h4,h5,h6 {
-        color: #111827 !important;
+        color: #1a2e1a !important;
         font-family: 'Poppins', sans-serif !important;
     }
     p, li { color: #374151 !important; }
-    a { color: #FF0000 !important; }
-    a:hover { color: #cc0000 !important; }
-    progress { accent-color: #FF0000 !important; }
+    a { color: #16a34a !important; }
+    a:hover { color: #15803d !important; }
+    progress { accent-color: #16a34a !important; }
 
     /* ══════════════════════════════════════════════════════════════
        SPINNER
     ══════════════════════════════════════════════════════════════ */
-    [data-testid="stSpinner"] > div { border-top-color: #FF0000 !important; }
+    [data-testid="stSpinner"] > div { border-top-color: #16a34a !important; }
 
     /* ══════════════════════════════════════════════════════════════
        PROGRESS BAR
     ══════════════════════════════════════════════════════════════ */
     [data-testid="stProgressBar"] > div > div {
-        background: linear-gradient(90deg, #FF0000, #ff6b6b) !important;
+        background: linear-gradient(90deg, #16a34a, #4ade80) !important;
         border-radius: 10px !important;
+    }
+
+    /* ══════════════════════════════════════════════════════════════
+       TOGGLE
+    ══════════════════════════════════════════════════════════════ */
+    [data-testid="stToggle"] > div[data-checked="true"] {
+        background-color: #16a34a !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -991,7 +996,7 @@ st.markdown("""
     &nbsp;|&nbsp; Hardcord Ad Targeting Tool for Sri Lankan Broadcast Industry
   </span>
   <span>
-    <span class="pill">🇱🇰 Sri Lanka</span>
+    <span class="pill">🌿 Sri Lanka</span>
     <span>100 Verified Channels</span>
   </span>
 </div>
@@ -1045,7 +1050,7 @@ tab1, tab2, tab3 = st.tabs(["🎭 Program Comparison", "🔀 Cross-Channel Compa
 # TAB 1 — Program Comparison
 # ===========================================================================
 
-PLOTLY_COLORS = ["#FF0000", "#0066FF", "#00AA44", "#FF8800", "#9900CC"]
+PLOTLY_COLORS = ["#16a34a", "#0066FF", "#f59e0b", "#7c3aed", "#0891b2"]
 
 
 def _plotly_line(analyses):
@@ -1153,8 +1158,8 @@ def _plotly_episode_detail(a):
         x=[e["date"] for e in eps],
         y=[e["views"] for e in eps],
         mode="lines+markers",
-        line=dict(color="#FF0000", width=2.5),
-        marker=dict(size=8, color="#FF0000",
+        line=dict(color="#16a34a", width=2.5),
+        marker=dict(size=8, color="#16a34a",
                     line=dict(color="white", width=1.5)),
         hovertemplate=(
             "<b>%{customdata}</b><br>"
@@ -1164,7 +1169,7 @@ def _plotly_episode_detail(a):
         ),
         customdata=[e["title"][:65] for e in eps],
         fill="tozeroy",
-        fillcolor="rgba(255,0,0,0.06)",
+        fillcolor="rgba(22,163,74,0.07)",
     ))
     fig.update_layout(
         paper_bgcolor="white", plot_bgcolor="#fafafa",
@@ -1419,33 +1424,34 @@ def render_program_comparison():
     best_thumb = best_ep.get("thumbnail", thumb_url(best_ep.get("video_id", "")))
     st.markdown(f"""
     <div style="
-        background: linear-gradient(135deg, #FF0000, #cc0000);
-        border-radius: 16px; padding: 0; margin-bottom: 1rem;
-        box-shadow: 0 6px 28px rgba(255,0,0,0.35); color: white;
-        display:flex; overflow:hidden;
+        background: linear-gradient(135deg, #0f2d14, #1a5c28);
+        border-radius: 18px; padding: 0; margin-bottom: 1rem;
+        box-shadow: 0 8px 32px rgba(15,45,20,0.45); color: white;
+        display:flex; overflow:hidden; border:1px solid rgba(74,222,128,0.2);
     ">
         <img src="{best_thumb}" alt="thumbnail"
              style="width:220px; min-width:220px; object-fit:cover; display:block; flex-shrink:0;"
              onerror="this.style.display='none'">
         <div style="padding:1.2rem 1.6rem; flex:1;">
-            <div style="font-size:0.78rem; text-transform:uppercase; letter-spacing:1px; opacity:0.85; margin-bottom:4px;">
+            <div style="font-size:0.75rem; text-transform:uppercase; letter-spacing:1.2px;
+                color:#4ade80; font-weight:700; margin-bottom:6px;">
                 🎯 Best Episode to Place Your Ad RIGHT NOW
             </div>
-            <div style="font-size:1.35rem; font-weight:800; line-height:1.25; margin-bottom:8px;">
+            <div style="font-size:1.35rem; font-weight:800; line-height:1.25; margin-bottom:8px; color:#fff;">
                 {best_ep['title'][:70]}
             </div>
-            <div style="display:flex; gap:20px; flex-wrap:wrap; font-size:0.9rem; opacity:0.95; margin-bottom:10px;">
-                <span>👁 <b>{format_number(best_ep['views'])}</b> views</span>
+            <div style="display:flex; gap:20px; flex-wrap:wrap; font-size:0.88rem;
+                color:rgba(255,255,255,0.8); margin-bottom:12px;">
+                <span>👁 <b style="color:#4ade80;">{format_number(best_ep['views'])}</b> views</span>
                 <span>📺 <b>{best_prog['name'][:25]}</b></span>
-                <span>📅 <b>{best_ep['date']}</b></span>
-                <span>💬 <b>{best_ep['engagement']}%</b> engagement</span>
+                <span>📅 {best_ep['date']}</span>
+                <span>💬 {best_ep['engagement']}% engagement</span>
             </div>
             <a href="{best_ep['url']}" target="_blank"
-               style="background:rgba(255,255,255,0.2); color:white; text-decoration:none;
-                      font-weight:700; font-size:0.88rem; padding:6px 18px;
-                      border-radius:50px; border:1.5px solid rgba(255,255,255,0.5);
-                      display:inline-block;">
-                ▶ Watch Episode →
+               style="background:#4ade80; color:#0f2d14; text-decoration:none;
+                      font-weight:800; font-size:0.85rem; padding:7px 20px;
+                      border-radius:50px; display:inline-block; letter-spacing:0.3px;">
+                ▶ Watch Episode
             </a>
         </div>
     </div>
@@ -1535,7 +1541,7 @@ def render_program_comparison():
                                 -webkit-box-orient:vertical;overflow:hidden;">
                                 {e['title'][:65]}</div>
                             <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:0.75rem;color:#6b7280;">
-                                <span>👁 <b style="color:#FF0000;">{format_number(e['views'])}</b></span>
+                                <span>👁 <b style="color:#16a34a;">{format_number(e['views'])}</b></span>
                                 <span>💬 {e['engagement']}%</span>
                                 <span>📅 {e['date']}</span>
                             </div>
@@ -1756,14 +1762,14 @@ def render_inter_channel():
         for i, slot in enumerate(st.session_state.inter_slots):
             with slot_cols[i]:
                 st.markdown(f"""
-                <div style="background:#fff5f5;border:1.5px solid #fca5a5;
-                    border-left:4px solid #FF0000;border-radius:10px;
+                <div style="background:#f0fdf4;border:1.5px solid #bbf7d0;
+                    border-left:4px solid #16a34a;border-radius:10px;
                     padding:0.8rem 1rem;margin-bottom:0.5rem;">
-                    <div style="font-size:0.72rem;color:#888;text-transform:uppercase;
+                    <div style="font-size:0.72rem;color:#6b7280;text-transform:uppercase;
                         letter-spacing:0.5px;margin-bottom:2px;">Slot {i+1}</div>
-                    <div style="font-weight:700;color:#1a1a2e;font-size:0.95rem;">
+                    <div style="font-weight:700;color:#1a2e1a;font-size:0.95rem;">
                         📺 {slot['channel_name']}</div>
-                    <div style="color:#FF0000;font-weight:600;font-size:0.88rem;
+                    <div style="color:#16a34a;font-weight:600;font-size:0.88rem;
                         margin-top:2px;">🎬 {slot['program_name'][:32]}</div>
                 </div>
                 """, unsafe_allow_html=True)
@@ -1894,30 +1900,30 @@ def render_inter_channel():
     best_prog = next(a for a in analyses if best_ep in a["episodes"])
     best_thumb2 = best_ep.get("thumbnail", thumb_url(best_ep.get("video_id", "")))
     st.markdown(f"""
-    <div style="background:linear-gradient(135deg,#FF0000,#cc0000);
-        border-radius:16px;padding:0;margin-bottom:1rem;
-        box-shadow:0 6px 28px rgba(255,0,0,0.35);color:white;
-        display:flex;overflow:hidden;">
+    <div style="background:linear-gradient(135deg,#0f2d14,#1a5c28);
+        border-radius:18px;padding:0;margin-bottom:1rem;
+        box-shadow:0 8px 32px rgba(15,45,20,0.45);color:white;
+        display:flex;overflow:hidden;border:1px solid rgba(74,222,128,0.2);">
         <img src="{best_thumb2}" alt="thumbnail"
              style="width:220px;min-width:220px;object-fit:cover;display:block;flex-shrink:0;"
              onerror="this.style.display='none'">
         <div style="padding:1.2rem 1.6rem;flex:1;">
-            <div style="font-size:0.78rem;text-transform:uppercase;letter-spacing:1px;
-                opacity:0.85;margin-bottom:4px;">🎯 Best Episode to Place Your Ad RIGHT NOW</div>
-            <div style="font-size:1.35rem;font-weight:800;line-height:1.25;margin-bottom:8px;">
+            <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:1.2px;
+                color:#4ade80;font-weight:700;margin-bottom:6px;">🎯 Best Episode to Place Your Ad RIGHT NOW</div>
+            <div style="font-size:1.35rem;font-weight:800;line-height:1.25;margin-bottom:8px;color:#fff;">
                 {best_ep['title'][:70]}</div>
-            <div style="display:flex;gap:20px;flex-wrap:wrap;font-size:0.9rem;opacity:0.95;margin-bottom:10px;">
-                <span>👁 <b>{format_number(best_ep['views'])}</b> views</span>
+            <div style="display:flex;gap:20px;flex-wrap:wrap;font-size:0.88rem;
+                color:rgba(255,255,255,0.8);margin-bottom:12px;">
+                <span>👁 <b style="color:#4ade80;">{format_number(best_ep['views'])}</b> views</span>
                 <span>📺 <b>{best_prog['name'][:30]}</b></span>
-                <span>📅 <b>{best_ep['date']}</b></span>
-                <span>💬 <b>{best_ep['engagement']}%</b> engagement</span>
+                <span>📅 {best_ep['date']}</span>
+                <span>💬 {best_ep['engagement']}% engagement</span>
             </div>
             <a href="{best_ep['url']}" target="_blank"
-               style="background:rgba(255,255,255,0.2);color:white;text-decoration:none;
-                      font-weight:700;font-size:0.88rem;padding:6px 18px;
-                      border-radius:50px;border:1.5px solid rgba(255,255,255,0.5);
-                      display:inline-block;">
-                ▶ Watch Episode →</a>
+               style="background:#4ade80;color:#0f2d14;text-decoration:none;
+                      font-weight:800;font-size:0.85rem;padding:7px 20px;
+                      border-radius:50px;display:inline-block;letter-spacing:0.3px;">
+                ▶ Watch Episode</a>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -2003,7 +2009,7 @@ def render_inter_channel():
                                 -webkit-box-orient:vertical;overflow:hidden;">
                                 {e['title'][:65]}</div>
                             <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:0.75rem;color:#6b7280;">
-                                <span>👁 <b style="color:#FF0000;">{format_number(e['views'])}</b></span>
+                                <span>👁 <b style="color:#16a34a;">{format_number(e['views'])}</b></span>
                                 <span>💬 {e['engagement']}%</span>
                                 <span>📅 {e['date']}</span>
                             </div>
