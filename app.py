@@ -733,6 +733,7 @@ st.markdown("""
 }
 .chan-feat-card:hover { transform:translateY(-3px); box-shadow:0 8px 24px rgba(225,29,46,0.14); }
 .chan-feat-card .cf-icon { font-size:1.8rem; margin-bottom:4px; }
+.chan-feat-card .cf-avatar { width:56px;height:56px;border-radius:50%;object-fit:cover;margin-bottom:8px;border:2.5px solid #e6eaef;box-shadow:0 2px 8px rgba(0,0,0,0.12); }
 .chan-feat-card .cf-name { font-weight:800; color:#0f172a; font-size:0.88rem; margin-bottom:4px; line-height:1.2; }
 .chan-feat-card .cf-subs { color:#e11d2e; font-size:1.15rem; font-weight:800; margin-bottom:2px; }
 .chan-feat-card .cf-type { color:#9ca3af; font-size:0.65rem; text-transform:uppercase; letter-spacing:0.6px; }
@@ -747,6 +748,7 @@ st.markdown("""
     margin-bottom:1rem;
 }
 .sel-channel-banner .scb-icon { font-size:2rem; }
+.sel-channel-banner .scb-avatar { width:52px;height:52px;border-radius:50%;object-fit:cover;border:2.5px solid rgba(251,113,133,0.5);box-shadow:0 2px 12px rgba(0,0,0,0.2);flex-shrink:0; }
 .sel-channel-banner .scb-name { color:#fff; font-size:1.1rem; font-weight:800; }
 .sel-channel-banner .scb-sub  { color:#fb7185; font-size:0.8rem; font-weight:500; }
 
@@ -900,10 +902,13 @@ def aggregate_channel_data(videos, channel_details, local_only=False):
         if channel_id not in channels:
             ch = channel_details.get(channel_id, {})
             ch_stats = ch.get("statistics", {})
+            ch_thumbs = ch.get("snippet", {}).get("thumbnails", {})
+            ch_pic = (ch_thumbs.get("medium") or ch_thumbs.get("default") or {}).get("url", "")
             channels[channel_id] = {
                 "channel_name": ch.get("snippet", {}).get("title", snippet.get("channelTitle", "Unknown")),
                 "subscribers": safe_int(ch_stats.get("subscriberCount")),
                 "category": category_name, "is_local": channel_id in local_ids,
+                "profile_pic": ch_pic,
                 "total_views": 0, "total_likes": 0, "video_count": 0,
             }
         channels[channel_id]["total_views"] += views
@@ -917,6 +922,7 @@ def aggregate_channel_data(videos, channel_details, local_only=False):
         result.append({
             "Rank": 0, "🇱🇰": "✅" if ch["is_local"] else "", "Channel": ch["channel_name"],
             "Category": ch["category"], "Subscribers": ch["subscribers"],
+            "profile_pic": ch.get("profile_pic", ""),
             "Total Views": ch["total_views"], "Engagement %": engagement,
             "Hardcord Score": score, "Trending Videos": ch["video_count"],
         })
@@ -945,7 +951,7 @@ def get_local_channel_trending_stats(days_back):
         batch = ids[i:i+50]
         try:
             data = api_get("channels",
-                           {"part": "statistics,contentDetails", "id": ",".join(batch)})
+                           {"part": "snippet,statistics,contentDetails", "id": ",".join(batch)})
         except requests.exceptions.HTTPError:
             continue
         for item in data.get("items", []):
@@ -955,6 +961,8 @@ def get_local_channel_trending_stats(days_back):
     for ch_name, (cid, ch_type) in SRI_LANKA_LOCAL_CHANNELS.items():
         d = details.get(cid, {})
         ch_stats = d.get("statistics", {})
+        ch_thumbs = d.get("snippet", {}).get("thumbnails", {})
+        ch_pic = (ch_thumbs.get("medium") or ch_thumbs.get("default") or {}).get("url", "")
         subscribers = safe_int(ch_stats.get("subscriberCount"))
         uploads = (d.get("contentDetails", {})
                     .get("relatedPlaylists", {})
@@ -1005,6 +1013,7 @@ def get_local_channel_trending_stats(days_back):
             "Rank": 0, "🇱🇰": "✅", "Channel": ch_name,
             "Type": ch_type,
             "Category": ch_type,
+            "profile_pic": ch_pic,
             "Subscribers": subscribers,
             "Total Views": total_views,
             "Engagement %": engagement,
@@ -1075,10 +1084,13 @@ def get_curated_channel_stats():
     for name, (cid, ch_type) in SRI_LANKA_LOCAL_CHANNELS.items():
         d = details.get(cid, {})
         stats = d.get("statistics", {})
+        thumbs = d.get("snippet", {}).get("thumbnails", {})
+        pic = (thumbs.get("medium") or thumbs.get("default") or {}).get("url", "")
         rows.append({
             "channel_id": cid,
             "Channel": name,
             "Type": ch_type,
+            "profile_pic": pic,
             "Subscribers": safe_int(stats.get("subscriberCount")),
             "Total Views": safe_int(stats.get("viewCount")),
             "Total Videos": safe_int(stats.get("videoCount")),
@@ -1538,9 +1550,15 @@ def render_program_comparison():
     for col, c in zip(feat_cols, top4):
         icon = type_icons.get(c["Type"], "📺")
         pct = int(c["Subscribers"] / max(max_subs, 1) * 100)
+        pic = c.get("profile_pic", "")
+        avatar_html = (
+            f'<img class="cf-avatar" src="{pic}" '
+            f'onerror="this.style.display=\'none\';this.nextSibling.style.display=\'block\'">'
+            f'<div class="cf-icon" style="display:none">{icon}</div>'
+        ) if pic else f'<div class="cf-icon">{icon}</div>'
         col.markdown(f"""
         <div class="chan-feat-card">
-            <div class="cf-icon">{icon}</div>
+            {avatar_html}
             <div class="cf-name">{c['Channel']}</div>
             <div class="cf-subs">{format_number(c['Subscribers'])}</div>
             <div class="cf-type">SUBSCRIBERS</div>
@@ -1576,8 +1594,9 @@ def render_program_comparison():
 
     chan_df = pd.DataFrame([{
         "Rank": c["Rank"],
-        "Type": c["Type"],
+        "Logo": c.get("profile_pic", ""),
         "Channel": c["Channel"],
+        "Type": c["Type"],
         "Subscribers": c["Subscribers"],
         "Total Views": c["Total Views"],
         "Total Videos": c["Total Videos"],
@@ -1588,6 +1607,7 @@ def render_program_comparison():
         on_select="rerun", selection_mode="single-row", key="chan_table",
         column_config={
             "Rank": st.column_config.NumberColumn("Rank", format="%d"),
+            "Logo": st.column_config.ImageColumn("", width="small"),
             "Subscribers": st.column_config.NumberColumn("Subscribers", format="%.2f"),
             "Total Views": st.column_config.NumberColumn("Total Views", format="%.2f"),
             "Total Videos": st.column_config.NumberColumn("Total Videos", format="%d"),
@@ -1614,9 +1634,15 @@ def render_program_comparison():
 
     # Selected channel banner
     ch_meta = next((c for c in chan_stats if c["channel_id"] == st.session_state.selected_channel_id), {})
+    ch_pic = ch_meta.get("profile_pic", "")
+    banner_avatar = (
+        f'<img class="scb-avatar" src="{ch_pic}" '
+        f'onerror="this.style.display=\'none\';this.nextSibling.style.display=\'block\'">'
+        f'<div class="scb-icon" style="display:none">📺</div>'
+    ) if ch_pic else '<div class="scb-icon">📺</div>'
     st.markdown(f"""
     <div class="sel-channel-banner">
-        <div class="scb-icon">📺</div>
+        {banner_avatar}
         <div>
             <div class="scb-name">{st.session_state.selected_channel_name}</div>
             <div class="scb-sub">
@@ -2065,7 +2091,9 @@ trending chart. Use **Local SL Channels Only** toggle to see a curated Sri Lanka
 
             max_score = ranked[0]["Hardcord Score"] if ranked else 1
             disp = pd.DataFrame([{
-                "Rank": f"#{r['Rank']}", "🇱🇰": "✅", "Channel": r["Channel"],
+                "Rank": f"#{r['Rank']}", "🇱🇰": "✅",
+                "Logo": r.get("profile_pic", ""),
+                "Channel": r["Channel"],
                 "Type": r["Type"],
                 "Subscribers": format_number(r["Subscribers"]),
                 "Total Views": format_number(r["Total Views"]),
@@ -2075,8 +2103,11 @@ trending chart. Use **Local SL Channels Only** toggle to see a curated Sri Lanka
             } for r in ranked[:top_n]])
             st.dataframe(
                 disp, use_container_width=True, hide_index=True,
-                column_config={"Hardcord Score": st.column_config.ProgressColumn(
-                    "Hardcord Score", min_value=0, max_value=max_score, format="%.4f")},
+                column_config={
+                    "Logo": st.column_config.ImageColumn("", width="small"),
+                    "Hardcord Score": st.column_config.ProgressColumn(
+                        "Hardcord Score", min_value=0, max_value=max_score, format="%.4f"),
+                },
             )
 
         else:
@@ -2096,15 +2127,20 @@ trending chart. Use **Local SL Channels Only** toggle to see a curated Sri Lanka
             st.subheader(f"🏆 Trending Channels — {region_label} | {category_label}")
             max_score = ranked[0]["Hardcord Score"] if ranked else 1
             disp = pd.DataFrame([{
-                "Rank": f"#{r['Rank']}", "🇱🇰": r["🇱🇰"], "Channel": r["Channel"],
+                "Rank": f"#{r['Rank']}", "🇱🇰": r["🇱🇰"],
+                "Logo": r.get("profile_pic", ""),
+                "Channel": r["Channel"],
                 "Category": r["Category"], "Subscribers": format_number(r["Subscribers"]),
                 "Total Views": format_number(r["Total Views"]),
                 "Engagement %": f"{r['Engagement %']}%", "Hardcord Score": r["Hardcord Score"],
             } for r in ranked[:top_n]])
             st.dataframe(
                 disp, use_container_width=True, hide_index=True,
-                column_config={"Hardcord Score": st.column_config.ProgressColumn(
-                    "Hardcord Score", min_value=0, max_value=max_score, format="%.4f")},
+                column_config={
+                    "Logo": st.column_config.ImageColumn("", width="small"),
+                    "Hardcord Score": st.column_config.ProgressColumn(
+                        "Hardcord Score", min_value=0, max_value=max_score, format="%.4f"),
+                },
             )
 
         buf = io.StringIO()
