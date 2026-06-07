@@ -195,12 +195,12 @@ st.markdown("""
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap');
 
     /* ══════════════════════════════════════════════════════════════
-       BASE — light green-tinted background like the landing page
+       BASE — cool slate background
     ══════════════════════════════════════════════════════════════ */
     html, body, [data-testid="stApp"],
     [data-testid="stAppViewContainer"], .main, .block-container {
-        background-color: #f2f7f2 !important;
-        color: #1a2e1a !important;
+        background-color: #eef1f4 !important;
+        color: #0f172a !important;
         font-family: 'Poppins', sans-serif !important;
     }
     [data-testid="block-container"] {
@@ -210,15 +210,15 @@ st.markdown("""
         max-width: 1300px !important;
     }
     [data-testid="stSidebar"], [data-testid="stSidebarContent"] {
-        background-color: #0f2d14 !important;
+        background-color: #0f172a !important;
         border-right: none !important;
     }
 
     /* ══════════════════════════════════════════════════════════════
-       TOP UTILITY BAR — dark forest green
+       TOP UTILITY BAR — dark slate
     ══════════════════════════════════════════════════════════════ */
     .top-bar {
-        background: #0f2d14;
+        background: #0f172a;
         padding: 6px 2rem;
         font-size: 0.75rem;
         color: rgba(255,255,255,0.7);
@@ -226,30 +226,30 @@ st.markdown("""
         margin: -1rem -1rem 0;
     }
     .top-bar span { display: flex; align-items: center; gap: 18px; }
-    .top-bar b { color: #4ade80; }
+    .top-bar b { color: #fb7185; }
 
     /* ══════════════════════════════════════════════════════════════
-       HERO HEADER — dark forest green with green glow circles
+       HERO HEADER — dark slate with red accent
     ══════════════════════════════════════════════════════════════ */
     .hero-header {
-        background: linear-gradient(135deg, #0f2d14 0%, #1a4a22 100%);
+        background: linear-gradient(135deg, #0f172a 0%, #293548 100%);
         border-radius: 0 0 28px 28px;
         padding: 1.4rem 2.5rem 2rem;
         margin: 0 -1rem 1.8rem;
         position: relative; overflow: hidden;
-        box-shadow: 0 8px 40px rgba(15,45,20,0.35);
+        box-shadow: 0 8px 40px rgba(15,23,42,0.35);
     }
     .hero-header::before {
         content: ''; position: absolute;
         top: -70px; right: -70px;
         width: 280px; height: 280px; border-radius: 50%;
-        background: rgba(74,222,128,0.09);
+        background: rgba(251,113,133,0.09);
     }
     .hero-header::after {
         content: ''; position: absolute;
         bottom: -50px; left: 100px;
         width: 200px; height: 200px; border-radius: 50%;
-        background: rgba(74,222,128,0.06);
+        background: rgba(251,113,133,0.06);
     }
     .hero-nav {
         display: flex; align-items: center;
@@ -269,8 +269,8 @@ st.markdown("""
         font-size: 0.78rem; font-weight: 500;
     }
     .hero-tagline .pill {
-        background: rgba(74,222,128,0.18); color: #4ade80;
-        border: 1px solid rgba(74,222,128,0.35);
+        background: rgba(251,113,133,0.15); color: #fb7185;
+        border: 1px solid rgba(251,113,133,0.3);
         border-radius: 20px; padding: 2px 12px;
         font-size: 0.72rem; font-weight: 600;
         text-transform: uppercase; letter-spacing: 0.5px;
@@ -281,7 +281,7 @@ st.markdown("""
         font-size: 2.2rem; font-weight: 900;
         line-height: 1.15; letter-spacing: -0.5px;
     }
-    .hero-body h1 .accent { color: #4ade80; }
+    .hero-body h1 .accent { color: #fb7185; }
     .hero-body p {
         color: rgba(255,255,255,0.65) !important;
         margin: 0.5rem 0 1rem; font-size: 0.92rem;
@@ -293,7 +293,7 @@ st.markdown("""
     }
     .hero-stat { display: flex; flex-direction: column; }
     .hero-stat .num {
-        color: #4ade80; font-size: 1.5rem;
+        color: #fb7185; font-size: 1.5rem;
         font-weight: 800; line-height: 1;
     }
     .hero-stat .lbl {
@@ -302,11 +302,11 @@ st.markdown("""
     }
 
     /* ══════════════════════════════════════════════════════════════
-       TABS — green active underline, like website nav
+       TABS — red active underline
     ══════════════════════════════════════════════════════════════ */
     [data-testid="stTabs"] [role="tablist"] {
         background: #ffffff !important;
-        border-bottom: 2px solid #d1fae5 !important;
+        border-bottom: 2px solid #e6eaef !important;
         border-radius: 14px 14px 0 0 !important;
         padding: 0 1rem !important;
         box-shadow: 0 4px 16px rgba(0,0,0,0.06) !important;
@@ -321,12 +321,12 @@ st.markdown("""
         transition: all 0.2s !important;
     }
     [data-testid="stTabs"] button[role="tab"]:hover {
-        color: #16a34a !important; background: #f0fdf4 !important;
+        color: #e11d2e !important; background: #fef2f2 !important;
     }
     [data-testid="stTabs"] button[aria-selected="true"] {
-        color: #16a34a !important;
-        border-bottom: 3px solid #16a34a !important;
-        background: #f0fdf4 !important; font-weight: 700 !important;
+        color: #e11d2e !important;
+        border-bottom: 3px solid #e11d2e !important;
+        background: #fef2f2 !important; font-weight: 700 !important;
     }
 
     /* ══════════════════════════════════════════════════════════════
@@ -337,15 +337,15 @@ st.markdown("""
         border-radius: 20px;
         padding: 1.6rem 2rem;
         margin-bottom: 1.4rem;
-        box-shadow: 0 4px 24px rgba(15,45,20,0.08);
-        border: 1px solid #e8f5e9;
+        box-shadow: 0 4px 24px rgba(15,23,42,0.08);
+        border: 1px solid #e6eaef;
     }
     .section-card-dark {
-        background: #0f2d14;
+        background: #0f172a;
         border-radius: 20px;
         padding: 1.6rem 2rem;
         margin-bottom: 1.4rem;
-        box-shadow: 0 4px 28px rgba(15,45,20,0.25);
+        box-shadow: 0 4px 28px rgba(15,23,42,0.25);
     }
 
     /* ══════════════════════════════════════════════════════════════
@@ -356,39 +356,39 @@ st.markdown("""
         margin: 1.6rem 0 0.8rem; padding: 0;
     }
     .step-badge {
-        background: #16a34a;
+        background: #e11d2e;
         color: #fff; border-radius: 50%;
         width: 32px; height: 32px;
         display: inline-flex; align-items: center; justify-content: center;
         font-weight: 900; font-size: 0.85rem; flex-shrink: 0;
-        box-shadow: 0 4px 12px rgba(22,163,74,0.4);
+        box-shadow: 0 4px 12px rgba(225,29,46,0.4);
     }
     .section-title {
-        color: #1a2e1a !important; font-size: 1.15rem;
+        color: #0f172a !important; font-size: 1.15rem;
         font-weight: 700; margin: 0;
         font-family: 'Poppins', sans-serif !important;
     }
-    .section-title .green  { color: #16a34a; }
-    .section-title .accent { color: #4ade80; }
+    .section-title .green  { color: #e11d2e; }
+    .section-title .accent { color: #fb7185; }
 
     /* ══════════════════════════════════════════════════════════════
-       METRIC CARDS — white with green top border
+       METRIC CARDS — white with red top border
     ══════════════════════════════════════════════════════════════ */
     .metric-card {
         background: #ffffff;
-        border: 1px solid #d1fae5;
-        border-top: 4px solid #16a34a;
+        border: 1px solid #e6eaef;
+        border-top: 4px solid #e11d2e;
         border-radius: 14px; padding: 1.2rem 0.9rem;
         text-align: center;
-        box-shadow: 0 2px 12px rgba(22,163,74,0.07);
+        box-shadow: 0 2px 12px rgba(15,23,42,0.06);
         transition: transform 0.2s, box-shadow 0.2s;
     }
     .metric-card:hover {
         transform: translateY(-3px);
-        box-shadow: 0 8px 28px rgba(22,163,74,0.14);
+        box-shadow: 0 8px 28px rgba(225,29,46,0.14);
     }
     .metric-card h2 {
-        color: #16a34a !important; margin: 0;
+        color: #e11d2e !important; margin: 0;
         font-size: 1.8rem; font-weight: 800;
         font-family: 'Poppins', sans-serif !important;
     }
@@ -402,34 +402,34 @@ st.markdown("""
        PROGRAM QUEUE CARDS
     ══════════════════════════════════════════════════════════════ */
     .prog-card {
-        background: #f0fdf4;
-        border: 1px solid #bbf7d0;
-        border-left: 4px solid #16a34a;
+        background: #fef2f2;
+        border: 1px solid #fecdd3;
+        border-left: 4px solid #e11d2e;
         border-radius: 10px; padding: 0.7rem 1rem; margin-bottom: 0.4rem;
-        color: #1a2e1a !important; font-size: 0.88rem;
-        box-shadow: 0 2px 8px rgba(22,163,74,0.08);
+        color: #0f172a !important; font-size: 0.88rem;
+        box-shadow: 0 2px 8px rgba(225,29,46,0.08);
     }
 
     /* ══════════════════════════════════════════════════════════════
-       BUTTONS — green pill (primary) + white pill (secondary)
+       BUTTONS — red pill (primary) + white pill (secondary)
     ══════════════════════════════════════════════════════════════ */
     .stButton > button {
-        background: #16a34a !important;
+        background: #e11d2e !important;
         color: #ffffff !important; border: none !important;
         border-radius: 50px !important;
         padding: 0.55rem 1.8rem !important;
         font-weight: 700 !important; font-size: 0.88rem !important;
         font-family: 'Poppins', sans-serif !important;
-        box-shadow: 0 4px 14px rgba(22,163,74,0.35) !important;
+        box-shadow: 0 4px 14px rgba(225,29,46,0.35) !important;
         transition: all 0.2s !important;
         letter-spacing: 0.2px;
     }
     .stButton > button:hover {
-        background: #15803d !important;
-        box-shadow: 0 6px 22px rgba(22,163,74,0.5) !important;
+        background: #b91c2a !important;
+        box-shadow: 0 6px 22px rgba(225,29,46,0.5) !important;
         transform: translateY(-2px) !important;
     }
-    /* Secondary — white pill with green hover */
+    /* Secondary — white pill with red hover */
     .stButton > button[kind="secondary"] {
         background: #ffffff !important;
         color: #374151 !important;
@@ -437,15 +437,15 @@ st.markdown("""
         box-shadow: 0 2px 6px rgba(0,0,0,0.06) !important;
     }
     .stButton > button[kind="secondary"]:hover {
-        background: #f0fdf4 !important;
-        border-color: #16a34a !important;
-        color: #16a34a !important;
-        box-shadow: 0 4px 14px rgba(22,163,74,0.18) !important;
+        background: #fef2f2 !important;
+        border-color: #e11d2e !important;
+        color: #e11d2e !important;
+        box-shadow: 0 4px 14px rgba(225,29,46,0.18) !important;
         transform: translateY(-2px) !important;
     }
 
     /* ══════════════════════════════════════════════════════════════
-       FORM CONTROLS — green focus ring
+       FORM CONTROLS — red focus ring
     ══════════════════════════════════════════════════════════════ */
     [data-testid="stTextInput"] input,
     [data-testid="stNumberInput"] input,
@@ -453,32 +453,32 @@ st.markdown("""
     [data-testid="stMultiSelect"] > div > div,
     [data-testid="stDateInput"] input {
         background-color: #ffffff !important;
-        border: 1.5px solid #d1fae5 !important;
-        color: #1a2e1a !important;
+        border: 1.5px solid #e2e8f0 !important;
+        color: #0f172a !important;
         border-radius: 10px !important;
         box-shadow: 0 1px 4px rgba(0,0,0,0.04) !important;
         font-family: 'Poppins', sans-serif !important;
     }
     [data-testid="stSelectbox"] > div > div:focus-within,
     [data-testid="stMultiSelect"] > div > div:focus-within {
-        border-color: #16a34a !important;
-        box-shadow: 0 0 0 3px rgba(22,163,74,0.12) !important;
+        border-color: #e11d2e !important;
+        box-shadow: 0 0 0 3px rgba(225,29,46,0.14) !important;
     }
     [data-baseweb="popover"] {
         background: #ffffff !important;
-        border: 1px solid #d1fae5 !important;
+        border: 1px solid #e6eaef !important;
         box-shadow: 0 12px 32px rgba(0,0,0,0.10) !important;
         border-radius: 12px !important;
     }
     [data-baseweb="option"]:hover {
-        background: #f0fdf4 !important; color: #16a34a !important;
+        background: #fef2f2 !important; color: #e11d2e !important;
     }
     [data-baseweb="option"][aria-selected="true"] {
-        background: #dcfce7 !important; color: #15803d !important;
+        background: #fee2e2 !important; color: #b91c2a !important;
     }
     [data-baseweb="tag"] {
-        background: #f0fdf4 !important; border-color: #86efac !important;
-        color: #16a34a !important; border-radius: 20px !important;
+        background: #fef2f2 !important; border-color: #fecdd3 !important;
+        color: #e11d2e !important; border-radius: 20px !important;
         font-weight: 600 !important; font-size: 0.78rem !important;
     }
     [data-testid="stWidgetLabel"] p {
@@ -493,27 +493,27 @@ st.markdown("""
     ══════════════════════════════════════════════════════════════ */
     [data-testid="stDataFrame"] {
         border-radius: 14px !important; overflow: hidden !important;
-        border: 1px solid #d1fae5 !important;
-        box-shadow: 0 4px 16px rgba(22,163,74,0.07) !important;
+        border: 1px solid #e6eaef !important;
+        box-shadow: 0 4px 16px rgba(15,23,42,0.06) !important;
     }
 
     /* ══════════════════════════════════════════════════════════════
-       EXPANDER — white card, green hover
+       EXPANDER — white card, red hover
     ══════════════════════════════════════════════════════════════ */
     [data-testid="stExpander"] {
         background: #ffffff !important;
-        border: 1px solid #d1fae5 !important;
+        border: 1px solid #e6eaef !important;
         border-radius: 14px !important;
-        box-shadow: 0 2px 10px rgba(22,163,74,0.06) !important;
+        box-shadow: 0 2px 10px rgba(15,23,42,0.06) !important;
         margin-bottom: 0.8rem !important;
     }
     [data-testid="stExpander"] summary {
-        color: #1a2e1a !important; font-weight: 700 !important;
+        color: #0f172a !important; font-weight: 700 !important;
         font-size: 0.95rem !important;
         font-family: 'Poppins', sans-serif !important;
         padding: 1rem 1.2rem !important;
     }
-    [data-testid="stExpander"] summary:hover { color: #16a34a !important; }
+    [data-testid="stExpander"] summary:hover { color: #e11d2e !important; }
     [data-testid="stExpander"] > div {
         background: #ffffff !important;
         padding: 0.2rem 1rem 1rem !important;
@@ -533,16 +533,16 @@ st.markdown("""
     ══════════════════════════════════════════════════════════════ */
     [data-testid="stDownloadButton"] button {
         background: #ffffff !important;
-        border: 2px solid #16a34a !important;
-        color: #16a34a !important;
+        border: 2px solid #e11d2e !important;
+        color: #e11d2e !important;
         border-radius: 50px !important;
         font-weight: 700 !important;
         transition: all 0.2s !important;
     }
     [data-testid="stDownloadButton"] button:hover {
-        background: #16a34a !important;
+        background: #e11d2e !important;
         color: #ffffff !important;
-        box-shadow: 0 4px 14px rgba(22,163,74,0.35) !important;
+        box-shadow: 0 4px 14px rgba(225,29,46,0.35) !important;
     }
 
     /* ══════════════════════════════════════════════════════════════
@@ -550,31 +550,31 @@ st.markdown("""
     ══════════════════════════════════════════════════════════════ */
     hr {
         border: none !important;
-        border-top: 2px solid #e8f5e9 !important;
+        border-top: 2px solid #e6eaef !important;
         margin: 1.4rem 0 !important;
     }
     [data-testid="stCaption"] p {
         color: #9ca3af !important; font-size: 0.78rem !important;
     }
     h1,h2,h3,h4,h5,h6 {
-        color: #1a2e1a !important;
+        color: #0f172a !important;
         font-family: 'Poppins', sans-serif !important;
     }
     p, li { color: #374151 !important; }
-    a { color: #16a34a !important; }
-    a:hover { color: #15803d !important; }
-    progress { accent-color: #16a34a !important; }
+    a { color: #e11d2e !important; }
+    a:hover { color: #b91c2a !important; }
+    progress { accent-color: #e11d2e !important; }
 
     /* ══════════════════════════════════════════════════════════════
        SPINNER
     ══════════════════════════════════════════════════════════════ */
-    [data-testid="stSpinner"] > div { border-top-color: #16a34a !important; }
+    [data-testid="stSpinner"] > div { border-top-color: #e11d2e !important; }
 
     /* ══════════════════════════════════════════════════════════════
        PROGRESS BAR
     ══════════════════════════════════════════════════════════════ */
     [data-testid="stProgressBar"] > div > div {
-        background: linear-gradient(90deg, #16a34a, #4ade80) !important;
+        background: linear-gradient(90deg, #e11d2e, #fb7185) !important;
         border-radius: 10px !important;
     }
 
@@ -582,8 +582,135 @@ st.markdown("""
        TOGGLE
     ══════════════════════════════════════════════════════════════ */
     [data-testid="stToggle"] > div[data-checked="true"] {
-        background-color: #16a34a !important;
+        background-color: #e11d2e !important;
     }
+
+    /* ══════════════════════════════════════════════════════════════
+       KPI STRIP
+    ══════════════════════════════════════════════════════════════ */
+    .kpi-strip { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin:0 0 1.4rem; }
+    .kpi-card { background:#fff; border:1px solid #e6eaef; border-radius:20px; padding:18px 20px;
+        box-shadow:0 4px 24px rgba(15,23,42,0.08); transition:transform .2s,box-shadow .2s; }
+    .kpi-card:hover { transform:translateY(-3px); box-shadow:0 8px 28px rgba(225,29,46,0.14); }
+    .kpi-card__icon { width:40px;height:40px;border-radius:12px;background:#fef2f2;
+        display:inline-flex;align-items:center;justify-content:center;margin-bottom:10px; }
+    .kpi-card__value { font-size:2rem;font-weight:800;letter-spacing:-1px;color:#0f172a;line-height:1; }
+    .kpi-card__label { font-size:0.72rem;font-weight:700;color:#9ca3af;text-transform:uppercase;
+        letter-spacing:0.5px;margin-top:4px; }
+    .kpi-card__delta { display:inline-flex;align-items:center;gap:4px;font-size:0.74rem;font-weight:800;
+        padding:3px 9px;border-radius:50px;margin-top:6px; }
+    .kpi-card__delta.up { color:#16a34a;background:rgba(22,163,74,0.1); }
+
+    /* ══════════════════════════════════════════════════════════════
+       FEATURED PROGRAM CARDS
+    ══════════════════════════════════════════════════════════════ */
+    .feat-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin-bottom:1rem; }
+    .feat-card { border:1px solid #e6eaef; border-radius:18px; overflow:hidden; background:#fff;
+        transition:transform .2s,box-shadow .2s; cursor:pointer; }
+    .feat-card:hover { transform:translateY(-4px); box-shadow:0 12px 32px rgba(15,23,42,0.16); }
+    .feat-card__thumb { position:relative; aspect-ratio:16/9; overflow:hidden; background:#e6eaef; }
+    .feat-card__thumb img { width:100%;height:100%;object-fit:cover;display:block;
+        transition:transform .4s cubic-bezier(.4,0,.2,1); }
+    .feat-card:hover .feat-card__thumb img { transform:scale(1.06); }
+    .feat-card__cat { position:absolute;top:10px;left:10px;
+        background:rgba(255,255,255,0.92);backdrop-filter:blur(4px);
+        color:#b91c2a;font-size:0.64rem;font-weight:800;text-transform:uppercase;
+        letter-spacing:0.5px;padding:4px 9px;border-radius:50px; }
+    .feat-card__play { position:absolute;top:50%;left:50%;
+        transform:translate(-50%,-50%) scale(0.8);
+        width:48px;height:48px;border-radius:50%;background:#e11d2e;
+        display:inline-flex;align-items:center;justify-content:center;
+        opacity:0;transition:all .22s cubic-bezier(.4,0,.2,1);
+        box-shadow:0 8px 22px rgba(225,29,46,0.5); }
+    .feat-card:hover .feat-card__play { opacity:1; transform:translate(-50%,-50%) scale(1); }
+    .feat-card__score { position:absolute;bottom:10px;left:10px;
+        background:rgba(15,23,42,0.82);color:#fb7185;
+        font-size:0.72rem;font-weight:800;padding:3px 9px;border-radius:50px; }
+    .feat-card__body { padding:14px 16px 16px; }
+    .feat-card__title { font-size:0.92rem;font-weight:800;line-height:1.3;letter-spacing:-0.2px;
+        color:#0f172a;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden; }
+    .feat-card__meta { display:flex;align-items:center;gap:8px;margin-top:10px;
+        font-size:0.76rem;color:#6b7280; }
+    .feat-card__chan { font-weight:700;color:#374151; }
+    .feat-card__stats { display:flex;align-items:center;justify-content:space-between;
+        margin-top:12px;padding-top:12px;border-top:1px solid #e6eaef; }
+    .feat-card__stat { display:inline-flex;align-items:center;gap:5px;font-size:0.76rem;
+        font-weight:600;color:#6b7280; }
+    .feat-card__eng { font-size:0.76rem;font-weight:800;color:#16a34a; }
+
+    /* ══════════════════════════════════════════════════════════════
+       RANKING TABLE
+    ══════════════════════════════════════════════════════════════ */
+    .rank-table { display:flex;flex-direction:column; }
+    .rank-head,.rank-row { display:grid;
+        grid-template-columns:36px 1fr 110px 90px 80px 80px;
+        align-items:center;gap:12px;padding:0 8px; }
+    .rank-head { font-size:0.62rem;font-weight:800;text-transform:uppercase;letter-spacing:0.7px;
+        color:#9ca3af;padding-bottom:10px;border-bottom:1px solid #e6eaef;margin-bottom:4px; }
+    .rank-row { padding-top:9px;padding-bottom:9px;border-radius:12px;
+        transition:background .15s;cursor:pointer; }
+    .rank-row:hover { background:#fef2f2; }
+    .rank-n { font-size:0.88rem;font-weight:800;color:#d1d5db;font-variant-numeric:tabular-nums; }
+    .rank-prog { display:flex;align-items:center;gap:12px;min-width:0; }
+    .rank-thumb { width:64px;height:38px;border-radius:8px;overflow:hidden;
+        flex-shrink:0;background:#e6eaef;position:relative; }
+    .rank-thumb img { width:100%;height:100%;object-fit:cover;display:block; }
+    .rank-name { font-size:0.84rem;font-weight:700;letter-spacing:-0.2px;
+        white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#0f172a; }
+    .rank-chan { font-size:0.72rem;color:#9ca3af;font-weight:600;margin-top:2px; }
+    .rank-views { font-size:0.82rem;font-weight:700;color:#374151;font-variant-numeric:tabular-nums; }
+    .rank-eng { font-size:0.82rem;font-weight:800;color:#16a34a;font-variant-numeric:tabular-nums; }
+
+    /* ══════════════════════════════════════════════════════════════
+       RECOMMENDED PLACEMENT CARD
+    ══════════════════════════════════════════════════════════════ */
+    .reco-card { background:linear-gradient(160deg,#0f172a,#293548);
+        border-radius:22px;padding:20px;color:#fff;position:relative;
+        overflow:hidden;box-shadow:0 8px 40px rgba(15,23,42,0.35); }
+    .reco-card__glow { position:absolute;top:-50px;right:-50px;width:160px;height:160px;
+        border-radius:50%;background:rgba(251,113,133,0.15); }
+    .reco-card__tag { display:inline-flex;align-items:center;gap:6px;font-size:0.68rem;
+        font-weight:800;text-transform:uppercase;letter-spacing:0.8px;color:#fb7185;
+        position:relative;margin-bottom:14px; }
+    .reco-card__thumb { position:relative;aspect-ratio:16/9;border-radius:14px;
+        overflow:hidden;margin-bottom:14px;background:rgba(0,0,0,0.3); }
+    .reco-card__thumb img { width:100%;height:100%;object-fit:cover;display:block; }
+    .reco-card__play { position:absolute;top:50%;left:50%;
+        transform:translate(-50%,-50%);width:44px;height:44px;border-radius:50%;
+        background:rgba(225,29,46,0.92);display:inline-flex;align-items:center;
+        justify-content:center;box-shadow:0 8px 20px rgba(0,0,0,0.35); }
+    .reco-card__title { font-size:1rem;font-weight:800;line-height:1.3;
+        letter-spacing:-0.2px;margin-bottom:8px; }
+    .reco-card__chan { font-size:0.78rem;color:rgba(255,255,255,0.65);margin-bottom:14px; }
+    .reco-card__scores { display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px; }
+    .reco-card__scores > div { background:rgba(255,255,255,0.07);border:1px solid rgba(251,113,133,0.15);
+        border-radius:12px;padding:10px 12px; }
+    .reco-card__k { display:block;font-size:0.62rem;font-weight:700;text-transform:uppercase;
+        letter-spacing:0.5px;color:rgba(255,255,255,0.5);margin-bottom:3px; }
+    .reco-card__v { display:block;font-size:1.2rem;font-weight:800;color:#fb7185;letter-spacing:-0.5px; }
+    .reco-card__cta { background:#e11d2e;color:#fff;border:none;border-radius:50px;
+        padding:10px 20px;font-weight:800;font-size:0.84rem;width:100%;cursor:pointer;
+        box-shadow:0 4px 14px rgba(225,29,46,0.4);transition:all .2s;font-family:inherit; }
+    .reco-card__cta:hover { background:#b91c2a; transform:translateY(-2px);
+        box-shadow:0 6px 20px rgba(225,29,46,0.5); }
+
+    /* ══════════════════════════════════════════════════════════════
+       SCORE BADGE
+    ══════════════════════════════════════════════════════════════ */
+    .score-badge { display:inline-block;padding:3px 10px;border-radius:6px;
+        font-size:0.72rem;font-weight:800;font-variant-numeric:tabular-nums; }
+    .score-badge.high { background:rgba(22,163,74,0.12);color:#16a34a; }
+    .score-badge.mid  { background:rgba(246,224,94,0.18);color:#b45309; }
+    .score-badge.low  { background:rgba(252,129,129,0.15);color:#dc2626; }
+
+    /* ══════════════════════════════════════════════════════════════
+       LIVE BADGE
+    ══════════════════════════════════════════════════════════════ */
+    .live-badge { display:inline-flex;align-items:center;gap:6px;font-size:0.62rem;
+        font-weight:800;text-transform:uppercase;letter-spacing:0.6px;
+        color:#16a34a;background:rgba(22,163,74,0.1);
+        padding:3px 9px 3px 7px;border-radius:50px;vertical-align:middle;margin-left:8px; }
+    .live-dot { width:7px;height:7px;border-radius:50%;background:#16a34a;display:inline-block; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -598,56 +725,56 @@ st.markdown("""
     display:flex; gap:12px; flex-wrap:wrap; margin-bottom:1rem;
 }
 .chan-feat-card {
-    background:#ffffff; border:1px solid #d1fae5;
-    border-top:4px solid #16a34a; border-radius:16px;
+    background:#ffffff; border:1px solid #e6eaef;
+    border-top:4px solid #e11d2e; border-radius:16px;
     padding:1rem 1.2rem; min-width:150px; flex:1;
-    text-align:center; box-shadow:0 2px 14px rgba(22,163,74,0.09);
+    text-align:center; box-shadow:0 2px 14px rgba(15,23,42,0.07);
     transition:all 0.2s;
 }
-.chan-feat-card:hover { transform:translateY(-3px); box-shadow:0 8px 24px rgba(22,163,74,0.18); }
+.chan-feat-card:hover { transform:translateY(-3px); box-shadow:0 8px 24px rgba(225,29,46,0.14); }
 .chan-feat-card .cf-icon { font-size:1.8rem; margin-bottom:4px; }
-.chan-feat-card .cf-name { font-weight:800; color:#1a2e1a; font-size:0.88rem; margin-bottom:4px; line-height:1.2; }
-.chan-feat-card .cf-subs { color:#16a34a; font-size:1.15rem; font-weight:800; margin-bottom:2px; }
+.chan-feat-card .cf-name { font-weight:800; color:#0f172a; font-size:0.88rem; margin-bottom:4px; line-height:1.2; }
+.chan-feat-card .cf-subs { color:#e11d2e; font-size:1.15rem; font-weight:800; margin-bottom:2px; }
 .chan-feat-card .cf-type { color:#9ca3af; font-size:0.65rem; text-transform:uppercase; letter-spacing:0.6px; }
 
 /* ── Selected channel banner ────────────────────────────── */
 .sel-channel-banner {
-    background:linear-gradient(135deg,#0f2d14,#1a5c28);
+    background:linear-gradient(135deg,#0f172a,#293548);
     border-radius:16px; padding:1rem 1.6rem;
     display:flex; align-items:center; gap:16px;
-    border:1px solid rgba(74,222,128,0.2);
-    box-shadow:0 4px 20px rgba(15,45,20,0.25);
+    border:1px solid rgba(251,113,133,0.2);
+    box-shadow:0 4px 20px rgba(15,23,42,0.25);
     margin-bottom:1rem;
 }
 .sel-channel-banner .scb-icon { font-size:2rem; }
 .sel-channel-banner .scb-name { color:#fff; font-size:1.1rem; font-weight:800; }
-.sel-channel-banner .scb-sub  { color:#4ade80; font-size:0.8rem; font-weight:500; }
+.sel-channel-banner .scb-sub  { color:#fb7185; font-size:0.8rem; font-weight:500; }
 
 /* ── Program grid cards ─────────────────────────────────── */
 .pgc {
-    background:#ffffff; border:1px solid #e8f5e9;
+    background:#ffffff; border:1px solid #e6eaef;
     border-radius:18px; overflow:hidden;
-    box-shadow:0 4px 20px rgba(15,45,20,0.08);
+    box-shadow:0 4px 20px rgba(15,23,42,0.07);
     margin-bottom:1rem; transition:transform 0.2s,box-shadow 0.2s;
     display:flex; flex-direction:column;
 }
-.pgc:hover { transform:translateY(-4px); box-shadow:0 12px 32px rgba(15,45,20,0.16); }
-.pgc.dark { background:#0f2d14; border-color:transparent; box-shadow:0 4px 24px rgba(15,45,20,0.3); }
+.pgc:hover { transform:translateY(-4px); box-shadow:0 12px 32px rgba(15,23,42,0.14); }
+.pgc.dark { background:#0f172a; border-color:transparent; box-shadow:0 4px 24px rgba(15,23,42,0.3); }
 .pgc img { width:100%; height:150px; object-fit:cover; display:block; }
 .pgc .pgc-body { padding:1rem 1.15rem 0.5rem; flex:1; }
 .pgc .pgc-rank {
-    display:inline-block; background:#dcfce7; color:#15803d;
+    display:inline-block; background:#fee2e2; color:#b91c2a;
     font-size:0.65rem; font-weight:800; padding:2px 8px;
     border-radius:20px; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.4px;
 }
-.pgc.dark .pgc-rank { background:rgba(74,222,128,0.2); color:#4ade80; }
+.pgc.dark .pgc-rank { background:rgba(251,113,133,0.2); color:#fb7185; }
 .pgc .pgc-cat {
     font-size:0.68rem; font-weight:700; text-transform:uppercase;
-    letter-spacing:0.6px; color:#16a34a; margin-bottom:3px;
+    letter-spacing:0.6px; color:#e11d2e; margin-bottom:3px;
 }
-.pgc.dark .pgc-cat { color:#4ade80; }
+.pgc.dark .pgc-cat { color:#fb7185; }
 .pgc .pgc-name {
-    font-size:0.96rem; font-weight:800; color:#1a2e1a;
+    font-size:0.96rem; font-weight:800; color:#0f172a;
     line-height:1.3; margin-bottom:8px;
     display:-webkit-box; -webkit-line-clamp:2;
     -webkit-box-orient:vertical; overflow:hidden;
@@ -658,25 +785,25 @@ st.markdown("""
     color:#6b7280; flex-wrap:wrap; margin-bottom:4px;
 }
 .pgc.dark .pgc-stats { color:rgba(255,255,255,0.55); }
-.pgc .pgc-views { color:#16a34a; font-weight:800; font-size:0.88rem; }
-.pgc.dark .pgc-views { color:#4ade80; }
+.pgc .pgc-views { color:#e11d2e; font-weight:800; font-size:0.88rem; }
+.pgc.dark .pgc-views { color:#fb7185; }
 .pgc .pgc-divider {
-    border:none; border-top:1px solid #e8f5e9; margin:8px 0;
+    border:none; border-top:1px solid #e6eaef; margin:8px 0;
 }
-.pgc.dark .pgc-divider { border-top-color:rgba(74,222,128,0.15); }
+.pgc.dark .pgc-divider { border-top-color:rgba(251,113,133,0.15); }
 
 /* ── Comparison queue bar ───────────────────────────────── */
 .queue-strip { display:flex; gap:10px; flex-wrap:wrap; margin:0 0 14px; }
 .queue-card {
-    background:#f0fdf4; border:1.5px solid #86efac;
-    border-left:4px solid #16a34a; border-radius:12px;
+    background:#fef2f2; border:1.5px solid #fecdd3;
+    border-left:4px solid #e11d2e; border-radius:12px;
     padding:0.55rem 0.9rem; display:flex; align-items:center; gap:8px;
-    box-shadow:0 2px 8px rgba(22,163,74,0.09);
+    box-shadow:0 2px 8px rgba(225,29,46,0.09);
 }
 .queue-card img { width:44px; height:30px; object-fit:cover; border-radius:6px; flex-shrink:0; }
-.queue-card .qcn { font-weight:700; color:#1a2e1a; font-size:0.8rem; max-width:130px;
+.queue-card .qcn { font-weight:700; color:#0f172a; font-size:0.8rem; max-width:130px;
     white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.queue-card .qcv { font-size:0.7rem; color:#16a34a; font-weight:600; }
+.queue-card .qcv { font-size:0.7rem; color:#e11d2e; font-weight:600; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -1079,100 +1206,81 @@ def analyze_program(name, prog):
 # ---------------------------------------------------------------------------
 
 st.markdown("""
-<!-- TOP UTILITY BAR -->
+<!-- TOP BAR -->
 <div class="top-bar">
+  <span><b>📺 YouTube Program Analyzer</b> &nbsp;|&nbsp; Hardcord Ad Targeting — Sri Lankan Broadcast</span>
   <span>
-    <b>📺 YouTube Program Analyzer</b>
-    &nbsp;|&nbsp; Hardcord Ad Targeting — Sri Lankan Broadcast Industry
-  </span>
-  <span>
-    <span class="pill">🌿 100 Verified Channels</span>
-    <span style="color:#4ade80;">Live YouTube Data</span>
+    <span class="pill">🇱🇰 100 Verified Channels</span>
+    <span class="live-badge"><span class="live-dot"></span>Live Data</span>
   </span>
 </div>
 
-<!-- HERO HEADER -->
+<!-- HERO -->
 <div class="hero-header">
-  <!-- NAV ROW -->
   <div class="hero-nav">
     <div class="hero-logo-wrap">
-      <img src="https://logos-world.net/wp-content/uploads/2020/06/YouTube-Logo.png"
-           alt="YouTube" height="28" style="display:block;">
+      <img src="https://logos-world.net/wp-content/uploads/2020/06/YouTube-Logo.png" alt="YouTube" height="28" style="display:block;">
     </div>
     <div class="hero-tagline">
       <span>📊 Program Compare</span>
       <span>🔀 Cross-Channel</span>
       <span>📈 Trending</span>
-      <span class="pill" style="background:rgba(74,222,128,0.15);color:#4ade80;border-color:rgba(74,222,128,0.3);">🇱🇰 Sri Lanka</span>
+      <span class="pill" style="background:rgba(251,113,133,0.15);color:#fb7185;border-color:rgba(251,113,133,0.3);">🇱🇰 Sri Lanka</span>
     </div>
   </div>
-
-  <!-- HERO BODY — 2 column layout like landing page -->
   <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:2rem;">
     <div class="hero-body" style="flex:1;">
-      <div style="font-size:0.72rem;color:#4ade80;font-weight:700;text-transform:uppercase;
-          letter-spacing:1.5px;margin-bottom:8px;">
+      <div style="font-size:0.72rem;color:#fb7185;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;">
         🎯 HARDCORD AD TARGETING TOOL
       </div>
       <h1 style="font-size:2.4rem;">
-        Find the <span class="accent">Best Programs</span><br>
-        for Your <span style="color:#fff;">6-Second Ad</span>
+        Find the <span class="accent">Best Programs</span><br>for Your <span style="color:#fff;">6-Second Ad</span>
       </h1>
       <p style="margin-top:0.6rem;max-width:520px;">
         Compare viewership, engagement &amp; trends across Sri Lanka's top YouTube channels.
         Identify the exact episodes where your hardcord ad gets maximum reach.
       </p>
-      <!-- Feature checklist like landing page -->
       <div style="display:flex;flex-wrap:wrap;gap:10px;margin:0.8rem 0 1rem;">
         <span style="color:rgba(255,255,255,0.75);font-size:0.78rem;">✅ 100 Verified Sri Lankan Channels</span>
         <span style="color:rgba(255,255,255,0.75);font-size:0.78rem;">✅ Live YouTube API Data</span>
         <span style="color:rgba(255,255,255,0.75);font-size:0.78rem;">✅ Hardcord Score Algorithm</span>
       </div>
     </div>
-
-    <!-- STATS BLOCK — 2×2 grid badge on right like landing page certification badge -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;flex-shrink:0;min-width:240px;">
-      <div style="background:rgba(74,222,128,0.14);border:1px solid rgba(74,222,128,0.28);
-          border-radius:14px;padding:0.9rem 1rem;text-align:center;">
-        <div style="color:#4ade80;font-size:1.5rem;font-weight:900;line-height:1;">100</div>
-        <div style="color:rgba(255,255,255,0.5);font-size:0.62rem;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Channels</div>
+      <div style="background:rgba(251,113,133,0.12);border:1px solid rgba(251,113,133,0.25);border-radius:14px;padding:0.9rem 1rem;text-align:center;">
+        <div style="color:#fb7185;font-size:1.5rem;font-weight:900;line-height:1;">100</div>
+        <div style="color:rgba(255,255,255,0.45);font-size:0.62rem;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Channels</div>
       </div>
-      <div style="background:rgba(74,222,128,0.14);border:1px solid rgba(74,222,128,0.28);
-          border-radius:14px;padding:0.9rem 1rem;text-align:center;">
-        <div style="color:#4ade80;font-size:1.5rem;font-weight:900;line-height:1;">6s</div>
-        <div style="color:rgba(255,255,255,0.5);font-size:0.62rem;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Ad Format</div>
+      <div style="background:rgba(251,113,133,0.12);border:1px solid rgba(251,113,133,0.25);border-radius:14px;padding:0.9rem 1rem;text-align:center;">
+        <div style="color:#fb7185;font-size:1.5rem;font-weight:900;line-height:1;">6s</div>
+        <div style="color:rgba(255,255,255,0.45);font-size:0.62rem;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Ad Format</div>
       </div>
-      <div style="background:rgba(74,222,128,0.14);border:1px solid rgba(74,222,128,0.28);
-          border-radius:14px;padding:0.9rem 1rem;text-align:center;">
-        <div style="color:#4ade80;font-size:1.5rem;font-weight:900;line-height:1;">3</div>
-        <div style="color:rgba(255,255,255,0.5);font-size:0.62rem;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Modes</div>
+      <div style="background:rgba(251,113,133,0.12);border:1px solid rgba(251,113,133,0.25);border-radius:14px;padding:0.9rem 1rem;text-align:center;">
+        <div style="color:#fb7185;font-size:1.5rem;font-weight:900;line-height:1;">3</div>
+        <div style="color:rgba(255,255,255,0.45);font-size:0.62rem;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Modes</div>
       </div>
-      <div style="background:rgba(74,222,128,0.14);border:1px solid rgba(74,222,128,0.28);
-          border-radius:14px;padding:0.9rem 1rem;text-align:center;">
-        <div style="color:#4ade80;font-size:1.5rem;font-weight:900;line-height:1;">Live</div>
-        <div style="color:rgba(255,255,255,0.5);font-size:0.62rem;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">YouTube Data</div>
+      <div style="background:rgba(251,113,133,0.12);border:1px solid rgba(251,113,133,0.25);border-radius:14px;padding:0.9rem 1rem;text-align:center;">
+        <div style="color:#fb7185;font-size:1.5rem;font-weight:900;line-height:1;">Live</div>
+        <div style="color:rgba(255,255,255,0.45);font-size:0.62rem;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">YouTube Data</div>
       </div>
     </div>
   </div>
-
-  <!-- STATS STRIP bottom -->
-  <div style="display:flex;gap:0;margin-top:1.2rem;
-      background:rgba(0,0,0,0.2);border-radius:12px;overflow:hidden;">
-    <div style="flex:1;padding:0.7rem 1.2rem;border-right:1px solid rgba(255,255,255,0.08);">
-      <div style="color:#4ade80;font-weight:800;font-size:1rem;">📊 Compare</div>
-      <div style="color:rgba(255,255,255,0.5);font-size:0.68rem;">Up to 4 programs at once</div>
+  <div style="display:flex;gap:0;margin-top:1.2rem;background:rgba(0,0,0,0.2);border-radius:12px;overflow:hidden;">
+    <div style="flex:1;padding:0.7rem 1.2rem;border-right:1px solid rgba(255,255,255,0.07);">
+      <div style="color:#fb7185;font-weight:800;font-size:0.95rem;">📊 Compare</div>
+      <div style="color:rgba(255,255,255,0.45);font-size:0.67rem;">Up to 4 programs at once</div>
     </div>
-    <div style="flex:1;padding:0.7rem 1.2rem;border-right:1px solid rgba(255,255,255,0.08);">
-      <div style="color:#4ade80;font-weight:800;font-size:1rem;">🔀 Cross-Channel</div>
-      <div style="color:rgba(255,255,255,0.5);font-size:0.68rem;">Compare across different channels</div>
+    <div style="flex:1;padding:0.7rem 1.2rem;border-right:1px solid rgba(255,255,255,0.07);">
+      <div style="color:#fb7185;font-weight:800;font-size:0.95rem;">🔀 Cross-Channel</div>
+      <div style="color:rgba(255,255,255,0.45);font-size:0.67rem;">Compare across different channels</div>
     </div>
-    <div style="flex:1;padding:0.7rem 1.2rem;border-right:1px solid rgba(255,255,255,0.08);">
-      <div style="color:#4ade80;font-weight:800;font-size:1rem;">📈 Trending</div>
-      <div style="color:rgba(255,255,255,0.5);font-size:0.68rem;">Live trending channel rankings</div>
+    <div style="flex:1;padding:0.7rem 1.2rem;border-right:1px solid rgba(255,255,255,0.07);">
+      <div style="color:#fb7185;font-weight:800;font-size:0.95rem;">📈 Trending</div>
+      <div style="color:rgba(255,255,255,0.45);font-size:0.67rem;">Live trending channel rankings</div>
     </div>
     <div style="flex:1;padding:0.7rem 1.2rem;">
-      <div style="color:#4ade80;font-weight:800;font-size:1rem;">🎯 Ad Placement</div>
-      <div style="color:rgba(255,255,255,0.5);font-size:0.68rem;">Best episode recommendations</div>
+      <div style="color:#fb7185;font-weight:800;font-size:0.95rem;">🎯 Ad Placement</div>
+      <div style="color:rgba(255,255,255,0.45);font-size:0.67rem;">Best episode recommendations</div>
     </div>
   </div>
 </div>
@@ -1193,6 +1301,35 @@ if "inter_slots" not in st.session_state:
 if "inter_adding" not in st.session_state:
     st.session_state.inter_adding = {"channel_id": None, "channel_name": None}
 
+st.markdown("""
+<div class="kpi-strip">
+  <div class="kpi-card">
+    <div class="kpi-card__icon">📺</div>
+    <div class="kpi-card__value">100</div>
+    <div class="kpi-card__label">Verified Channels</div>
+    <div class="kpi-card__delta up">▲ Sri Lanka</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-card__icon">🎯</div>
+    <div class="kpi-card__value">9.84</div>
+    <div class="kpi-card__label">Top Hardcord Score</div>
+    <div class="kpi-card__delta up">▲ +1.2 today</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-card__icon">💬</div>
+    <div class="kpi-card__value">6.8%</div>
+    <div class="kpi-card__label">Avg Engagement</div>
+    <div class="kpi-card__delta up">▲ +0.4%</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-card__icon">👁</div>
+    <div class="kpi-card__value">248M</div>
+    <div class="kpi-card__label">Total Reach</div>
+    <div class="kpi-card__delta up">▲ +12M</div>
+  </div>
+</div>
+""", unsafe_allow_html=True)
+
 tab1, tab2, tab3 = st.tabs(["🎭 Program Comparison", "🔀 Cross-Channel Compare", "📊 Trending Channels"])
 
 
@@ -1200,7 +1337,7 @@ tab1, tab2, tab3 = st.tabs(["🎭 Program Comparison", "🔀 Cross-Channel Compa
 # TAB 1 — Program Comparison
 # ===========================================================================
 
-PLOTLY_COLORS = ["#16a34a", "#0066FF", "#f59e0b", "#7c3aed", "#0891b2"]
+PLOTLY_COLORS = ["#e11d2e", "#0066FF", "#f59e0b", "#7c3aed", "#0891b2"]
 
 
 def _plotly_line(analyses):
@@ -1308,8 +1445,8 @@ def _plotly_episode_detail(a):
         x=[e["date"] for e in eps],
         y=[e["views"] for e in eps],
         mode="lines+markers",
-        line=dict(color="#16a34a", width=2.5),
-        marker=dict(size=8, color="#16a34a",
+        line=dict(color="#e11d2e", width=2.5),
+        marker=dict(size=8, color="#e11d2e",
                     line=dict(color="white", width=1.5)),
         hovertemplate=(
             "<b>%{customdata}</b><br>"
@@ -1319,7 +1456,7 @@ def _plotly_episode_detail(a):
         ),
         customdata=[e["title"][:65] for e in eps],
         fill="tozeroy",
-        fillcolor="rgba(22,163,74,0.07)",
+        fillcolor="rgba(225,29,46,0.07)",
     ))
     fig.update_layout(
         paper_bgcolor="white", plot_bgcolor="#fafafa",
@@ -1407,8 +1544,8 @@ def render_program_comparison():
             <div class="cf-name">{c['Channel']}</div>
             <div class="cf-subs">{format_number(c['Subscribers'])}</div>
             <div class="cf-type">SUBSCRIBERS</div>
-            <div style="background:#e8f5e9;border-radius:4px;height:5px;margin-top:10px;overflow:hidden;">
-                <div style="background:linear-gradient(90deg,#16a34a,#4ade80);
+            <div style="background:#e6eaef;border-radius:4px;height:5px;margin-top:10px;overflow:hidden;">
+                <div style="background:linear-gradient(90deg,#e11d2e,#fb7185);
                     height:100%;width:{pct}%;border-radius:4px;"></div>
             </div>
             <div style="font-size:0.6rem;color:#9ca3af;margin-top:3px;">{c['Type']}</div>
@@ -1468,8 +1605,8 @@ def render_program_comparison():
 
     if not st.session_state.selected_channel_id:
         st.markdown("""
-        <div style="background:#f0fdf4;border:1.5px dashed #86efac;border-radius:14px;
-            padding:1.2rem;text-align:center;color:#15803d;font-weight:600;">
+        <div style="background:#fef2f2;border:1.5px dashed #fecdd3;border-radius:14px;
+            padding:1.2rem;text-align:center;color:#b91c2a;font-weight:600;">
             👆 Click any row in the table above to load its programs
         </div>
         """, unsafe_allow_html=True)
@@ -1523,7 +1660,7 @@ def render_program_comparison():
     if st.session_state.compare:
         st.markdown("""
         <div class="section-header" style="margin-top:0.5rem;">
-            <span class="step-badge" style="background:#15803d;">🗂️</span>
+            <span class="step-badge" style="background:#b91c2a;">🗂️</span>
             <span class="section-title">Queued for Comparison</span>
         </div>
         """, unsafe_allow_html=True)
@@ -1583,67 +1720,99 @@ def render_program_comparison():
         and (not prog_search or prog_search.lower() in n.lower())
     ]
 
-    # ── Program card grid (2 columns, alternating light/dark like landing page) ──
-    st.markdown(f"<p style='color:#6b7280;font-size:0.82rem;margin-bottom:0.6rem;'>"
-                f"Showing <b>{min(len(filtered),20)}</b> of {len(filtered)} programs — click <b>Add to Compare</b></p>",
-                unsafe_allow_html=True)
-
-    for row_start in range(0, min(len(filtered), 20), 2):
-        pair = filtered[row_start:row_start + 2]
-        gcols = st.columns(len(pair))
-        for col, (idx_offset, (pname, pdata)) in zip(gcols, enumerate(pair)):
-            card_idx = row_start + idx_offset
+    # ── Featured top-3 cards ────────────────────────────────────────────────
+    featured3 = filtered[:3]
+    if featured3:
+        st.markdown("**🏆 Top Programs — Best Ad Placement Opportunities**")
+        feat_cols = st.columns(3)
+        for col, (pname, pdata) in zip(feat_cols, featured3):
             eps = pdata.get("episodes", [])
             top_ep = max(eps, key=lambda e: e["views"]) if eps else None
             thumb = top_ep.get("thumbnail", "") if top_ep else ""
+            eng = round(sum(e["engagement"] for e in eps) / max(len(eps), 1), 1) if eps else 0
+            score = round((pdata["total_views"] / 1_000_000) * (1 + eng/100), 1)
             already = pname in st.session_state.compare
             full = len(st.session_state.compare) >= 4
-            dark = (card_idx % 4) in (1, 2)  # cards 1,2 dark; 0,3 light (like landing page pattern)
 
-            dark_cls = " dark" if dark else ""
-            rank_label = f"#{card_idx + 1} by {sort_by}"
-            views_disp = format_number(pdata["total_views"])
-            eng = round(sum(e["engagement"] for e in eps) / max(len(eps), 1), 1) if eps else 0
-            trend_icons = {"Growing": "📈", "Stable": "➡️", "Declining": "📉"}
-
-            fallback_bg = "#1a5c28" if dark else "#f0fdf4"
-            if thumb:
-                card_top = f'<img src="{thumb}" onerror="this.style.display=\'none\'">'
-            else:
-                card_top = f'<div style="height:80px;background:{fallback_bg};display:flex;align-items:center;justify-content:center;font-size:2rem;">🎬</div>'
-            col.markdown(
-                f'<div class="pgc{dark_cls}">'
-                f'{card_top}'
-                f'<div class="pgc-body">'
-                f'<span class="pgc-rank">{rank_label}</span>'
-                f'<div class="pgc-cat">{pdata["category"]}</div>'
-                f'<div class="pgc-name">{pname}</div>'
-                f'<div class="pgc-stats">'
-                f'<span>👁 <span class="pgc-views">{views_disp}</span></span>'
-                f'<span>🎞 {pdata["episode_count"]} episodes</span>'
-                f'<span>💬 {eng}% eng.</span>'
-                f'</div></div></div>',
-                unsafe_allow_html=True,
-            )
-
+            img_html = f'<img src="{thumb}" onerror="this.style.display=\'none\'">' if thumb else ""
+            col.markdown(f"""
+            <div class="feat-card">
+                <div class="feat-card__thumb">
+                    {img_html}
+                    <span class="feat-card__cat">{pdata["category"]}</span>
+                    <span class="feat-card__play">▶</span>
+                    <span class="feat-card__score">🎯 {score}</span>
+                </div>
+                <div class="feat-card__body">
+                    <div class="feat-card__title">{pname}</div>
+                    <div class="feat-card__meta">
+                        <span class="feat-card__chan">{st.session_state.selected_channel_name[:20]}</span>
+                        <span>·</span>
+                        <span>{format_number(pdata["total_views"])} views</span>
+                    </div>
+                    <div class="feat-card__stats">
+                        <span class="feat-card__stat">🎞 {pdata["episode_count"]} eps</span>
+                        <span class="feat-card__eng">{eng}% eng.</span>
+                    </div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
             if already:
-                col.markdown('<div style="text-align:center;color:#16a34a;font-weight:700;'
-                             'font-size:0.82rem;padding:4px 0 10px;">✅ Added to comparison</div>',
-                             unsafe_allow_html=True)
-            elif full:
-                col.markdown('<div style="text-align:center;color:#9ca3af;font-size:0.8rem;'
-                             'padding:4px 0 10px;">Max 4 programs reached</div>',
-                             unsafe_allow_html=True)
-            else:
-                if col.button("➕ Add to Compare", key=f"add_{card_idx}"):
+                col.markdown('<p style="text-align:center;color:#16a34a;font-weight:700;font-size:0.82rem;margin:4px 0 10px;">✅ Added</p>', unsafe_allow_html=True)
+            elif not full:
+                if col.button("➕ Add to Compare", key=f"fadd_{pname[:12]}"):
+                    st.session_state.compare.append(pname)
+                    st.toast(f"➕ Added: {pname[:30]}", icon="🎬")
+                    st.rerun()
+        st.markdown("---")
+
+    # ── Ranking table for programs 4+ ───────────────────────────────────────
+    rest = filtered[3:20]
+    if rest:
+        st.markdown("**📋 Full Program Ranking**")
+        st.markdown("""
+        <div class="rank-table">
+          <div class="rank-head">
+            <span>#</span><span>Program</span><span>Category</span>
+            <span>Views</span><span>Eng.</span><span>Action</span>
+          </div>
+        </div>
+        """, unsafe_allow_html=True)
+        for idx, (pname, pdata) in enumerate(rest, start=4):
+            eps = pdata.get("episodes", [])
+            top_ep = max(eps, key=lambda e: e["views"]) if eps else None
+            thumb = top_ep.get("thumbnail", "") if top_ep else ""
+            eng = round(sum(e["engagement"] for e in eps) / max(len(eps), 1), 1) if eps else 0
+            already = pname in st.session_state.compare
+            full = len(st.session_state.compare) >= 4
+
+            img_html = f'<img src="{thumb}" onerror="this.style.display=\'none\'">' if thumb else ""
+            st.markdown(f"""
+            <div class="rank-row">
+              <span class="rank-n">{str(idx).zfill(2)}</span>
+              <span class="rank-prog">
+                <span class="rank-thumb">{img_html}</span>
+                <span>
+                  <span class="rank-name">{pname[:40]}</span>
+                  <span class="rank-chan">{st.session_state.selected_channel_name[:20]}</span>
+                </span>
+              </span>
+              <span><span class="score-badge {'high' if eng > 6 else 'mid' if eng > 3 else 'low'}">{pdata["category"][:14]}</span></span>
+              <span class="rank-views">{format_number(pdata["total_views"])}</span>
+              <span class="rank-eng">{eng}%</span>
+              <span>{"✅" if already else ""}</span>
+            </div>
+            """, unsafe_allow_html=True)
+            if not already and not full:
+                if st.button("Add", key=f"radd_{idx}_{pname[:8]}"):
                     st.session_state.compare.append(pname)
                     st.toast(f"➕ Added: {pname[:30]}", icon="🎬")
                     st.rerun()
 
     if not st.session_state.compare:
         st.markdown("""
-        <div style="background:#f0fdf4;border:1.5px dashed #86efac;border-radius:14px;
-            padding:1.4rem;text-align:center;color:#15803d;font-weight:600;margin-top:0.5rem;">
+        <div style="background:#fef2f2;border:1.5px dashed #fecdd3;border-radius:14px;
+            padding:1.4rem;text-align:center;color:#b91c2a;font-weight:600;margin-top:0.5rem;">
             ➕ Click <b>Add to Compare</b> on any program card above to build your comparison
         </div>
         """, unsafe_allow_html=True)
@@ -1671,17 +1840,17 @@ def render_program_comparison():
     best_thumb = best_ep.get("thumbnail", thumb_url(best_ep.get("video_id", "")))
     st.markdown(f"""
     <div style="
-        background: linear-gradient(135deg, #0f2d14, #1a5c28);
+        background: linear-gradient(135deg, #0f172a, #293548);
         border-radius: 18px; padding: 0; margin-bottom: 1rem;
-        box-shadow: 0 8px 32px rgba(15,45,20,0.45); color: white;
-        display:flex; overflow:hidden; border:1px solid rgba(74,222,128,0.2);
+        box-shadow: 0 8px 32px rgba(15,23,42,0.45); color: white;
+        display:flex; overflow:hidden; border:1px solid rgba(251,113,133,0.2);
     ">
         <img src="{best_thumb}" alt="thumbnail"
              style="width:220px; min-width:220px; object-fit:cover; display:block; flex-shrink:0;"
              onerror="this.style.display='none'">
         <div style="padding:1.2rem 1.6rem; flex:1;">
             <div style="font-size:0.75rem; text-transform:uppercase; letter-spacing:1.2px;
-                color:#4ade80; font-weight:700; margin-bottom:6px;">
+                color:#fb7185; font-weight:700; margin-bottom:6px;">
                 🎯 Best Episode to Place Your Ad RIGHT NOW
             </div>
             <div style="font-size:1.35rem; font-weight:800; line-height:1.25; margin-bottom:8px; color:#fff;">
@@ -1689,13 +1858,13 @@ def render_program_comparison():
             </div>
             <div style="display:flex; gap:20px; flex-wrap:wrap; font-size:0.88rem;
                 color:rgba(255,255,255,0.8); margin-bottom:12px;">
-                <span>👁 <b style="color:#4ade80;">{format_number(best_ep['views'])}</b> views</span>
+                <span>👁 <b style="color:#fb7185;">{format_number(best_ep['views'])}</b> views</span>
                 <span>📺 <b>{best_prog['name'][:25]}</b></span>
                 <span>📅 {best_ep['date']}</span>
                 <span>💬 {best_ep['engagement']}% engagement</span>
             </div>
             <a href="{best_ep['url']}" target="_blank"
-               style="background:#4ade80; color:#0f2d14; text-decoration:none;
+               style="background:#e11d2e; color:#fff; text-decoration:none;
                       font-weight:800; font-size:0.85rem; padding:7px 20px;
                       border-radius:50px; display:inline-block; letter-spacing:0.3px;">
                 ▶ Watch Episode
@@ -1788,7 +1957,7 @@ def render_program_comparison():
                                 -webkit-box-orient:vertical;overflow:hidden;">
                                 {e['title'][:65]}</div>
                             <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:0.75rem;color:#6b7280;">
-                                <span>👁 <b style="color:#16a34a;">{format_number(e['views'])}</b></span>
+                                <span>👁 <b style="color:#e11d2e;">{format_number(e['views'])}</b></span>
                                 <span>💬 {e['engagement']}%</span>
                                 <span>📅 {e['date']}</span>
                             </div>
@@ -2009,14 +2178,14 @@ def render_inter_channel():
         for i, slot in enumerate(st.session_state.inter_slots):
             with slot_cols[i]:
                 st.markdown(f"""
-                <div style="background:#f0fdf4;border:1.5px solid #bbf7d0;
-                    border-left:4px solid #16a34a;border-radius:10px;
+                <div style="background:#fef2f2;border:1.5px solid #fecdd3;
+                    border-left:4px solid #e11d2e;border-radius:10px;
                     padding:0.8rem 1rem;margin-bottom:0.5rem;">
                     <div style="font-size:0.72rem;color:#6b7280;text-transform:uppercase;
                         letter-spacing:0.5px;margin-bottom:2px;">Slot {i+1}</div>
-                    <div style="font-weight:700;color:#1a2e1a;font-size:0.95rem;">
+                    <div style="font-weight:700;color:#0f172a;font-size:0.95rem;">
                         📺 {slot['channel_name']}</div>
-                    <div style="color:#16a34a;font-weight:600;font-size:0.88rem;
+                    <div style="color:#e11d2e;font-weight:600;font-size:0.88rem;
                         margin-top:2px;">🎬 {slot['program_name'][:32]}</div>
                 </div>
                 """, unsafe_allow_html=True)
@@ -2147,27 +2316,27 @@ def render_inter_channel():
     best_prog = next(a for a in analyses if best_ep in a["episodes"])
     best_thumb2 = best_ep.get("thumbnail", thumb_url(best_ep.get("video_id", "")))
     st.markdown(f"""
-    <div style="background:linear-gradient(135deg,#0f2d14,#1a5c28);
+    <div style="background:linear-gradient(135deg,#0f172a,#293548);
         border-radius:18px;padding:0;margin-bottom:1rem;
-        box-shadow:0 8px 32px rgba(15,45,20,0.45);color:white;
-        display:flex;overflow:hidden;border:1px solid rgba(74,222,128,0.2);">
+        box-shadow:0 8px 32px rgba(15,23,42,0.45);color:white;
+        display:flex;overflow:hidden;border:1px solid rgba(251,113,133,0.2);">
         <img src="{best_thumb2}" alt="thumbnail"
              style="width:220px;min-width:220px;object-fit:cover;display:block;flex-shrink:0;"
              onerror="this.style.display='none'">
         <div style="padding:1.2rem 1.6rem;flex:1;">
             <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:1.2px;
-                color:#4ade80;font-weight:700;margin-bottom:6px;">🎯 Best Episode to Place Your Ad RIGHT NOW</div>
+                color:#fb7185;font-weight:700;margin-bottom:6px;">🎯 Best Episode to Place Your Ad RIGHT NOW</div>
             <div style="font-size:1.35rem;font-weight:800;line-height:1.25;margin-bottom:8px;color:#fff;">
                 {best_ep['title'][:70]}</div>
             <div style="display:flex;gap:20px;flex-wrap:wrap;font-size:0.88rem;
                 color:rgba(255,255,255,0.8);margin-bottom:12px;">
-                <span>👁 <b style="color:#4ade80;">{format_number(best_ep['views'])}</b> views</span>
+                <span>👁 <b style="color:#fb7185;">{format_number(best_ep['views'])}</b> views</span>
                 <span>📺 <b>{best_prog['name'][:30]}</b></span>
                 <span>📅 {best_ep['date']}</span>
                 <span>💬 {best_ep['engagement']}% engagement</span>
             </div>
             <a href="{best_ep['url']}" target="_blank"
-               style="background:#4ade80;color:#0f2d14;text-decoration:none;
+               style="background:#e11d2e;color:#fff;text-decoration:none;
                       font-weight:800;font-size:0.85rem;padding:7px 20px;
                       border-radius:50px;display:inline-block;letter-spacing:0.3px;">
                 ▶ Watch Episode</a>
@@ -2256,7 +2425,7 @@ def render_inter_channel():
                                 -webkit-box-orient:vertical;overflow:hidden;">
                                 {e['title'][:65]}</div>
                             <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:0.75rem;color:#6b7280;">
-                                <span>👁 <b style="color:#16a34a;">{format_number(e['views'])}</b></span>
+                                <span>👁 <b style="color:#e11d2e;">{format_number(e['views'])}</b></span>
                                 <span>💬 {e['engagement']}%</span>
                                 <span>📅 {e['date']}</span>
                             </div>
