@@ -1921,17 +1921,17 @@ def render_program_comparison():
 
     # ── Interactive Charts ─────────────────────────────────────────────────
     st.markdown("##### 📈 Episode Views Trend — hover a point to see episode title")
-    st.plotly_chart(_plotly_line(analyses), use_container_width=True)
+    st.plotly_chart(_plotly_line(analyses), use_container_width=True, key="t1_line")
     st.caption("Click legend items to show/hide programs. Drag to zoom. Double-click to reset.")
 
     ch_left, ch_right = st.columns([1, 1])
     with ch_left:
         st.markdown("##### 📊 Avg Views per Episode")
-        st.plotly_chart(_plotly_bar(ranked_analyses), use_container_width=True)
+        st.plotly_chart(_plotly_bar(ranked_analyses), use_container_width=True, key="t1_bar")
     with ch_right:
         st.markdown("##### 🕸️ Program Comparison Radar")
         st.caption("Scores normalised to 100 across all compared programs.")
-        st.plotly_chart(_plotly_radar(ranked_analyses), use_container_width=True)
+        st.plotly_chart(_plotly_radar(ranked_analyses), use_container_width=True, key="t1_radar")
 
     st.markdown("---")
 
@@ -1957,7 +1957,8 @@ def render_program_comparison():
                          f"[{a['lowest']['title'][:55]}]({a['lowest']['url']})")
 
             # Interactive per-program line
-            st.plotly_chart(_plotly_episode_detail(a), use_container_width=True)
+            st.plotly_chart(_plotly_episode_detail(a), use_container_width=True,
+                            key=f"ep_detail_{a['name']}")
 
             top3 = sorted(a["episodes"], key=lambda e: e["views"], reverse=True)[:3]
             st.markdown("**🎯 Best episodes to place your ad:**")
@@ -2401,17 +2402,17 @@ def render_inter_channel():
 
     # ── Charts ────────────────────────────────────────────────────────────────
     st.markdown("##### 📈 Episode Views Trend — hover for episode details")
-    st.plotly_chart(_plotly_line(analyses), use_container_width=True)
+    st.plotly_chart(_plotly_line(analyses), use_container_width=True, key="t2_line")
     st.caption("Click legend to show/hide. Drag to zoom. Double-click to reset.")
 
     cr1, cr2 = st.columns([1, 1])
     with cr1:
         st.markdown("##### 📊 Avg Views per Episode")
-        st.plotly_chart(_plotly_bar(ranked_analyses), use_container_width=True)
+        st.plotly_chart(_plotly_bar(ranked_analyses), use_container_width=True, key="t2_bar")
     with cr2:
         st.markdown("##### 🕸️ Radar Comparison")
         st.caption("Scores normalised across all compared programs.")
-        st.plotly_chart(_plotly_radar(ranked_analyses), use_container_width=True)
+        st.plotly_chart(_plotly_radar(ranked_analyses), use_container_width=True, key="t2_radar")
 
     st.markdown("---")
 
@@ -2435,7 +2436,8 @@ def render_inter_channel():
             hc2.markdown(f"🔻 **Lowest:** {format_number(a['lowest']['views'])} views — "
                          f"[{a['lowest']['title'][:55]}]({a['lowest']['url']})")
 
-            st.plotly_chart(_plotly_episode_detail(a), use_container_width=True)
+            st.plotly_chart(_plotly_episode_detail(a), use_container_width=True,
+                            key=f"inter_ep_detail_{a['name']}")
 
             top3 = sorted(a["episodes"], key=lambda e: e["views"], reverse=True)[:3]
             st.markdown("**🎯 Best episodes to place your ad:**")
