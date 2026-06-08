@@ -831,6 +831,15 @@ def safe_int(value, default=0):
         return default
 
 
+# Industry-average YouTube CTR used to back-calculate estimated impressions.
+# Typical range is 2–10%; 5% is a conservative mid-point for established channels.
+DEFAULT_CTR = 0.05
+
+def est_impressions(views: int, ctr: float = DEFAULT_CTR) -> int:
+    """Estimate thumbnail impressions = views / CTR."""
+    return int(views / max(ctr, 0.001))
+
+
 def format_number(n):
     if n >= 1_000_000:
         return f"{n/1_000_000:.2f}M"
@@ -923,7 +932,9 @@ def aggregate_channel_data(videos, channel_details, local_only=False):
             "Rank": 0, "🇱🇰": "✅" if ch["is_local"] else "", "Channel": ch["channel_name"],
             "Category": ch["category"], "Subscribers": ch["subscribers"],
             "profile_pic": ch.get("profile_pic", ""),
-            "Total Views": ch["total_views"], "Engagement %": engagement,
+            "Total Views": ch["total_views"],
+            "Est. Impressions": est_impressions(ch["total_views"]),
+            "Engagement %": engagement,
             "Hardcord Score": score, "Trending Videos": ch["video_count"],
         })
     result.sort(key=lambda x: x["Hardcord Score"], reverse=True)
@@ -1016,6 +1027,7 @@ def get_local_channel_trending_stats(days_back):
             "profile_pic": ch_pic,
             "Subscribers": subscribers,
             "Total Views": total_views,
+            "Est. Impressions": est_impressions(total_views),
             "Engagement %": engagement,
             "Hardcord Score": score,
             "Recent Videos": count,
@@ -1086,13 +1098,15 @@ def get_curated_channel_stats():
         stats = d.get("statistics", {})
         thumbs = d.get("snippet", {}).get("thumbnails", {})
         pic = (thumbs.get("medium") or thumbs.get("default") or {}).get("url", "")
+        total_v = safe_int(stats.get("viewCount"))
         rows.append({
             "channel_id": cid,
             "Channel": name,
             "Type": ch_type,
             "profile_pic": pic,
             "Subscribers": safe_int(stats.get("subscriberCount")),
-            "Total Views": safe_int(stats.get("viewCount")),
+            "Total Views": total_v,
+            "Est. Impressions": est_impressions(total_v),
             "Total Videos": safe_int(stats.get("videoCount")),
         })
     rows.sort(key=lambda x: x["Total Views"], reverse=True)
@@ -1157,6 +1171,7 @@ def get_channel_programs(channel_id, date_from_str, date_to_str, max_scan):
             "title": snippet["title"],
             "date": snippet["publishedAt"][:10],
             "views": views,
+            "est_impressions": est_impressions(views),
             "likes": likes,
             "comments": comments,
             "engagement": round((likes / max(views, 1)) * 100, 2),
@@ -1173,6 +1188,7 @@ def get_channel_programs(channel_id, date_from_str, date_to_str, max_scan):
             "episodes": eps,
             "episode_count": len(eps),
             "total_views": total_views,
+            "total_est_impressions": est_impressions(total_views),
             "avg_views": total_views // max(len(eps), 1),
             "category": classify_program(name, eps),
         }
@@ -1206,6 +1222,7 @@ def analyze_program(name, prog):
 
     return {
         "name": name, "episode_count": count, "total_views": total_views,
+        "total_est_impressions": prog.get("total_est_impressions", est_impressions(total_views)),
         "avg_views": avg_views, "highest": highest, "lowest": lowest,
         "avg_engagement": avg_eng, "trend": trend, "trend_icon": trend_icon,
         "trend_change": round(change, 1), "hardcord": hardcord, "episodes": eps,
@@ -1599,6 +1616,7 @@ def render_program_comparison():
         "Type": c["Type"],
         "Subscribers": c["Subscribers"],
         "Total Views": c["Total Views"],
+        "Est. Impressions": c.get("Est. Impressions", est_impressions(c["Total Views"])),
         "Total Videos": c["Total Videos"],
     } for c in filtered_chans])
 
@@ -1610,6 +1628,8 @@ def render_program_comparison():
             "Logo": st.column_config.ImageColumn("", width="small"),
             "Subscribers": st.column_config.NumberColumn("Subscribers", format="%.2f"),
             "Total Views": st.column_config.NumberColumn("Total Views", format="%.2f"),
+            "Est. Impressions": st.column_config.NumberColumn("Est. Impressions ≈", format="%.2f",
+                help="Estimated from views ÷ 5% avg CTR. Not official YouTube data."),
             "Total Videos": st.column_config.NumberColumn("Total Videos", format="%d"),
         },
     )
@@ -1943,12 +1963,13 @@ def render_program_comparison():
             f"{format_number(a['avg_views'])} avg views/ep · {a['trend']}",
             expanded=True,
         ):
-            m1, m2, m3, m4, m5 = st.columns(5)
+            m1, m2, m3, m4, m5, m6 = st.columns(6)
             m1.markdown(f'<div class="metric-card"><h2>{a["episode_count"]}</h2><p>Episodes</p></div>', unsafe_allow_html=True)
             m2.markdown(f'<div class="metric-card"><h2>{format_number(a["total_views"])}</h2><p>Total Views</p></div>', unsafe_allow_html=True)
-            m3.markdown(f'<div class="metric-card"><h2>{format_number(a["avg_views"])}</h2><p>Avg / Episode</p></div>', unsafe_allow_html=True)
-            m4.markdown(f'<div class="metric-card"><h2>{a["avg_engagement"]}%</h2><p>Engagement</p></div>', unsafe_allow_html=True)
-            m5.markdown(f'<div class="metric-card"><h2>{a["trend_icon"]}</h2><p>{a["trend"]} ({a["trend_change"]:+.0f}%)</p></div>', unsafe_allow_html=True)
+            m3.markdown(f'<div class="metric-card"><h2>{format_number(a.get("total_est_impressions", est_impressions(a["total_views"])))}</h2><p>Est. Impressions</p></div>', unsafe_allow_html=True)
+            m4.markdown(f'<div class="metric-card"><h2>{format_number(a["avg_views"])}</h2><p>Avg / Episode</p></div>', unsafe_allow_html=True)
+            m5.markdown(f'<div class="metric-card"><h2>{a["avg_engagement"]}%</h2><p>Engagement</p></div>', unsafe_allow_html=True)
+            m6.markdown(f'<div class="metric-card"><h2>{a["trend_icon"]}</h2><p>{a["trend"]} ({a["trend_change"]:+.0f}%)</p></div>', unsafe_allow_html=True)
 
             hc1, hc2 = st.columns(2)
             hc1.markdown(f"🔺 **Highest:** {format_number(a['highest']['views'])} views — "
@@ -1996,7 +2017,9 @@ def render_program_comparison():
             ep_disp = pd.DataFrame([{
                 "Thumbnail": e.get("thumbnail", thumb_url(e.get("video_id", ""))),
                 "Date": e["date"], "Episode": e["title"],
-                "Views": format_number(e["views"]), "Likes": format_number(e["likes"]),
+                "Views": format_number(e["views"]),
+                "Est. Impressions": format_number(e.get("est_impressions", est_impressions(e["views"]))),
+                "Likes": format_number(e["likes"]),
                 "Comments": format_number(e["comments"]), "Engagement %": f"{e['engagement']}%",
                 "Watch": e["url"],
             } for e in sorted(a["episodes"], key=lambda e: e["date"], reverse=True)])
@@ -2098,6 +2121,7 @@ trending chart. Use **Local SL Channels Only** toggle to see a curated Sri Lanka
                 "Type": r["Type"],
                 "Subscribers": format_number(r["Subscribers"]),
                 "Total Views": format_number(r["Total Views"]),
+                "Est. Impressions": format_number(r.get("Est. Impressions", est_impressions(r["Total Views"]))),
                 "Engagement %": f"{r['Engagement %']}%",
                 "Hardcord Score": r["Hardcord Score"],
                 "Recent Videos": r["Recent Videos"],
@@ -2133,6 +2157,7 @@ trending chart. Use **Local SL Channels Only** toggle to see a curated Sri Lanka
                 "Channel": r["Channel"],
                 "Category": r["Category"], "Subscribers": format_number(r["Subscribers"]),
                 "Total Views": format_number(r["Total Views"]),
+                "Est. Impressions": format_number(r.get("Est. Impressions", est_impressions(r["Total Views"]))),
                 "Engagement %": f"{r['Engagement %']}%", "Hardcord Score": r["Hardcord Score"],
             } for r in ranked[:top_n]])
             st.dataframe(
@@ -2423,12 +2448,13 @@ def render_inter_channel():
             f"{a['trend_icon']} {a['name']} — {format_number(a['avg_views'])} avg views · {a['trend']}",
             expanded=True,
         ):
-            m1, m2, m3, m4, m5 = st.columns(5)
+            m1, m2, m3, m4, m5, m6 = st.columns(6)
             m1.markdown(f'<div class="metric-card"><h2>{a["episode_count"]}</h2><p>Episodes</p></div>', unsafe_allow_html=True)
             m2.markdown(f'<div class="metric-card"><h2>{format_number(a["total_views"])}</h2><p>Total Views</p></div>', unsafe_allow_html=True)
-            m3.markdown(f'<div class="metric-card"><h2>{format_number(a["avg_views"])}</h2><p>Avg / Episode</p></div>', unsafe_allow_html=True)
-            m4.markdown(f'<div class="metric-card"><h2>{a["avg_engagement"]}%</h2><p>Engagement</p></div>', unsafe_allow_html=True)
-            m5.markdown(f'<div class="metric-card"><h2>{a["trend_icon"]}</h2><p>{a["trend"]} ({a["trend_change"]:+.0f}%)</p></div>', unsafe_allow_html=True)
+            m3.markdown(f'<div class="metric-card"><h2>{format_number(a.get("total_est_impressions", est_impressions(a["total_views"])))}</h2><p>Est. Impressions</p></div>', unsafe_allow_html=True)
+            m4.markdown(f'<div class="metric-card"><h2>{format_number(a["avg_views"])}</h2><p>Avg / Episode</p></div>', unsafe_allow_html=True)
+            m5.markdown(f'<div class="metric-card"><h2>{a["avg_engagement"]}%</h2><p>Engagement</p></div>', unsafe_allow_html=True)
+            m6.markdown(f'<div class="metric-card"><h2>{a["trend_icon"]}</h2><p>{a["trend"]} ({a["trend_change"]:+.0f}%)</p></div>', unsafe_allow_html=True)
 
             hc1, hc2 = st.columns(2)
             hc1.markdown(f"🔺 **Highest:** {format_number(a['highest']['views'])} views — "
@@ -2475,7 +2501,9 @@ def render_inter_channel():
             ep_disp = pd.DataFrame([{
                 "Thumbnail": e.get("thumbnail", thumb_url(e.get("video_id", ""))),
                 "Date": e["date"], "Episode": e["title"],
-                "Views": format_number(e["views"]), "Likes": format_number(e["likes"]),
+                "Views": format_number(e["views"]),
+                "Est. Impressions": format_number(e.get("est_impressions", est_impressions(e["views"]))),
+                "Likes": format_number(e["likes"]),
                 "Comments": format_number(e["comments"]), "Engagement %": f"{e['engagement']}%",
                 "Watch": e["url"],
             } for e in sorted(a["episodes"], key=lambda e: e["date"], reverse=True)])
