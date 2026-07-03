@@ -9,8 +9,8 @@ Tab 2: Trending Channels (region-wide rankings)
 import os
 import io
 import re
-from collections import defaultdict
-from datetime import datetime, date, timedelta
+from collections import defaultdict, Counter
+from datetime import datetime, date, timedelta, timezone
 from math import log10
 
 import requests
@@ -1330,6 +1330,8 @@ def get_channel_programs(channel_id, date_from_str, date_to_str, max_scan):
             "video_id": vid,
             "title": snippet["title"],
             "date": snippet["publishedAt"][:10],
+            "published_at": snippet["publishedAt"],
+            "tags": snippet.get("tags", []),
             "views": views,
             "est_impressions": est_impressions(views),
             "likes": likes,
@@ -1388,6 +1390,254 @@ def analyze_program(name, prog):
         "trend_change": round(change, 1), "hardcord": hardcord, "episodes": eps,
         "category": prog.get("category", "📺 Other"),
     }
+
+
+# ---------------------------------------------------------------------------
+# Feature: Tags & keywords aggregation (from videos.list snippet.tags)
+# ---------------------------------------------------------------------------
+def aggregate_tags(episodes, top_n=15):
+    """Return most common tags across a program's episodes as (tag, count)."""
+    counts = Counter()
+    for e in episodes:
+        for t in e.get("tags", []):
+            t = t.strip()
+            if t:
+                counts[t.lower()] += 1
+    return counts.most_common(top_n)
+
+
+def render_tags(episodes, key_prefix=""):
+    """Render a program's most common video tags as sized keyword pills."""
+    tags = aggregate_tags(episodes)
+    if not tags:
+        return
+    max_c = tags[0][1]
+    pills = ""
+    for tag, c in tags:
+        weight = c / max_c
+        size = 0.68 + weight * 0.28
+        bg = "#fef2f2" if weight > 0.5 else "#f8fafc"
+        color = "#b91c2a" if weight > 0.5 else "#64748b"
+        border = "#fecdd3" if weight > 0.5 else "#e6eaef"
+        pills += (
+            f'<span style="background:{bg};color:{color};border:1px solid {border};'
+            f'border-radius:20px;padding:3px 11px;font-size:{size:.2f}rem;'
+            f'font-weight:{700 if weight > 0.5 else 500};">'
+            f'{tag}</span>'
+        )
+    st.markdown(f"""
+    <div style="background:#fff;border:1px solid #e6eaef;border-radius:14px;
+        padding:14px 16px;margin-top:10px;box-shadow:0 2px 10px rgba(15,23,42,0.06);">
+        <div style="font-size:0.68rem;font-weight:800;text-transform:uppercase;
+            letter-spacing:0.8px;color:#e11d2e;margin-bottom:10px;">
+            🏷️ Program Tags & Keywords
+            <span style="color:#9ca3af;font-weight:400;text-transform:none;
+                letter-spacing:0;margin-left:6px;font-size:0.62rem;">
+                what this program targets · from video metadata
+            </span>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;">{pills}</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+
+# ---------------------------------------------------------------------------
+# Feature: Best Time-to-Advertise heatmap
+# Uses each episode's publishedAt (UTC) converted to Sri Lanka time (UTC+5:30).
+# Publish time is a proxy for when the audience is most active for that program.
+# ---------------------------------------------------------------------------
+SL_TZ = timezone(timedelta(hours=5, minutes=30))
+_WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+
+def build_time_heatmap(episodes):
+    """Return a 7x24 matrix of view-weighted activity (weekday x hour, SL time)."""
+    grid = [[0.0] * 24 for _ in range(7)]
+    for e in episodes:
+        ts = e.get("published_at", "")
+        if not ts:
+            continue
+        try:
+            dt = datetime.fromisoformat(ts.replace("Z", "+00:00")).astimezone(SL_TZ)
+        except ValueError:
+            continue
+        grid[dt.weekday()][dt.hour] += e.get("views", 0)
+    return grid
+
+
+def render_time_heatmap(episodes, key_prefix=""):
+    """Plotly heatmap of best day/hour to advertise (view-weighted upload times)."""
+    grid = build_time_heatmap(episodes)
+    if not any(any(row) for row in grid):
+        return
+    z = grid
+    fig = go.Figure(data=go.Heatmap(
+        z=z,
+        x=[f"{h:02d}:00" for h in range(24)],
+        y=_WEEKDAYS,
+        colorscale=[[0, "#f8fafc"], [0.5, "#fb7185"], [1, "#e11d2e"]],
+        hovertemplate="%{y} %{x}<br>Views: %{z:,.0f}<extra></extra>",
+        showscale=True,
+        colorbar=dict(title="Views", thickness=10),
+    ))
+    fig.update_layout(
+        height=260,
+        margin=dict(l=10, r=10, t=10, b=10),
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        font=dict(family="Poppins, sans-serif", size=11, color="#374151"),
+        xaxis=dict(showgrid=False, tickfont=dict(size=9)),
+        yaxis=dict(showgrid=False, autorange="reversed"),
+    )
+    st.plotly_chart(fig, use_container_width=True, key=f"heatmap_{key_prefix}")
+
+    # Surface the single best slot as a plain-language recommendation.
+    best_val, best_dh = 0, None
+    for d in range(7):
+        for h in range(24):
+            if grid[d][h] > best_val:
+                best_val, best_dh = grid[d][h], (d, h)
+    if best_dh:
+        d, h = best_dh
+        st.markdown(
+            f'<div style="background:#fef2f2;border:1px solid #fecdd3;border-radius:10px;'
+            f'padding:8px 14px;font-size:0.85rem;color:#b91c2a;font-weight:600;margin-top:-4px;">'
+            f'🎯 Best slot to place your 6-second ad: '
+            f'<b>{_WEEKDAYS[d]} around {h:02d}:00</b> (Sri Lanka time)</div>',
+            unsafe_allow_html=True,
+        )
+
+
+# ---------------------------------------------------------------------------
+# Feature: Comment sentiment (commentThreads.list — 1 quota unit per call)
+# Lightweight lexicon scorer over English + common Sinhala-transliterated words.
+# ---------------------------------------------------------------------------
+_POS_WORDS = {
+    "good", "great", "best", "love", "loved", "nice", "super", "awesome", "amazing",
+    "beautiful", "excellent", "wonderful", "perfect", "fantastic", "wow", "lovely",
+    "fun", "happy", "enjoy", "enjoyed", "brilliant", "top", "gem", "masterpiece",
+    "hoda", "harida", "lassana", "supiri", "නියමයි", "ලස්සනයි", "හොඳයි", "සුපිරි",
+    "❤️", "😍", "🥰", "👏", "🔥", "💯", "👌",
+}
+_NEG_WORDS = {
+    "bad", "worst", "hate", "boring", "poor", "terrible", "awful", "waste", "bore",
+    "cringe", "stupid", "nonsense", "trash", "disappointing", "disappointed", "flop",
+    "fake", "worse", "ugly", "sad", "annoying", "rubbish", "weak",
+    "naraka", "kunu", "epa", "නරකයි", "එපා", "කණගාටුයි",
+    "👎", "😡", "🤮", "💩",
+}
+
+
+@st.cache_data(show_spinner=False, ttl=1800)
+def fetch_comment_sentiment(video_id, max_comments=60):
+    """Fetch top comments for a video and score sentiment via a keyword lexicon.
+
+    Returns dict with pos/neg/neu counts, a score (-100..100), and sample comments.
+    Gracefully returns None if comments are disabled or the call fails.
+    """
+    try:
+        data = api_get("commentThreads", {
+            "part": "snippet", "videoId": video_id,
+            "maxResults": min(max_comments, 100), "order": "relevance",
+            "textFormat": "plainText",
+        })
+    except requests.exceptions.HTTPError:
+        return None
+
+    pos = neg = neu = 0
+    samples = []
+    for item in data.get("items", []):
+        top = item.get("snippet", {}).get("topLevelComment", {}).get("snippet", {})
+        text = top.get("textDisplay", "")
+        if not text:
+            continue
+        low = text.lower()
+        p = sum(1 for w in _POS_WORDS if w in low)
+        n = sum(1 for w in _NEG_WORDS if w in low)
+        if p > n:
+            pos += 1
+            tag = "pos"
+        elif n > p:
+            neg += 1
+            tag = "neg"
+        else:
+            neu += 1
+            tag = "neu"
+        if len(samples) < 5 and (p or n):
+            samples.append({"text": text[:140], "tag": tag,
+                            "likes": safe_int(top.get("likeCount"))})
+
+    total = pos + neg + neu
+    if total == 0:
+        return None
+    score = round((pos - neg) / total * 100)
+    return {"pos": pos, "neg": neg, "neu": neu, "total": total,
+            "score": score, "samples": samples}
+
+
+def render_comment_sentiment(episodes, key_prefix=""):
+    """Render a sentiment gauge for a program using its top episode's comments."""
+    ranked = sorted(episodes, key=lambda e: e.get("comments", 0), reverse=True)
+    target = next((e for e in ranked if e.get("comments", 0) > 0), None)
+    if not target:
+        return
+
+    with st.spinner("Reading viewer comments…"):
+        sent = fetch_comment_sentiment(target["video_id"])
+    if not sent:
+        st.caption("💬 Comments are disabled or unavailable for this program.")
+        return
+
+    score = sent["score"]
+    if score >= 25:
+        mood, mood_color = "Positive", "#16a34a"
+    elif score <= -25:
+        mood, mood_color = "Negative", "#dc2626"
+    else:
+        mood, mood_color = "Mixed", "#d97706"
+
+    pos_pct = int(sent["pos"] / sent["total"] * 100)
+    neg_pct = int(sent["neg"] / sent["total"] * 100)
+    neu_pct = 100 - pos_pct - neg_pct
+
+    samples_html = ""
+    for s in sent["samples"]:
+        c = {"pos": "#16a34a", "neg": "#dc2626", "neu": "#9ca3af"}[s["tag"]]
+        icon = {"pos": "👍", "neg": "👎", "neu": "•"}[s["tag"]]
+        samples_html += (
+            f'<div style="font-size:0.72rem;color:#475569;padding:4px 0;'
+            f'border-top:1px solid #f1f5f9;">'
+            f'<span style="color:{c};">{icon}</span> {s["text"]}</div>'
+        )
+
+    st.markdown(f"""
+    <div style="background:#fff;border:1px solid #e6eaef;border-radius:14px;
+        padding:14px 16px;margin-top:10px;box-shadow:0 2px 10px rgba(15,23,42,0.06);">
+        <div style="font-size:0.68rem;font-weight:800;text-transform:uppercase;
+            letter-spacing:0.8px;color:#e11d2e;margin-bottom:10px;">
+            💬 Comment Sentiment
+            <span style="color:#9ca3af;font-weight:400;text-transform:none;
+                letter-spacing:0;margin-left:6px;font-size:0.62rem;">
+                {sent['total']} top comments · keyword-based
+            </span>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:10px;">
+            <div style="font-size:1.6rem;font-weight:800;color:{mood_color};">{mood}</div>
+            <div style="font-size:0.8rem;color:#6b7280;">score {score:+d} / 100</div>
+        </div>
+        <div style="display:flex;border-radius:6px;overflow:hidden;height:10px;">
+            <div style="width:{pos_pct}%;background:#16a34a;"></div>
+            <div style="width:{neu_pct}%;background:#e5e7eb;"></div>
+            <div style="width:{neg_pct}%;background:#dc2626;"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:0.7rem;
+            color:#6b7280;margin-top:3px;">
+            <span>👍 {pos_pct}% positive</span>
+            <span>{neu_pct}% neutral</span>
+            <span>👎 {neg_pct}% negative</span>
+        </div>
+        {f'<div style="margin-top:8px;">{samples_html}</div>' if samples_html else ''}
+    </div>
+    """, unsafe_allow_html=True)
 
 
 # ---------------------------------------------------------------------------
@@ -2195,6 +2445,15 @@ def render_program_comparison():
             render_audience_signals(a.get("category", "📺 Other"), a["total_views"],
                                     key_prefix=a["name"])
 
+            st.markdown("**🕐 Best Time to Advertise** (view-weighted upload times, SL time)")
+            render_time_heatmap(a["episodes"], key_prefix=a["name"])
+
+            sig_c1, sig_c2 = st.columns(2)
+            with sig_c1:
+                render_tags(a["episodes"], key_prefix=a["name"])
+            with sig_c2:
+                render_comment_sentiment(a["episodes"], key_prefix=a["name"])
+
             csv_buf = io.StringIO()
             pd.DataFrame(a["episodes"]).to_csv(csv_buf, index=False)
             st.download_button(
@@ -2681,6 +2940,15 @@ def render_inter_channel():
 
             render_audience_signals(a.get("category", "📺 Other"), a["total_views"],
                                     key_prefix=f"inter_{a['name']}")
+
+            st.markdown("**🕐 Best Time to Advertise** (view-weighted upload times, SL time)")
+            render_time_heatmap(a["episodes"], key_prefix=f"inter_{a['name']}")
+
+            sig_c1, sig_c2 = st.columns(2)
+            with sig_c1:
+                render_tags(a["episodes"], key_prefix=f"inter_{a['name']}")
+            with sig_c2:
+                render_comment_sentiment(a["episodes"], key_prefix=f"inter_{a['name']}")
 
             csv_buf = io.StringIO()
             pd.DataFrame(a["episodes"]).to_csv(csv_buf, index=False)
