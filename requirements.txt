@@ -5,3 +5,4 @@ jinja2
 rich
 streamlit
 plotly
+yt-dlp

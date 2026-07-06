@@ -19,6 +19,8 @@ import pandas as pd
 import plotly.graph_objects as go
 import plotly.express as px
 
+import tiktok_data as tt
+
 # ---------------------------------------------------------------------------
 # Config
 # ---------------------------------------------------------------------------
@@ -1493,7 +1495,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-tab1, tab2, tab3 = st.tabs(["🎭 Program Comparison", "🔀 Cross-Channel Compare", "📊 Trending Channels"])
+tab1, tab2, tab3, tab4 = st.tabs(["🎭 Program Comparison", "🔀 Cross-Channel Compare", "📊 Trending Channels", "🎵 TikTok"])
 
 
 # ===========================================================================
@@ -2661,6 +2663,140 @@ def render_inter_channel():
 
 
 # ===========================================================================
+# TAB 4 — TikTok (via yt-dlp, free / no API key)
+# ===========================================================================
+@st.cache_data(show_spinner=False, ttl=1800)
+def _tiktok_scan(handles_key, max_videos):
+    """Fetch + summarize all curated TikTok channels. Cached 30 min."""
+    rows = []
+    for name, (handle, ch_type) in tt.SRI_LANKA_TIKTOK.items():
+        data = tt.fetch_tiktok_channel(handle, max_videos=max_videos)
+        rows.append(tt.summarize_channel(name, ch_type, data))
+    rows.sort(key=lambda r: r["Hardcord Score"], reverse=True)
+    for i, r in enumerate(rows, 1):
+        r["Rank"] = i
+    return rows
+
+
+def render_tiktok():
+    st.markdown("""
+    <div class="section-header">
+        <span class="step-badge">🎵</span>
+        <span class="section-title">TikTok — Sri Lankan Channels
+            <span class="accent">(experimental)</span></span>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.info(
+        "ℹ️ TikTok data is pulled with **yt-dlp** (free, no API key). "
+        "TikTok blocks many datacenter IPs, so this works most reliably on a "
+        "local / residential machine and may return empty on cloud hosts."
+    )
+
+    c1, c2 = st.columns([1, 3])
+    with c1:
+        max_videos = st.slider("Videos per channel", 5, 30, 12, key="tt_maxvid")
+    with c2:
+        st.write("")
+        st.write("")
+        run = st.button("🔍 Scan TikTok Channels", key="tt_run")
+
+    if not run and "tt_scanned" not in st.session_state:
+        st.caption("Curated handles: " +
+                   ", ".join(f"@{h}" for h, _ in tt.SRI_LANKA_TIKTOK.values()))
+        return
+
+    if run:
+        st.session_state.tt_scanned = True
+        with st.spinner("Fetching TikTok channels via yt-dlp… (can take a while)"):
+            rows = _tiktok_scan("v1", max_videos)
+        st.session_state.tt_rows = rows
+
+    rows = st.session_state.get("tt_rows", [])
+    if not rows:
+        st.warning("No TikTok data yet — click **Scan TikTok Channels**.")
+        return
+
+    working = [r for r in rows if not r["error"] and r["Videos"] > 0]
+    blocked = [r for r in rows if r["error"] or r["Videos"] == 0]
+
+    if not working:
+        st.error(
+            "⚠️ TikTok returned no data for any channel — this host is very "
+            "likely being blocked by TikTok. Try running the app locally.\n\n"
+            f"First error: {blocked[0]['error'] if blocked else 'empty response'}"
+        )
+        return
+
+    # ── KPI strip ──────────────────────────────────────────────────────────
+    total_views = sum(r["Total Views"] for r in working)
+    total_followers = sum(r["Followers"] for r in working)
+    kpi = st.columns(4)
+    kpi[0].markdown(f'<div class="metric-card"><h2>{len(working)}</h2><p>Channels</p></div>', unsafe_allow_html=True)
+    kpi[1].markdown(f'<div class="metric-card"><h2>{format_number(total_views)}</h2><p>Total Views</p></div>', unsafe_allow_html=True)
+    kpi[2].markdown(f'<div class="metric-card"><h2>{format_number(total_followers)}</h2><p>Total Followers</p></div>', unsafe_allow_html=True)
+    kpi[3].markdown(f'<div class="metric-card"><h2>{working[0]["Hardcord Score"]:.2f}</h2><p>Top Score</p></div>', unsafe_allow_html=True)
+
+    # ── Ranking table ──────────────────────────────────────────────────────
+    st.markdown("##### 🏆 TikTok Hardcord Ranking")
+    max_sc = working[0]["Hardcord Score"] or 1
+    disp = pd.DataFrame([{
+        "Rank": f"#{r['Rank']}",
+        "Channel": r["Channel"],
+        "Type": r["Type"],
+        "Handle": f"@{r['handle']}",
+        "Followers": format_number(r["Followers"]),
+        "Total Views": format_number(r["Total Views"]),
+        "Videos": r["Videos"],
+        "Engagement %": f"{r['Engagement %']}%",
+        "Hardcord Score": r["Hardcord Score"],
+    } for r in working])
+    st.dataframe(
+        disp, use_container_width=True, hide_index=True,
+        column_config={"Hardcord Score": st.column_config.ProgressColumn(
+            "Hardcord Score", min_value=0, max_value=max_sc, format="%.4f")},
+    )
+
+    if blocked:
+        st.caption("⚠️ No data for: " +
+                   ", ".join(f"@{r['handle']}" for r in blocked))
+
+    # ── Per-channel top videos ─────────────────────────────────────────────
+    st.markdown("##### 📹 Top Videos per Channel")
+    for r in working:
+        with st.expander(f"{r['Type']} {r['Channel']} — "
+                         f"{format_number(r['Total Views'])} views · "
+                         f"{r['Videos']} videos"):
+            top = sorted(r["videos"], key=lambda v: v["views"], reverse=True)[:6]
+            vcols = st.columns(3)
+            for i, v in enumerate(top):
+                col = vcols[i % 3]
+                thumb = v["thumbnail"] or "https://via.placeholder.com/200x260?text=TikTok"
+                col.markdown(f"""
+                <div style="border-radius:12px;overflow:hidden;background:#fff;
+                    box-shadow:0 4px 16px rgba(0,0,0,0.1);border:1px solid #f0f0f0;
+                    margin-bottom:10px;">
+                    <a href="{v['url']}" target="_blank" style="text-decoration:none;">
+                        <img src="{thumb}" style="width:100%;display:block;aspect-ratio:9/16;
+                            object-fit:cover;" onerror="this.style.display='none'">
+                        <div style="padding:8px 10px;">
+                            <div style="font-size:0.78rem;font-weight:700;color:#111;
+                                line-height:1.3;margin-bottom:4px;
+                                display:-webkit-box;-webkit-line-clamp:2;
+                                -webkit-box-orient:vertical;overflow:hidden;">
+                                {v['title'][:60] or 'TikTok video'}</div>
+                            <div style="display:flex;gap:8px;flex-wrap:wrap;font-size:0.72rem;color:#6b7280;">
+                                <span>👁 <b style="color:#e11d2e;">{format_number(v['views'])}</b></span>
+                                <span>❤️ {format_number(v['likes'])}</span>
+                                <span>💬 {format_number(v['comments'])}</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                """, unsafe_allow_html=True)
+
+
+# ===========================================================================
 # Render tabs
 # ===========================================================================
 
@@ -2672,3 +2808,6 @@ with tab2:
 
 with tab3:
     render_trending_channels()
+
+with tab4:
+    render_tiktok()
