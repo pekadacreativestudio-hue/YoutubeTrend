@@ -9,8 +9,8 @@ Tab 2: Trending Channels (region-wide rankings)
 import os
 import io
 import re
-from collections import defaultdict, Counter
-from datetime import datetime, date, timedelta, timezone
+from collections import defaultdict
+from datetime import datetime, date, timedelta
 from math import log10
 
 import requests
@@ -1067,167 +1067,6 @@ _MUSIC_KW = ["song", "sindu", "සිංදු", "ගීත", " music", "cover s
 _TALK_KW = ["talk", "interview", "chat", "salakuna", "tharu walalla",
             "the hot seat", "live at", "diyatha"]
 
-# ---------------------------------------------------------------------------
-# Audience Signal profiles keyed by program category.
-# Source: Nielsen Sri Lanka 2023, SLRC viewership surveys, YouTube Creator
-# Academy regional benchmarks. All values are estimates; label clearly in UI.
-# ---------------------------------------------------------------------------
-AUDIENCE_SIGNALS = {
-    "🎭 Teledrama": {
-        "gender": {"Female": 72, "Male": 28},
-        "age":    [("13–17", 5), ("18–24", 18), ("25–34", 29), ("35–44", 24),
-                   ("45–54", 15), ("55+", 9)],
-        "regions": [("Western Province", 34), ("Southern Province", 16),
-                    ("Central Province", 12), ("Sabaragamuwa", 10),
-                    ("North Western", 9), ("Other", 19)],
-        "peak_time": "7 PM – 10 PM",
-        "device": {"Mobile": 68, "TV/SmartTV": 24, "Desktop": 8},
-    },
-    "📰 News": {
-        "gender": {"Male": 57, "Female": 43},
-        "age":    [("13–17", 3), ("18–24", 10), ("25–34", 20), ("35–44", 27),
-                   ("45–54", 24), ("55+", 16)],
-        "regions": [("Western Province", 38), ("North Western", 13),
-                    ("Central Province", 11), ("Southern Province", 10),
-                    ("Northern Province", 8), ("Other", 20)],
-        "peak_time": "6 AM – 8 AM, 12 PM, 7 PM – 9 PM",
-        "device": {"Mobile": 54, "TV/SmartTV": 32, "Desktop": 14},
-    },
-    "🎤 Reality/Show": {
-        "gender": {"Female": 64, "Male": 36},
-        "age":    [("13–17", 14), ("18–24", 26), ("25–34", 28), ("35–44", 18),
-                   ("45–54", 10), ("55+", 4)],
-        "regions": [("Western Province", 30), ("Southern Province", 18),
-                    ("Central Province", 14), ("Sabaragamuwa", 11),
-                    ("North Western", 10), ("Other", 17)],
-        "peak_time": "8 PM – 11 PM (weekends)",
-        "device": {"Mobile": 72, "TV/SmartTV": 20, "Desktop": 8},
-    },
-    "🎵 Music": {
-        "gender": {"Female": 58, "Male": 42},
-        "age":    [("13–17", 18), ("18–24", 32), ("25–34", 26), ("35–44", 14),
-                   ("45–54", 7), ("55+", 3)],
-        "regions": [("Western Province", 28), ("Southern Province", 17),
-                    ("Central Province", 13), ("North Western", 11),
-                    ("Sabaragamuwa", 9), ("Other", 22)],
-        "peak_time": "Evenings & weekends",
-        "device": {"Mobile": 80, "TV/SmartTV": 10, "Desktop": 10},
-    },
-    "🗣️ Talk Show": {
-        "gender": {"Male": 54, "Female": 46},
-        "age":    [("13–17", 4), ("18–24", 14), ("25–34", 22), ("35–44", 26),
-                   ("45–54", 22), ("55+", 12)],
-        "regions": [("Western Province", 36), ("Central Province", 13),
-                    ("North Western", 12), ("Southern Province", 11),
-                    ("Eastern Province", 8), ("Other", 20)],
-        "peak_time": "8 PM – 10 PM",
-        "device": {"Mobile": 60, "TV/SmartTV": 28, "Desktop": 12},
-    },
-    "📺 Other": {
-        "gender": {"Male": 50, "Female": 50},
-        "age":    [("13–17", 10), ("18–24", 22), ("25–34", 25), ("35–44", 20),
-                   ("45–54", 15), ("55+", 8)],
-        "regions": [("Western Province", 32), ("Southern Province", 15),
-                    ("Central Province", 13), ("North Western", 11),
-                    ("Sabaragamuwa", 9), ("Other", 20)],
-        "peak_time": "Evenings",
-        "device": {"Mobile": 65, "TV/SmartTV": 22, "Desktop": 13},
-    },
-}
-
-
-def render_audience_signals(category: str, views: int, key_prefix: str = "") -> None:
-    """Render audience signal cards for a program category."""
-    sig = AUDIENCE_SIGNALS.get(category, AUDIENCE_SIGNALS["📺 Other"])
-    female = sig["gender"].get("Female", 50)
-    male = 100 - female
-
-    # Gender bar
-    gender_bar = (
-        f'<div style="display:flex;border-radius:6px;overflow:hidden;height:10px;margin:6px 0 2px;">'
-        f'<div style="width:{female}%;background:#fb7185;"></div>'
-        f'<div style="width:{male}%;background:#60a5fa;"></div>'
-        f'</div>'
-        f'<div style="display:flex;justify-content:space-between;font-size:0.7rem;color:#6b7280;">'
-        f'<span>♀ Female {female}%</span><span>♂ Male {male}%</span></div>'
-    )
-
-    # Age bars (top 3 age groups highlighted)
-    age_groups = sig["age"]
-    max_age_pct = max(p for _, p in age_groups)
-    age_bars = ""
-    for label, pct in age_groups:
-        bar_w = int(pct / max_age_pct * 100)
-        is_top = pct >= sorted([p for _, p in age_groups], reverse=True)[1]
-        color = "#e11d2e" if is_top else "#e6eaef"
-        txt_color = "#0f172a" if is_top else "#9ca3af"
-        age_bars += (
-            f'<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">'
-            f'<div style="width:44px;font-size:0.65rem;color:{txt_color};font-weight:{"700" if is_top else "400"};flex-shrink:0;">{label}</div>'
-            f'<div style="flex:1;background:#f1f5f9;border-radius:3px;height:7px;overflow:hidden;">'
-            f'<div style="width:{bar_w}%;background:{color};height:100%;border-radius:3px;"></div></div>'
-            f'<div style="width:26px;text-align:right;font-size:0.65rem;color:{txt_color};font-weight:{"700" if is_top else "400"};">{pct}%</div>'
-            f'</div>'
-        )
-
-    # Regions (top 3)
-    top_regions = sig["regions"][:3]
-    region_tags = " ".join(
-        f'<span style="background:#fef2f2;color:#b91c2a;border:1px solid #fecdd3;'
-        f'border-radius:20px;padding:2px 9px;font-size:0.65rem;font-weight:700;">{r}</span>'
-        for r, _ in top_regions
-    )
-
-    # Device split
-    dev = sig["device"]
-    device_items = " · ".join(f"<b>{k}</b> {v}%" for k, v in dev.items())
-
-    st.markdown(f"""
-    <div style="background:#fff;border:1px solid #e6eaef;border-radius:14px;
-        padding:14px 16px;margin-top:10px;
-        box-shadow:0 2px 10px rgba(15,23,42,0.06);">
-        <div style="font-size:0.68rem;font-weight:800;text-transform:uppercase;
-            letter-spacing:0.8px;color:#e11d2e;margin-bottom:10px;">
-            📊 Est. Audience Signals
-            <span style="color:#9ca3af;font-weight:400;text-transform:none;
-                letter-spacing:0;margin-left:6px;font-size:0.62rem;">
-                category-based estimates · not official data
-            </span>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
-            <div>
-                <div style="font-size:0.68rem;font-weight:700;color:#374151;margin-bottom:4px;">
-                    👥 GENDER SPLIT
-                </div>
-                {gender_bar}
-            </div>
-            <div>
-                <div style="font-size:0.68rem;font-weight:700;color:#374151;margin-bottom:4px;">
-                    📱 DEVICE
-                </div>
-                <div style="font-size:0.7rem;color:#6b7280;line-height:1.6;">{device_items}</div>
-                <div style="font-size:0.68rem;font-weight:700;color:#374151;margin-top:8px;margin-bottom:2px;">
-                    🕐 PEAK TIME
-                </div>
-                <div style="font-size:0.7rem;color:#6b7280;">{sig["peak_time"]}</div>
-            </div>
-        </div>
-        <div style="margin-top:12px;">
-            <div style="font-size:0.68rem;font-weight:700;color:#374151;margin-bottom:6px;">
-                🎂 AGE GROUPS
-            </div>
-            {age_bars}
-        </div>
-        <div style="margin-top:10px;">
-            <div style="font-size:0.68rem;font-weight:700;color:#374151;margin-bottom:5px;">
-                🗺️ TOP REGIONS (Sri Lanka)
-            </div>
-            <div style="display:flex;flex-wrap:wrap;gap:5px;">{region_tags}</div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-
 def classify_program(name, episodes):
     n = name.lower()
     cats = [e.get("category_id", "") for e in episodes]
@@ -1390,121 +1229,6 @@ def analyze_program(name, prog):
         "trend_change": round(change, 1), "hardcord": hardcord, "episodes": eps,
         "category": prog.get("category", "📺 Other"),
     }
-
-
-# ---------------------------------------------------------------------------
-# Feature: Tags & keywords aggregation (from videos.list snippet.tags)
-# ---------------------------------------------------------------------------
-def aggregate_tags(episodes, top_n=15):
-    """Return most common tags across a program's episodes as (tag, count)."""
-    counts = Counter()
-    for e in episodes:
-        for t in e.get("tags", []):
-            t = t.strip()
-            if t:
-                counts[t.lower()] += 1
-    return counts.most_common(top_n)
-
-
-def render_tags(episodes, key_prefix=""):
-    """Render a program's most common video tags as sized keyword pills."""
-    tags = aggregate_tags(episodes)
-    if not tags:
-        return
-    max_c = tags[0][1]
-    pills = ""
-    for tag, c in tags:
-        weight = c / max_c
-        size = 0.68 + weight * 0.28
-        bg = "#fef2f2" if weight > 0.5 else "#f8fafc"
-        color = "#b91c2a" if weight > 0.5 else "#64748b"
-        border = "#fecdd3" if weight > 0.5 else "#e6eaef"
-        pills += (
-            f'<span style="background:{bg};color:{color};border:1px solid {border};'
-            f'border-radius:20px;padding:3px 11px;font-size:{size:.2f}rem;'
-            f'font-weight:{700 if weight > 0.5 else 500};">'
-            f'{tag}</span>'
-        )
-    st.markdown(f"""
-    <div style="background:#fff;border:1px solid #e6eaef;border-radius:14px;
-        padding:14px 16px;margin-top:10px;box-shadow:0 2px 10px rgba(15,23,42,0.06);">
-        <div style="font-size:0.68rem;font-weight:800;text-transform:uppercase;
-            letter-spacing:0.8px;color:#e11d2e;margin-bottom:10px;">
-            🏷️ Program Tags & Keywords
-            <span style="color:#9ca3af;font-weight:400;text-transform:none;
-                letter-spacing:0;margin-left:6px;font-size:0.62rem;">
-                what this program targets · from video metadata
-            </span>
-        </div>
-        <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;">{pills}</div>
-    </div>
-    """, unsafe_allow_html=True)
-
-
-# ---------------------------------------------------------------------------
-# Feature: Best Time-to-Advertise heatmap
-# Uses each episode's publishedAt (UTC) converted to Sri Lanka time (UTC+5:30).
-# Publish time is a proxy for when the audience is most active for that program.
-# ---------------------------------------------------------------------------
-SL_TZ = timezone(timedelta(hours=5, minutes=30))
-_WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
-
-def build_time_heatmap(episodes):
-    """Return a 7x24 matrix of view-weighted activity (weekday x hour, SL time)."""
-    grid = [[0.0] * 24 for _ in range(7)]
-    for e in episodes:
-        ts = e.get("published_at", "")
-        if not ts:
-            continue
-        try:
-            dt = datetime.fromisoformat(ts.replace("Z", "+00:00")).astimezone(SL_TZ)
-        except ValueError:
-            continue
-        grid[dt.weekday()][dt.hour] += e.get("views", 0)
-    return grid
-
-
-def render_time_heatmap(episodes, key_prefix=""):
-    """Plotly heatmap of best day/hour to advertise (view-weighted upload times)."""
-    grid = build_time_heatmap(episodes)
-    if not any(any(row) for row in grid):
-        return
-    z = grid
-    fig = go.Figure(data=go.Heatmap(
-        z=z,
-        x=[f"{h:02d}:00" for h in range(24)],
-        y=_WEEKDAYS,
-        colorscale=[[0, "#f8fafc"], [0.5, "#fb7185"], [1, "#e11d2e"]],
-        hovertemplate="%{y} %{x}<br>Views: %{z:,.0f}<extra></extra>",
-        showscale=True,
-        colorbar=dict(title="Views", thickness=10),
-    ))
-    fig.update_layout(
-        height=260,
-        margin=dict(l=10, r=10, t=10, b=10),
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)",
-        font=dict(family="Poppins, sans-serif", size=11, color="#374151"),
-        xaxis=dict(showgrid=False, tickfont=dict(size=9)),
-        yaxis=dict(showgrid=False, autorange="reversed"),
-    )
-    st.plotly_chart(fig, use_container_width=True, key=f"heatmap_{key_prefix}")
-
-    # Surface the single best slot as a plain-language recommendation.
-    best_val, best_dh = 0, None
-    for d in range(7):
-        for h in range(24):
-            if grid[d][h] > best_val:
-                best_val, best_dh = grid[d][h], (d, h)
-    if best_dh:
-        d, h = best_dh
-        st.markdown(
-            f'<div style="background:#fef2f2;border:1px solid #fecdd3;border-radius:10px;'
-            f'padding:8px 14px;font-size:0.85rem;color:#b91c2a;font-weight:600;margin-top:-4px;">'
-            f'🎯 Best slot to place your 6-second ad: '
-            f'<b>{_WEEKDAYS[d]} around {h:02d}:00</b> (Sri Lanka time)</div>',
-            unsafe_allow_html=True,
-        )
 
 
 # ---------------------------------------------------------------------------
@@ -2329,9 +2053,6 @@ def render_program_comparison():
     </div>
     """, unsafe_allow_html=True)
 
-    render_audience_signals(best_prog.get("category", "📺 Other"), best_prog["total_views"],
-                            key_prefix="banner")
-
     # ── Priority Ranking Table ─────────────────────────────────────────────
     st.markdown("##### 🏆 Hardcord Priority Ranking")
     max_hc = max((a["hardcord"] for a in analyses), default=1)
@@ -2442,17 +2163,7 @@ def render_program_comparison():
                              "Watch": st.column_config.LinkColumn("▶️", display_text="Watch"),
                          })
 
-            render_audience_signals(a.get("category", "📺 Other"), a["total_views"],
-                                    key_prefix=a["name"])
-
-            st.markdown("**🕐 Best Time to Advertise** (view-weighted upload times, SL time)")
-            render_time_heatmap(a["episodes"], key_prefix=a["name"])
-
-            sig_c1, sig_c2 = st.columns(2)
-            with sig_c1:
-                render_tags(a["episodes"], key_prefix=a["name"])
-            with sig_c2:
-                render_comment_sentiment(a["episodes"], key_prefix=a["name"])
+            render_comment_sentiment(a["episodes"], key_prefix=a["name"])
 
             csv_buf = io.StringIO()
             pd.DataFrame(a["episodes"]).to_csv(csv_buf, index=False)
@@ -2938,17 +2649,7 @@ def render_inter_channel():
                              "Watch": st.column_config.LinkColumn("▶️", display_text="Watch"),
                          })
 
-            render_audience_signals(a.get("category", "📺 Other"), a["total_views"],
-                                    key_prefix=f"inter_{a['name']}")
-
-            st.markdown("**🕐 Best Time to Advertise** (view-weighted upload times, SL time)")
-            render_time_heatmap(a["episodes"], key_prefix=f"inter_{a['name']}")
-
-            sig_c1, sig_c2 = st.columns(2)
-            with sig_c1:
-                render_tags(a["episodes"], key_prefix=f"inter_{a['name']}")
-            with sig_c2:
-                render_comment_sentiment(a["episodes"], key_prefix=f"inter_{a['name']}")
+            render_comment_sentiment(a["episodes"], key_prefix=f"inter_{a['name']}")
 
             csv_buf = io.StringIO()
             pd.DataFrame(a["episodes"]).to_csv(csv_buf, index=False)
