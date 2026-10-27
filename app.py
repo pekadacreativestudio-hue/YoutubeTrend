@@ -9,6 +9,7 @@ Tab 2: Trending Channels (region-wide rankings)
 import os
 import io
 import re
+import difflib
 from collections import defaultdict
 from datetime import datetime, date, timedelta
 from math import log10
@@ -1089,6 +1090,92 @@ def classify_program(name, episodes):
     return "📺 Other"
 
 
+# ---------------------------------------------------------------------------
+# Cross-channel duplicate detection
+# Finds the same drama/program appearing on more than one channel, using a
+# normalized-name fuzzy match (stdlib difflib — no extra dependency).
+# ---------------------------------------------------------------------------
+def _normalize_prog_name(name):
+    """Lowercase, drop episode/number noise and punctuation for matching."""
+    n = name.lower()
+    n = re.sub(r"(?i)\b(episode|ep|part|season|s\d+|finale|grand)\b", " ", n)
+    n = re.sub(r"\d+", " ", n)
+    # keep latin letters + Sinhala block, collapse the rest to spaces
+    n = re.sub(r"[^a-z඀-෿ ]+", " ", n)
+    return re.sub(r"\s+", " ", n).strip()
+
+
+def find_cross_channel_duplicates(programs_by_channel, threshold=0.80, min_len=4):
+    """Group near-identical program names that span 2+ channels.
+
+    programs_by_channel: {channel_name: {prog_name: prog_data}}
+    Returns a list of clusters (most cross-channel first):
+        {"label": str, "channels": [ {channel, program, norm, total_views,
+                                       episode_count, category, top_thumb} ]}
+    """
+    entries = []
+    for ch, progs in programs_by_channel.items():
+        for pname, pdata in progs.items():
+            norm = _normalize_prog_name(pname)
+            if len(norm) < min_len:
+                continue
+            eps = pdata.get("episodes", [])
+            top_thumb = ""
+            if eps:
+                top_thumb = max(eps, key=lambda e: e.get("views", 0)).get("thumbnail", "")
+            entries.append({
+                "channel": ch, "program": pname, "norm": norm,
+                "total_views": pdata.get("total_views", 0),
+                "episode_count": pdata.get("episode_count", len(eps)),
+                "category": pdata.get("category", "📺 Other"),
+                "top_thumb": top_thumb,
+            })
+
+    # Greedy clustering via union-find on fuzzy similarity.
+    parent = list(range(len(entries)))
+
+    def find(i):
+        while parent[i] != i:
+            parent[i] = parent[parent[i]]
+            i = parent[i]
+        return i
+
+    def union(i, j):
+        ri, rj = find(i), find(j)
+        if ri != rj:
+            parent[rj] = ri
+
+    for i in range(len(entries)):
+        for j in range(i + 1, len(entries)):
+            if entries[i]["channel"] == entries[j]["channel"]:
+                continue  # same drama on same channel isn't a cross-channel dup
+            a, b = entries[i]["norm"], entries[j]["norm"]
+            # quick containment shortcut, then ratio
+            if a in b or b in a or difflib.SequenceMatcher(None, a, b).ratio() >= threshold:
+                union(i, j)
+
+    clusters = defaultdict(list)
+    for idx, e in enumerate(entries):
+        clusters[find(idx)].append(e)
+
+    result = []
+    for members in clusters.values():
+        channels_seen = {m["channel"] for m in members}
+        if len(channels_seen) < 2:
+            continue  # only keep genuine cross-channel overlaps
+        # label = longest original program name in the cluster
+        label = max((m["program"] for m in members), key=len)
+        members.sort(key=lambda m: m["total_views"], reverse=True)
+        result.append({
+            "label": label,
+            "channel_count": len(channels_seen),
+            "total_views": sum(m["total_views"] for m in members),
+            "channels": members,
+        })
+    result.sort(key=lambda c: (c["channel_count"], c["total_views"]), reverse=True)
+    return result
+
+
 @st.cache_data(show_spinner=False, ttl=3600)
 def get_curated_channel_stats():
     ids = [cid for cid, _ in SRI_LANKA_LOCAL_CHANNELS.values()]
@@ -1495,7 +1582,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-tab1, tab2, tab3, tab4 = st.tabs(["🎭 Program Comparison", "🔀 Cross-Channel Compare", "📊 Trending Channels", "🎵 TikTok"])
+tab1, tab2, tab3, tab4, tab5 = st.tabs(["🎭 Program Comparison", "🔀 Cross-Channel Compare", "📊 Trending Channels", "🔁 Duplicate Finder", "🎵 TikTok"])
 
 
 # ===========================================================================
@@ -2663,7 +2750,148 @@ def render_inter_channel():
 
 
 # ===========================================================================
-# TAB 4 — TikTok (via yt-dlp, free / no API key)
+# TAB 4 — Duplicate Finder (same drama across channels)
+# ===========================================================================
+@st.cache_data(show_spinner=False, ttl=1800)
+def _scan_channels_for_programs(channel_ids_key, date_from, date_to, max_scan):
+    """Fetch programs for several channels (by name). Cached 30 min.
+
+    channel_ids_key is a tuple of channel names (hashable cache key).
+    Returns {channel_name: {prog_name: prog_data}}.
+    """
+    name_to_id = {n: cid for n, (cid, _) in SRI_LANKA_LOCAL_CHANNELS.items()}
+    out = {}
+    for name in channel_ids_key:
+        cid = name_to_id.get(name)
+        if not cid:
+            continue
+        try:
+            out[name] = get_channel_programs(cid, date_from, date_to, max_scan)
+        except Exception:  # noqa: BLE001 — skip a channel that fails, keep going
+            out[name] = {}
+    return out
+
+
+def render_duplicates():
+    st.markdown("""
+    <div class="section-header">
+        <span class="step-badge">🔁</span>
+        <span class="section-title">Duplicate Finder —
+            <span class="accent">same drama across channels</span></span>
+    </div>
+    """, unsafe_allow_html=True)
+    st.caption("Finds a program/drama that appears on more than one channel "
+               "(e.g. a teledrama on both a main TV channel and its Digital feed). "
+               "Useful to avoid paying twice for the same content — or to spot "
+               "wider cross-channel reach.")
+
+    chan_stats = get_curated_channel_stats()
+    all_names = [c["Channel"] for c in chan_stats]
+    # Default to the TV broadcast channels (where syndication is common).
+    tv_default = [c["Channel"] for c in chan_stats if "TV Channel" in c["Type"]][:12]
+
+    sel = st.multiselect(
+        "Channels to compare", all_names,
+        default=tv_default or all_names[:10],
+        key="dup_channels",
+        placeholder="Pick 2+ channels to scan…",
+    )
+    c1, c2, c3 = st.columns([1, 1, 1])
+    with c1:
+        days_back = st.selectbox("Date range", [30, 60, 90, 180, 365],
+                                 index=2, format_func=lambda d: f"Last {d} days",
+                                 key="dup_days")
+    with c2:
+        max_scan = st.selectbox("Scan depth / channel", [100, 200, 300, 500],
+                                index=1, key="dup_scan")
+    with c3:
+        threshold = st.slider("Match strictness", 0.60, 0.95, 0.80, 0.05,
+                              key="dup_thresh",
+                              help="Higher = stricter name matching")
+
+    if st.button("🔁 Find Duplicates", key="dup_run"):
+        if len(sel) < 2:
+            st.warning("Pick at least 2 channels.")
+            return
+        date_to = date.today().strftime("%Y-%m-%d")
+        date_from = (date.today() - timedelta(days=days_back)).strftime("%Y-%m-%d")
+        with st.spinner(f"Scanning {len(sel)} channels…"):
+            progs = _scan_channels_for_programs(tuple(sorted(sel)),
+                                                date_from, date_to, max_scan)
+            dups = find_cross_channel_duplicates(progs, threshold=threshold)
+        st.session_state.dup_results = dups
+        st.session_state.dup_scanned_n = sum(len(p) for p in progs.values())
+
+    dups = st.session_state.get("dup_results")
+    if dups is None:
+        return
+
+    scanned_n = st.session_state.get("dup_scanned_n", 0)
+    if not dups:
+        st.success(f"✅ Scanned {scanned_n} programs — no cross-channel "
+                   "duplicates found at this strictness. Try lowering it.")
+        return
+
+    st.markdown(f"##### 🔁 Found {len(dups)} program(s) on multiple channels")
+    for d in dups:
+        chans = ", ".join(sorted({m["channel"] for m in d["channels"]}))
+        with st.expander(
+            f"📺 {d['label'][:55]} — on {d['channel_count']} channels · "
+            f"{format_number(d['total_views'])} total views",
+            expanded=False,
+        ):
+            st.markdown(f"**Appears on:** {chans}")
+            rows = pd.DataFrame([{
+                "Channel": m["channel"],
+                "Program (as titled)": m["program"],
+                "Category": m["category"],
+                "Episodes": m["episode_count"],
+                "Total Views": m["total_views"],
+            } for m in d["channels"]])
+            st.dataframe(
+                rows, use_container_width=True, hide_index=True,
+                column_config={
+                    "Total Views": st.column_config.NumberColumn(
+                        "Total Views", format="%d"),
+                },
+            )
+            # thumbnails strip
+            thumbs = [m for m in d["channels"] if m["top_thumb"]][:4]
+            if thumbs:
+                tcols = st.columns(len(thumbs))
+                for col, m in zip(tcols, thumbs):
+                    col.markdown(
+                        f'<div style="border-radius:10px;overflow:hidden;'
+                        f'border:1px solid #e6eaef;">'
+                        f'<img src="{m["top_thumb"]}" style="width:100%;display:block;'
+                        f'aspect-ratio:16/9;object-fit:cover;" '
+                        f'onerror="this.style.display=\'none\'">'
+                        f'<div style="padding:5px 8px;font-size:0.68rem;'
+                        f'font-weight:700;color:#0f172a;">{m["channel"]}</div></div>',
+                        unsafe_allow_html=True,
+                    )
+
+    # Download
+    flat = []
+    for d in dups:
+        for m in d["channels"]:
+            flat.append({
+                "duplicate_group": d["label"],
+                "channel": m["channel"],
+                "program": m["program"],
+                "category": m["category"],
+                "episodes": m["episode_count"],
+                "total_views": m["total_views"],
+            })
+    buf = io.StringIO()
+    pd.DataFrame(flat).to_csv(buf, index=False)
+    st.download_button("⬇️ Download duplicates CSV", buf.getvalue(),
+                       file_name=f"cross_channel_duplicates_{date.today()}.csv",
+                       mime="text/csv", key="dup_dl")
+
+
+# ===========================================================================
+# TAB 5 — TikTok (via yt-dlp, free / no API key)
 # ===========================================================================
 @st.cache_data(show_spinner=False, ttl=1800)
 def _tiktok_scan(handles_key, max_videos):
@@ -2810,4 +3038,7 @@ with tab3:
     render_trending_channels()
 
 with tab4:
+    render_duplicates()
+
+with tab5:
     render_tiktok()
